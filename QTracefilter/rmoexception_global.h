@@ -1,0 +1,13 @@
+#ifndef RMOEXCEPTION_GLOBAL_H
+#define RMOEXCEPTION_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+//#ifdef RMOEXCEPTION_LIBRARY
+//# define RMOEXCEPTION_EXPORT Q_DECL_EXPORT
+//#else
+//# define RMOEXCEPTION_EXPORT Q_DECL_IMPORT
+//#endif
+# define RMOEXCEPTION_EXPORT
+
+#endif // RMOEXCEPTION_GLOBAL_H

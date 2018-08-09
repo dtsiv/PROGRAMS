@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PARAMETERS>
+    <DBEngine>1</DBEngine>
+    <Filter_output>AAAAGAAAAAAAAADPAAAA/w==</Filter_output>
+    <GeneratorAz0>-60</GeneratorAz0>
+    <GeneratorDelay>30</GeneratorDelay>
+    <GeneratorHeight>5</GeneratorHeight>
+    <GeneratorKinkAngle>30</GeneratorKinkAngle>
+    <GeneratorKinkTime>10</GeneratorKinkTime>
+    <GeneratorSigmaM>20</GeneratorSigmaM>
+    <GeneratorTrajCW>1</GeneratorTrajCW>
+    <GeneratorTrajR>200</GeneratorTrajR>
+    <GeneratorTrajType>1</GeneratorTrajType>
+    <GeneratorV0>100</GeneratorV0>
+    <GeneratorX0>-50</GeneratorX0>
+    <GeneratorY0>-150</GeneratorY0>
+    <Imitator_source>AAAAFgAAABgAAAAXAAAAgA==</Imitator_source>
+    <IndGeometry>///7EP///6n////vAAADUA==</IndGeometry>
+    <IndGridStep>50</IndGridStep>
+    <IndViewScale>0.0019</IndViewScale>
+    <IndViewX0>166.6</IndViewX0>
+    <IndViewY0>-2.8</IndViewY0>
+    <KalmanChi2Prob>3</KalmanChi2Prob>
+    <KalmanHeight>5</KalmanHeight>
+    <KalmanMatRelax>2000</KalmanMatRelax>
+    <KalmanMinStrob>100</KalmanMinStrob>
+    <KalmanSigmaM>20</KalmanSigmaM>
+    <KalmanSigmaS>0.1</KalmanSigmaS>
+    <KalmanSpaceStrob>200</KalmanSpaceStrob>
+    <KalmanStrobSpread>200</KalmanStrobSpread>
+    <KalmanTolerance>1e-08</KalmanTolerance>
+    <KalmanUseRelax>true</KalmanUseRelax>
+    <KalmanUseTolerance>1</KalmanUseTolerance>
+    <MainCtrl>C:/PROGRAMS/QTracefilter/02.06.2017-09.00.22.639-mainctrl.cfg</MainCtrl>
+    <PostgresConnectionString>host=127.0.0.1 dbname=rmo user=rmo password=123 client_encoding=WIN1251</PostgresConnectionString>
+    <Primary_points>AAAAAAAAAKoAAAAAAAAA/w==</Primary_points>
+    <PropTab>0</PropTab>
+    <SQLiteFile>C:/PROGRAMS/QTracefilter/poite20170602.db</SQLiteFile>
+    <Source_alarm>AAAA/wAAAAAAAAAAAAAAgA==</Source_alarm>
+    <SymbolSizes>AAAABgAAAAUAAAAKAAAABg==</SymbolSizes>
+    <TickIndex>1</TickIndex>
+    <TimeSlice>10</TimeSlice>
+    <TrajectoryDuration>60</TrajectoryDuration>
+    <UseImitator>true</UseImitator>
+    <geometry>AAADkAAAAcAAAAWhAAAC9g==</geometry>
+</PARAMETERS>
