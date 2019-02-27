@@ -1,5 +1,6 @@
 *.ncb
 *.suo
+*.aps
 GeneratedFiles/
 lib/
 Release/
@@ -9,3 +10,4 @@ Build/
 PostgreSQL_9.4_32bit/
 include/
 *.db
+Makefile

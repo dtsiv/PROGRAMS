@@ -1,0 +1,10 @@
+rm -f Release/chantblviewer
+rm -f Release/qcprmo
+rm -f Release/speeddialog
+make clean
+rm Makefile
+qmake
+make -j 3
+cd ./Release
+ls -al 
+

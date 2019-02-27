@@ -1,0 +1,2528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFIndicatorPropPage</class>
+ <widget class="QWidget" name="QFIndicatorPropPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>550</width>
+    <height>250</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>550</width>
+    <height>250</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>550</width>
+    <height>250</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>F-Indicator</string>
+  </property>
+  <widget class="QLabel" name="labelBkgColor">
+   <property name="geometry">
+    <rect>
+     <x>108</x>
+     <y>10</y>
+     <width>45</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Bkg color</string>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="toolButtonBkgColor">
+   <property name="geometry">
+    <rect>
+     <x>158</x>
+     <y>10</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="tableWidgetFLines">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>24</y>
+     <width>215</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="rowCount">
+    <number>4</number>
+   </property>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>60</number>
+   </attribute>
+   <attribute name="horizontalHeaderStretchLastSection">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
+   </attribute>
+   <attribute name="verticalHeaderDefaultSectionSize">
+    <number>21</number>
+   </attribute>
+   <row/>
+   <row/>
+   <row/>
+   <row/>
+   <column>
+    <property name="text">
+     <string>From Mhz</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>To Mhz</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Amp max dB</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QLabel" name="labelFLines">
+   <property name="geometry">
+    <rect>
+     <x>396</x>
+     <y>4</y>
+     <width>85</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Frequency lines</string>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="toolButtonHorizTextColor">
+   <property name="geometry">
+    <rect>
+     <x>192</x>
+     <y>58</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="toolButtonVertLineColor">
+   <property name="geometry">
+    <rect>
+     <x>158</x>
+     <y>34</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="toolButtonHorizLineColor">
+   <property name="geometry">
+    <rect>
+     <x>158</x>
+     <y>58</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxShowVert">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>34</y>
+     <width>141</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Show vertical grid lines</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxShowHoriz">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>60</y>
+     <width>141</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Show horizontal grid lines</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonFontW">
+   <property name="geometry">
+    <rect>
+     <x>218</x>
+     <y>36</y>
+     <width>87</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Light">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Midlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>212</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Dark">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>85</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Mid">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>113</red>
+         <green>170</green>
+         <blue>170</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Text">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="BrightText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ButtonText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Shadow">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="AlternateBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>212</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>220</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Light">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Midlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>212</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Dark">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>85</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Mid">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>113</red>
+         <green>170</green>
+         <blue>170</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Text">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="BrightText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ButtonText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Shadow">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="AlternateBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>212</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>220</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>85</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Light">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Midlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>212</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Dark">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>85</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Mid">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>113</red>
+         <green>170</green>
+         <blue>170</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Text">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>85</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="BrightText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ButtonText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>85</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Shadow">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="AlternateBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>220</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Font sample</string>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="toolButtonVertTextColor">
+   <property name="geometry">
+    <rect>
+     <x>192</x>
+     <y>34</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelDencityX">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>82</y>
+     <width>73</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>X Web dencity</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBoxDencityY">
+   <property name="geometry">
+    <rect>
+     <x>254</x>
+     <y>78</y>
+     <width>46</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>20</number>
+   </property>
+   <property name="value">
+    <number>15</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBoxDencityX">
+   <property name="geometry">
+    <rect>
+     <x>98</x>
+     <y>78</y>
+     <width>46</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>20</number>
+   </property>
+   <property name="value">
+    <number>15</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelDencityY">
+   <property name="geometry">
+    <rect>
+     <x>176</x>
+     <y>82</y>
+     <width>73</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Y Web dencity</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTTL">
+   <property name="geometry">
+    <rect>
+     <x>192</x>
+     <y>10</y>
+     <width>65</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Point TTL ms</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBoxPointTTL">
+   <property name="geometry">
+    <rect>
+     <x>258</x>
+     <y>6</y>
+     <width>63</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>20</number>
+   </property>
+   <property name="maximum">
+    <number>1800000</number>
+   </property>
+   <property name="singleStep">
+    <number>1000</number>
+   </property>
+   <property name="value">
+    <number>30000</number>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBoxFormular">
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>112</y>
+     <width>213</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Formular</string>
+   </property>
+   <widget class="QPushButton" name="pushButtonFontF">
+    <property name="geometry">
+     <rect>
+      <x>116</x>
+      <y>44</y>
+      <width>89</width>
+      <height>43</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="WindowText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Button">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Light">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Midlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>212</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Dark">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>85</red>
+          <green>127</green>
+          <blue>127</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Mid">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>113</red>
+          <green>170</green>
+          <blue>170</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Text">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="BrightText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ButtonText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Base">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Window">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Shadow">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="AlternateBase">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>212</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ToolTipBase">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>220</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ToolTipText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="WindowText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Button">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Light">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Midlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>212</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Dark">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>85</red>
+          <green>127</green>
+          <blue>127</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Mid">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>113</red>
+          <green>170</green>
+          <blue>170</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Text">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="BrightText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ButtonText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Base">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Window">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Shadow">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="AlternateBase">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>212</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ToolTipBase">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>220</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ToolTipText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="WindowText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>85</red>
+          <green>127</green>
+          <blue>127</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Button">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Light">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Midlight">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>212</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Dark">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>85</red>
+          <green>127</green>
+          <blue>127</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Mid">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>113</red>
+          <green>170</green>
+          <blue>170</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Text">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>85</red>
+          <green>127</green>
+          <blue>127</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="BrightText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ButtonText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>85</red>
+          <green>127</green>
+          <blue>127</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Base">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Window">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Shadow">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="AlternateBase">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>170</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ToolTipBase">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>255</red>
+          <green>255</green>
+          <blue>220</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="ToolTipText">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string>Font sample</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="toolButtonFillColor">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>18</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelFillColor">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>18</y>
+      <width>65</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Fill color</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="toolButtonOutlineColor">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>44</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelOutlineColor">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>44</y>
+      <width>65</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Outline color</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBoxFormular">
+    <property name="geometry">
+     <rect>
+      <x>136</x>
+      <y>16</y>
+      <width>69</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>non</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Trace Id</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dur only</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Full</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="labelFormularType">
+    <property name="geometry">
+     <rect>
+      <x>106</x>
+      <y>18</y>
+      <width>31</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>type</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="toolButtonTextColor">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>72</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelText1Color">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>72</y>
+      <width>65</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Text color</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QToolButton" name="toolButtonPoitColor">
+   <property name="geometry">
+    <rect>
+     <x>142</x>
+     <y>222</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="toolButtonTColor">
+   <property name="geometry">
+    <rect>
+     <x>62</x>
+     <y>222</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxEnableRequests">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>10</y>
+     <width>93</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trace requests</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxShowTraces">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>222</y>
+     <width>53</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trases</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxShowPoit">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>222</y>
+     <width>51</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Points</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBoxShowPeleng">
+   <property name="geometry">
+    <rect>
+     <x>225</x>
+     <y>146</y>
+     <width>319</width>
+     <height>67</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Show pelengs / raw</string>
+   </property>
+   <widget class="QToolButton" name="toolButtonP0Color">
+    <property name="geometry">
+     <rect>
+      <x>136</x>
+      <y>18</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxShowPeleng0">
+    <property name="geometry">
+     <rect>
+      <x>18</x>
+      <y>17</y>
+      <width>61</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string> from ID</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditId0">
+    <property name="geometry">
+     <rect>
+      <x>82</x>
+      <y>15</y>
+      <width>45</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="toolButtonP2Color">
+    <property name="geometry">
+     <rect>
+      <x>136</x>
+      <y>46</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxShowPeleng2">
+    <property name="geometry">
+     <rect>
+      <x>18</x>
+      <y>45</y>
+      <width>61</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string> from ID</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditId2">
+    <property name="geometry">
+     <rect>
+      <x>82</x>
+      <y>43</y>
+      <width>45</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxShowPeleng3">
+    <property name="geometry">
+     <rect>
+      <x>168</x>
+      <y>45</y>
+      <width>61</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string> from ID</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="toolButtonP1Color">
+    <property name="geometry">
+     <rect>
+      <x>286</x>
+      <y>18</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="toolButtonP3Color">
+    <property name="geometry">
+     <rect>
+      <x>286</x>
+      <y>46</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxShowPeleng1">
+    <property name="geometry">
+     <rect>
+      <x>168</x>
+      <y>17</y>
+      <width>61</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string> from ID</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditId1">
+    <property name="geometry">
+     <rect>
+      <x>232</x>
+      <y>15</y>
+      <width>45</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEditId3">
+    <property name="geometry">
+     <rect>
+      <x>232</x>
+      <y>43</y>
+      <width>45</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QRadioButton" name="radioButtonRaw">
+   <property name="geometry">
+    <rect>
+     <x>226</x>
+     <y>222</y>
+     <width>45</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Raw</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButtonPelengs">
+   <property name="geometry">
+    <rect>
+     <x>166</x>
+     <y>222</y>
+     <width>61</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pelengs</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBoxAzFrom">
+   <property name="geometry">
+    <rect>
+     <x>316</x>
+     <y>220</y>
+     <width>55</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <double>360.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>10.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBoxAzTo">
+   <property name="geometry">
+    <rect>
+     <x>386</x>
+     <y>220</y>
+     <width>55</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <double>360.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>10.000000000000000</double>
+   </property>
+   <property name="value">
+    <double>360.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelAzFrom">
+   <property name="geometry">
+    <rect>
+     <x>278</x>
+     <y>223</y>
+     <width>37</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Az deg</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelAzTo">
+   <property name="geometry">
+    <rect>
+     <x>376</x>
+     <y>223</y>
+     <width>10</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>-</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditComPoints">
+   <property name="geometry">
+    <rect>
+     <x>498</x>
+     <y>220</y>
+     <width>45</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelComPoints">
+   <property name="geometry">
+    <rect>
+     <x>456</x>
+     <y>223</y>
+     <width>41</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>C Points</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxTaRequest">
+   <property name="geometry">
+    <rect>
+     <x>242</x>
+     <y>126</y>
+     <width>77</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TA request</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxSowFFT">
+   <property name="geometry">
+    <rect>
+     <x>242</x>
+     <y>104</y>
+     <width>77</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Show FFT</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>toolButtonBkgColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonBkgColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>17</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>138</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonVertLineColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>167</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>177</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonVertTextColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>12</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonHorizLineColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>161</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonHorizTextColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>203</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonFillColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>140</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>78</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonOutlineColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>170</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>114</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonTextColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>98</x>
+     <y>196</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>106</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonTColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>519</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonPoitColor</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>420</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableWidgetFLines</sender>
+   <signal>customContextMenuRequested(QPoint)</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCustomContextMenuRequest(QPoint)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>343</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>316</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableWidgetFLines</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnFLineSelectionChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>344</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>302</x>
+     <y>151</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowVert</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>51</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowHoriz</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>29</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>23</x>
+     <y>66</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBoxDencityX</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnDensValueChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>180</x>
+     <y>94</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBoxDencityY</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnDensValueChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>276</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>275</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBoxPointTTL</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnDensValueChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>17</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>336</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonFontW</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonFontClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>300</x>
+     <y>61</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>318</x>
+     <y>55</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonFontF</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonFontClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>203</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>257</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxFormular</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnFormularTypeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>149</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>241</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonP0Color</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>179</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>370</x>
+     <y>156</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonP2Color</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>375</x>
+     <y>207</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>404</x>
+     <y>152</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonP1Color</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>523</x>
+     <y>179</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>393</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonP3Color</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnButtonItemColorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>523</x>
+     <y>207</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>140</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowPeleng0</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>254</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>188</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowPeleng2</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowPeleng1</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>432</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>548</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowPeleng3</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>441</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>547</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditId0</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnIdEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>232</x>
+     <y>203</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditId2</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnIdEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>332</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>325</x>
+     <y>246</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditId1</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnIdEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>485</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>450</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditId3</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnIdEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>490</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>491</x>
+     <y>244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowTraces</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>289</x>
+     <y>138</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowPoit</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>338</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>427</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButtonRaw</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnRadioButtunClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>517</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>548</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButtonPelengs</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnRadioButtunClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>469</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>548</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEditComPoints</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnIdEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>526</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>552</x>
+     <y>230</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxAzTo</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnAzValueChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>434</x>
+     <y>234</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>227</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBoxAzFrom</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnAzValueChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>345</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>209</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxTaRequest</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>265</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>546</x>
+     <y>15</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxSowFFT</sender>
+   <signal>clicked()</signal>
+   <receiver>QFIndicatorPropPage</receiver>
+   <slot>OnCheckBoxShowChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>280</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>274</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnButtonBkgColorClicked()</slot>
+  <slot>OnButtonItemColorClicked()</slot>
+  <slot>OnCustomContextMenuRequest(QPoint)</slot>
+  <slot>OnFLineSelectionChanged()</slot>
+  <slot>OnCheckBoxShowChanged()</slot>
+  <slot>OnDensValueChanged(int)</slot>
+  <slot>OnButtonFontClicked()</slot>
+  <slot>OnFormularTypeChanged(int)</slot>
+  <slot>OnIdEditingFinished()</slot>
+  <slot>OnRadioButtunClicked()</slot>
+  <slot>OnAzValueChanged(double)</slot>
+ </slots>
+</ui>

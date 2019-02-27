@@ -1,0 +1,8 @@
+Button Button.qml
+ControlPanelDelegate ControlPanelDelegate.qml
+ParamButton ParamButton.qml
+ProgramControl ProgramControl.qml
+ProgramsListModel ProgramsListModel.qml
+ProgramSwitch ProgramSwitch.qml
+SearchBox SearchBox.qml
+TabWidget TabWidget.qml

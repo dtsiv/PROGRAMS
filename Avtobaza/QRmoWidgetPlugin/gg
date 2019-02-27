@@ -1,0 +1,5 @@
+make clean
+rm Makefile
+qmake
+make -j 3
+sudo make install
