@@ -1,0 +1,22 @@
+#!/bin/bash
+if [ ! -f Spear.pro ]; then
+    echo "Main project file missing! Spear.pro"
+    exit 1
+fi
+rm -Rf Makefile */Makefile
+qmake
+if [ ! -d Build ]; then
+    rm -Rf Build
+    mkdir Build
+fi
+rm -Rf Build/*
+cd Build
+mkdir qexceptiondialog  qrmoconnection  qspear  rmoexception  speeddialog
+cd ..
+rm -f Release/qspear
+rm -f Release/speeddialog
+make clean
+make -j 3
+cd ./Release
+ls -al 
+

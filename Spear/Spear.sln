@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QRmoConnection", "QRmoConnectionLib\QRmoConnectionLib.vcproj", "{0AD44142-BC6A-4127-9348-1BBFD1D3D76D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpeedDialog", "SpeedDialog\SpeedDialog.vcproj", "{E9E40C87-07F2-4354-B704-861E0E016B36}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0AD44142-BC6A-4127-9348-1BBFD1D3D76D} = {0AD44142-BC6A-4127-9348-1BBFD1D3D76D}
+		{4117D878-EE77-46E0-A8EC-20D622D8B380} = {4117D878-EE77-46E0-A8EC-20D622D8B380}
+		{E18D0AC3-A09D-4546-A49E-B6E02803FFFE} = {E18D0AC3-A09D-4546-A49E-B6E02803FFFE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RmoException", "RmoExceptionLib\RmoExceptionLib.vcproj", "{4117D878-EE77-46E0-A8EC-20D622D8B380}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QExceptionDialog", "QExceptionDialogLib\QExceptionDialogLib.vcproj", "{E18D0AC3-A09D-4546-A49E-B6E02803FFFE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QSpear", "QSpear\qspear.vcproj", "{56689291-9C21-4921-8906-ABE80A5E1C04}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0AD44142-BC6A-4127-9348-1BBFD1D3D76D} = {0AD44142-BC6A-4127-9348-1BBFD1D3D76D}
+		{4117D878-EE77-46E0-A8EC-20D622D8B380} = {4117D878-EE77-46E0-A8EC-20D622D8B380}
+		{E18D0AC3-A09D-4546-A49E-B6E02803FFFE} = {E18D0AC3-A09D-4546-A49E-B6E02803FFFE}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0AD44142-BC6A-4127-9348-1BBFD1D3D76D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0AD44142-BC6A-4127-9348-1BBFD1D3D76D}.Debug|Win32.Build.0 = Debug|Win32
+		{0AD44142-BC6A-4127-9348-1BBFD1D3D76D}.Release|Win32.ActiveCfg = Release|Win32
+		{0AD44142-BC6A-4127-9348-1BBFD1D3D76D}.Release|Win32.Build.0 = Release|Win32
+		{E9E40C87-07F2-4354-B704-861E0E016B36}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E9E40C87-07F2-4354-B704-861E0E016B36}.Debug|Win32.Build.0 = Debug|Win32
+		{E9E40C87-07F2-4354-B704-861E0E016B36}.Release|Win32.ActiveCfg = Release|Win32
+		{E9E40C87-07F2-4354-B704-861E0E016B36}.Release|Win32.Build.0 = Release|Win32
+		{4117D878-EE77-46E0-A8EC-20D622D8B380}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4117D878-EE77-46E0-A8EC-20D622D8B380}.Debug|Win32.Build.0 = Debug|Win32
+		{4117D878-EE77-46E0-A8EC-20D622D8B380}.Release|Win32.ActiveCfg = Release|Win32
+		{4117D878-EE77-46E0-A8EC-20D622D8B380}.Release|Win32.Build.0 = Release|Win32
+		{E18D0AC3-A09D-4546-A49E-B6E02803FFFE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E18D0AC3-A09D-4546-A49E-B6E02803FFFE}.Debug|Win32.Build.0 = Debug|Win32
+		{E18D0AC3-A09D-4546-A49E-B6E02803FFFE}.Release|Win32.ActiveCfg = Release|Win32
+		{E18D0AC3-A09D-4546-A49E-B6E02803FFFE}.Release|Win32.Build.0 = Release|Win32
+		{56689291-9C21-4921-8906-ABE80A5E1C04}.Debug|Win32.ActiveCfg = Debug|Win32
+		{56689291-9C21-4921-8906-ABE80A5E1C04}.Debug|Win32.Build.0 = Debug|Win32
+		{56689291-9C21-4921-8906-ABE80A5E1C04}.Release|Win32.ActiveCfg = Release|Win32
+		{56689291-9C21-4921-8906-ABE80A5E1C04}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PARAMETERS>
+    <cannonAzimuth>12.1</cannonAzimuth>
+    <cannonElevation>23</cannonElevation>
+    <frequency>9600</frequency>
+    <geometry>AAAAAAAAABcAAAUDAAADig==</geometry>
+    <remoteAntennaAzimuth>0</remoteAntennaAzimuth>
+    <remoteAntennaElevation>23</remoteAntennaElevation>
+    <rotationSpeed>2</rotationSpeed>
+    <serverAddress>127.0.0.1</serverAddress>
+    <serverPort>7776</serverPort>
+</PARAMETERS>

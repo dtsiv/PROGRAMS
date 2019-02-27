@@ -1,0 +1,6 @@
+#!/bin/bash
+QSPEAR_DIR=$(pwd)
+LD_LIBRARY_PATH=$QSPEAR_DIR/lib
+export LD_LIBRARY_PATH
+cd $QSPEAR_DIR/Release
+./qspear

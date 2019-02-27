@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/settings.ico</file>
+        <file>Resources/exit.png</file>
+        <file>Resources/about.png</file>
+        <file>Resources/spear.ico</file>
+        <file>Resources/player_play.png</file>
+        <file>Resources/16x16-yellow.png</file>
+        <file>Resources/16x16-red.png</file>
+        <file>Resources/16x16-green.png</file>
+        <file>Resources/16x16-blue.png</file>
+        <file>Resources/16x16-gray.png</file>
+        <file>Resources/qspear_ru.qm</file>
+        <file>Resources/1downarrow.png</file>
+        <file>Resources/1uparrow.png</file>
+    </qresource>
+</RCC>
