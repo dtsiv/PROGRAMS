@@ -20,6 +20,7 @@ ConnectionThreadWorker::ConnectionThreadWorker(QRmoConnectionPrivate * pRmoConne
     , m_bStop(false)
 	, m_bConnected(false)
     , m_bIsNextBlockHeader(true)
+    , m_pbaPartialBuffer(0)
     , m_iTotalBytesRead(0)
 {
 	// if we are server - then initialize the member pointer
@@ -78,6 +79,7 @@ ConnectionThreadWorker::~ConnectionThreadWorker() {
 	if (m_pTcpSocket) delete m_pTcpSocket;
 	// delete m_pTcpServer as last. OTHERWISE DELETING CHILD AFTER PARENT leads to crash!
     if (m_pTcpServer) delete m_pTcpServer;
+    if (m_pbaPartialBuffer) delete m_pbaPartialBuffer;
     QObject::thread()->quit();
 }
 
@@ -106,8 +108,10 @@ void ConnectionThreadWorker::onStarted() {
 	}
     // start as server
 	if (m_pRmoConnectionPrivate->m_role == QRmoConnection::ServerRole) {
-		if (!m_pTcpServer)
-            throw QRmoConnectionException("fatal (m_pTcpServer=0)");
+        if (!m_pTcpServer) {
+            qDebug() << "fatal (m_pTcpServer=0)";
+            // throw QRmoConnectionException("fatal (m_pTcpServer=0)");
+        }
 		startListen();
 	}
 }
@@ -117,8 +121,10 @@ void ConnectionThreadWorker::onStarted() {
 //-----------------------------------------------------------------------
 void ConnectionThreadWorker::onNewConnection() {
 	// protext from unexpected error
-	if (!m_pTcpServer->hasPendingConnections()) 
-        throw QRmoConnectionException("ConnectionThreadWorker::onNewConnection(). No pending connections.");
+    if (!m_pTcpServer->hasPendingConnections()) {
+        qDebug() << "ConnectionThreadWorker::onNewConnection(). No pending connections.";
+        // throw QRmoConnectionException("ConnectionThreadWorker::onNewConnection(). No pending connections.");
+    }
 	// if the member socket is alive and connected - skip the incoming connection 
 	if (m_pTcpSocket) {
 		// Currently, only one connection is supported for server
@@ -210,7 +216,7 @@ void ConnectionThreadWorker::onCleanup() {
 	m_bStop=true;
     m_iTotalBytesRead=0;
     m_bIsNextBlockHeader=true;
-    m_baPartialBuffer.clear();
+    if (m_pbaPartialBuffer) { delete m_pbaPartialBuffer; m_pbaPartialBuffer=0; }
 	// stop timer of connection attempts
     if (m_pRmoConnectionPrivate->m_role == QRmoConnection::ClientRole) {
 		// stop timer and cancel connection attempts
@@ -350,7 +356,7 @@ void ConnectionThreadWorker::onConnected() {
     // stopping flag for worker threads
     m_iTotalBytesRead=0;
     m_bIsNextBlockHeader=true;
-    m_baPartialBuffer.clear();
+    if (m_pbaPartialBuffer) { delete m_pbaPartialBuffer; m_pbaPartialBuffer=0; }
     // SendThreadWorker::afterConnected() cleanup send queue and enable send
 	m_pSendThreadWorker->afterConnected();
 }
@@ -385,7 +391,7 @@ void ConnectionThreadWorker::onDisconnected() {
     m_bStop=true;
     m_iTotalBytesRead=0;
     m_bIsNextBlockHeader=true;
-    m_baPartialBuffer.clear();
+    if (m_pbaPartialBuffer) { delete m_pbaPartialBuffer; m_pbaPartialBuffer=0; }
     // block send transfer
     m_pSendThreadWorker->raiseError(QAbstractSocket::UnknownSocketError,"QRmoConnection: Not connected.");
     // inform all users about connection loss
@@ -424,7 +430,9 @@ void ConnectionThreadWorker::onReadyRead() {
 void ConnectionThreadWorker::readPayload() {
     qint64 iProtoHeaderSize, bytesRead, bytesAvailable;
     qint64 iBytesToRead;
+    static int iReenter=0;
 
+    iReenter++;
     // prepare for header receive
     iProtoHeaderSize = sizeof(m_receiveHeader.cdata);
     if(!m_pRmoConnectionPrivate->m_bDebugProto) iProtoHeaderSize -= sizeof(unsigned int);
@@ -433,87 +441,139 @@ void ConnectionThreadWorker::readPayload() {
         // read m_receiveHeader structures from socket until nonzero payload
         do {
             bytesAvailable = m_pTcpSocket->bytesAvailable();
-            if (!bytesAvailable) return;
+            if (!bytesAvailable) {    iReenter--; return;}
             if (!m_iTotalBytesRead) {
-                m_baPartialBuffer.resize(iProtoHeaderSize);
+                if (m_pbaPartialBuffer) {
+                    m_bStop=true;
+                    qDebug() << "ConnectionThreadWorker::readPayload(): stale m_pbaPartialBuffer";
+                    m_bStop=true;
+                    return;
+                }
+                m_pbaPartialBuffer=new QByteArray(iProtoHeaderSize,0);
+                if (!m_pbaPartialBuffer) {
+                    qDebug() << "ConnectionThreadWorker::readPayload(): bad alloc";
+                    m_bStop=true;
+                    return;
+                }
+                // qDebug() << "Hdr: m_pbaPartialBuffer->size() = " << m_pbaPartialBuffer->size() << " iProtoHeaderSize=" << iProtoHeaderSize;
             }
             if (m_iTotalBytesRead>=iProtoHeaderSize) {
-                throw QRmoConnectionException(QString("m_receiveHeader: m_iTotalBytesRead(%1)>=iProtoHeaderSize(%2); bytesAvailable=%3")
-                                              .arg(m_iTotalBytesRead).arg(iProtoHeaderSize).arg(bytesAvailable));
+                qDebug() << QString("m_receiveHeader: m_iTotalBytesRead(%1)>=iProtoHeaderSize(%2); bytesAvailable=%3")
+                                              .arg(m_iTotalBytesRead).arg(iProtoHeaderSize).arg(bytesAvailable);
+                m_bStop=true;
+                return;
             }
             // if not enough data then use baPartialBuffer
             iBytesToRead=qMin(bytesAvailable,iProtoHeaderSize-m_iTotalBytesRead);
-            if (m_iTotalBytesRead+iBytesToRead != iProtoHeaderSize) {
-                throw QRmoConnectionException(QString("m_iTotalBytesRead(%1)+iBytesToRead(%2) != iProtoHeaderSize(%3)")
-                                              .arg(m_iTotalBytesRead).arg(iBytesToRead).arg(iProtoHeaderSize));
-            }
-            bytesRead = m_pTcpSocket->read(m_baPartialBuffer.data()+m_iTotalBytesRead, iBytesToRead);
-            if (bytesRead != iBytesToRead) throw QRmoConnectionException("bytesRead != iBytesToRead");
-            m_iTotalBytesRead+=bytesRead;
-            if (m_iTotalBytesRead < iProtoHeaderSize) {
-                throw QRmoConnectionException(QString("return: m_iTotalBytesRead(%1) < iProtoHeaderSize(%2); bytesAvailable=%3")
-                                              .arg(m_iTotalBytesRead).arg(iProtoHeaderSize).arg(bytesAvailable));
-                 // complete header is not available at this time
+            if (!m_pbaPartialBuffer) {
+                qDebug() << "ConnectionThreadWorker::readPayload(): !m_pbaPartialBuffer";
+                m_bStop=true;
                 return;
             }
+            bytesRead = m_pTcpSocket->read(m_pbaPartialBuffer->data()+m_iTotalBytesRead, iBytesToRead);
+            if (bytesRead != iBytesToRead) {
+                qDebug() << "bytesRead != iBytesToRead";
+                m_bStop=true;
+                return;
+            }
+            m_iTotalBytesRead+=bytesRead;
+              // complete header is not available at this time
+            if (m_iTotalBytesRead < iProtoHeaderSize) { iReenter--; return; }
 #ifdef ERROR_CONTROL_LEVEL_DEBUG
             else if (m_iTotalBytesRead != iProtoHeaderSize) {
-                throw QRmoConnectionException(QString("m_iTotalBytesRead (%1) != iProtoHeaderSize (%2)").arg(m_iTotalBytesRead).arg(iProtoHeaderSize));
+                qDebug() << QString("m_iTotalBytesRead (%1) != iProtoHeaderSize (%2)").arg(m_iTotalBytesRead).arg(iProtoHeaderSize);
+                m_bStop=true;
+                return;
             }
 #endif
             // must be m_iTotalBytesRead == iProtoHeaderSize
             else {
                   // the data is enough then read directly to m_receiveHeader
-                memcpy(&m_receiveHeader.cdata[0],m_baPartialBuffer.data(),iProtoHeaderSize);
+                if (!m_pbaPartialBuffer) {
+                    qDebug() << "ConnectionThreadWorker::readPayload(): !m_pbaPartialBuffer";
+                    m_bStop=true;
+                    return;
+                }
+                memcpy(&m_receiveHeader.cdata[0],m_pbaPartialBuffer->data(),iProtoHeaderSize);
                   // header.iSize <= 0 is not an error for ADU
                   // if (m_receiveHeader.iSize <= 0) throw QRmoConnectionException("header.iSize <= 0");
                 // no need to clear it here
                 // baPartialBuffer.clear();
                 m_nNextBlockSize = m_receiveHeader.iSize;
-                //if (m_nNextBlockSize!=4096) {
-                //    throw QRmoConnectionException(QString("m_receiveHeader.iSize = %1; m_receiveHeader.iType = %2; m_iTotalBytesRead=%3; iProtoHeaderSize=%4; bytesRead=%5; iBytesToRead=%6; m_nNextBlockSize=%7; ")
-                //                  .arg(m_receiveHeader.iSize).arg(m_receiveHeader.iType).arg(m_iTotalBytesRead).arg(iProtoHeaderSize).arg(bytesRead).arg(iBytesToRead).arg(m_nNextBlockSize));
-                //}
                 m_iTotalBytesRead=0;
+                delete m_pbaPartialBuffer;
+                m_pbaPartialBuffer=0;
             }
             if (m_iTotalBytesRead>= iProtoHeaderSize) {
-                throw QRmoConnectionException(QString("m_iTotalBytesRead(%1); iBytesToRead(%2); iProtoHeaderSize(%3)")
-                                              .arg(m_iTotalBytesRead).arg(iBytesToRead).arg(iProtoHeaderSize));
+                qDebug() << QString("m_iTotalBytesRead(%1); iBytesToRead(%2); iProtoHeaderSize(%3)")
+                                              .arg(m_iTotalBytesRead).arg(iBytesToRead).arg(iProtoHeaderSize);
             }
-            if (m_nNextBlockSize == 0) throw QRmoConnectionException("do: m_nNextBlockSize == 0");
+            if (m_nNextBlockSize == 0) qDebug() << "do: m_nNextBlockSize == 0";
         } while (m_nNextBlockSize == 0);
         m_bIsNextBlockHeader=false;
-        m_baPartialBuffer.resize(m_nNextBlockSize);
     }
-    if (m_bIsNextBlockHeader == true || m_nNextBlockSize == 0 || m_nNextBlockSize>m_baPartialBuffer.size()) {
-        throw QRmoConnectionException(QString("bIsNextBlockHeader(%1) == true || m_nNextBlockSize(%2) == 0 || m_nNextBlockSize (%3) > baPartialBuffer.size() (%4)")
-                                      .arg(m_bIsNextBlockHeader).arg(m_nNextBlockSize).arg(m_nNextBlockSize).arg(m_baPartialBuffer.size()));
+    if (iReenter>1) {
+        qDebug() << QString("iReenter=%1; bIsNextBlockHeader(%2)false, m_nNextBlockSize(%3)Non0")
+                       .arg(iReenter).arg(m_bIsNextBlockHeader).arg(m_nNextBlockSize);
+        m_bStop=true;
+        return;
     }
 	// Ok, now expecting m_nNextBlockSize = header.iSize
     bytesAvailable = m_pTcpSocket->bytesAvailable();
-    if (!bytesAvailable) return;
+    if (!bytesAvailable) { iReenter--; return; }
     QByteArray payload;
 #pragma GCC diagnostic ignored "-Wsign-compare"
     if (m_iTotalBytesRead || bytesAvailable < m_nNextBlockSize) {
+        if (!m_iTotalBytesRead) {
+            // Here we start reading partial buffer. Prepare ByteArray
+            if (m_pbaPartialBuffer) {
+                qDebug() << "ConnectionThreadWorker::readPayload(): stale m_pbaPartialBuffer";
+                m_bStop=true;
+                return;
+            }
+            m_pbaPartialBuffer=new QByteArray(m_nNextBlockSize,0);
+            if (!m_pbaPartialBuffer) {
+                qDebug() << "ConnectionThreadWorker::readPayload(): bad alloc";
+                m_bStop=true;
+                return;
+            }
+            // qDebug() << "Payld: m_pbaPartialBuffer->size() = " << m_pbaPartialBuffer->size();
+        }
+
+        // m_iTotalBytesRead should be less than payload size
         if (m_iTotalBytesRead >= m_nNextBlockSize) {
-            throw QRmoConnectionException(QString("Payload: m_iTotalBytesRead(%1)>= m_nNextBlockSize(%2);")
-                                          .arg(m_iTotalBytesRead).arg(m_nNextBlockSize));
+            qDebug() << QString("Payload: m_iTotalBytesRead(%1)>= m_nNextBlockSize(%2);")
+                                          .arg(m_iTotalBytesRead).arg(m_nNextBlockSize);
+            m_bStop=true;
             return;
         }
 
         // if not enougn data - then use baPartialBuffer
         iBytesToRead=qMin((qint64)bytesAvailable,(qint64)(m_nNextBlockSize-m_iTotalBytesRead));
-        if (iBytesToRead <=0) throw QRmoConnectionException("iBytesToRead <=0");
-        bytesRead = m_pTcpSocket->read(m_baPartialBuffer.data()+m_iTotalBytesRead, iBytesToRead);
-        if (bytesRead != iBytesToRead) throw QRmoConnectionException("bytesRead != iBytesToRead");
-        m_iTotalBytesRead+=bytesRead;
-        if (m_iTotalBytesRead < m_nNextBlockSize) {
-             // complete header is not available at this time
+        if (iBytesToRead <=0) {
+            qDebug() << "iBytesToRead <=0";
+            m_bStop=true;
             return;
         }
-        payload = QByteArray(m_baPartialBuffer);
-        // baPartialBuffer is implicitly shared, try to avoid copy-on-write
-        // baPartialBuffer.clear();
+        if (!m_pbaPartialBuffer) {
+            qDebug() << "ConnectionThreadWorker::readPayload(): !m_pbaPartialBuffer";
+            m_bStop=true;
+            return;
+        }
+        bytesRead = m_pTcpSocket->read(m_pbaPartialBuffer->data()+m_iTotalBytesRead, iBytesToRead);
+        if (bytesRead != iBytesToRead) {
+            qDebug() << "bytesRead != iBytesToRead";
+            m_bStop=true;
+            return;
+        }
+        m_iTotalBytesRead+=bytesRead;
+          // complete header is not available at this time
+        if (m_iTotalBytesRead < m_nNextBlockSize) { iReenter--; return; }
+        if (!m_pbaPartialBuffer) {
+            qDebug() << "ConnectionThreadWorker::readPayload(): !m_pbaPartialBuffer";
+            m_bStop=true;
+            return;
+        }
     }
     else {
         // It is now possible to read whole payload.
@@ -522,13 +582,13 @@ void ConnectionThreadWorker::readPayload() {
 #ifdef ERROR_CONTROL_LEVEL_DEBUG
         // these error checks are in fact redundant
         if (payload.isEmpty())
-            throw QRmoConnectionException(QString("payload.isEmpty()."
+            qDebug() << QString("payload.isEmpty()."
                 " Error: %1. bytesAvailable: %2. m_nNextBlockSize: %3")
                 .arg(m_pTcpSocket->errorString())
                 .arg(bytesAvailable)
-                .arg(m_nNextBlockSize));
+                .arg(m_nNextBlockSize);
         if (payload.size() != m_nNextBlockSize)
-            throw QRmoConnectionException("payload.size() != m_nNextBlockSize");
+            qDebug() << "payload.size() != m_nNextBlockSize";
 #endif
         // checksum
         if (m_pRmoConnectionPrivate->m_bDebugProto) {
@@ -536,24 +596,36 @@ void ConnectionThreadWorker::readPayload() {
             while (i < m_receiveHeader.iSize) dwCS += payload.at(i++);
             // raise error on checksum mismatch
             if (m_receiveHeader.dwCS != dwCS)
-                throw QRmoConnectionException(QString("checksum/type mismatch."
+                qDebug() << QString("checksum/type mismatch."
                     " CS@header: %1, CS@buffer: %2, TY@header: %3, *(int*)buf: %4")
                     .arg(m_receiveHeader.dwCS)
                     .arg(dwCS)
                     .arg(m_receiveHeader.iType)
-                    .arg(*((int*)payload.data())));
+                    .arg(*((int*)payload.data()));
         }
     }
-    // additional size check
-    if (payload.isEmpty() || payload.size() != m_nNextBlockSize) {
-        throw QRmoConnectionException("payload.isEmpty() || payload.size() != m_nNextBlockSize");
-    }
     // dispatch the received payload
-    emit doRecv(new QByteArray(payload),m_receiveHeader.iType);
+    QByteArray *pbaUserCopy;
+    if (m_pbaPartialBuffer) {
+        pbaUserCopy = m_pbaPartialBuffer;
+        m_pbaPartialBuffer=0;
+    }
+    else {
+        // additional size check
+        if (payload.isEmpty() || payload.size() != m_nNextBlockSize) {
+            qDebug() << "payload.isEmpty() || payload.size() != m_nNextBlockSize";
+            m_bStop=true;
+            return;
+        }
+        pbaUserCopy = new QByteArray(payload);
+    }
+    // it is the user responsibility to delete pbaUserCopy
+    emit doRecv(pbaUserCopy,m_receiveHeader.iType);
     // reset to initial state
     m_bIsNextBlockHeader=true;
     // again start reading from 0 bytes
     m_iTotalBytesRead=0;
+    iReenter--; return;
 #pragma GCC diagnostic pop
 }
 
@@ -627,12 +699,11 @@ void ConnectionThreadWorker::onBytesWritten(qint64 bytes) {
 //-----------------------------------------------------------------------
 void ConnectionThreadWorker::onError(QAbstractSocket::SocketError iErrorCode) {
     // !!! IMPORTANT !!! to be called ONLY from m_pConnectionThread thread
-    // stopping flag for worker threads
     m_iTotalBytesRead=0;
     m_bIsNextBlockHeader=true;
-    m_baPartialBuffer.clear();
-
-	// release all senders 
+    if (m_pbaPartialBuffer) { delete m_pbaPartialBuffer; m_pbaPartialBuffer=0; }
+    // onError can also mean "Connectrion refused". Hence m_bStop - unchanged!!
+    // release all senders
 	m_pSendThreadWorker->raiseError(iErrorCode,m_pTcpSocket->errorString());
 }
 

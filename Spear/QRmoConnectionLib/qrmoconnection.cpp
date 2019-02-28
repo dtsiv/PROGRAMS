@@ -48,21 +48,21 @@ QRmoConnection::~QRmoConnection() {
 	if (d->m_pConnectionThread->isRunning()) {
         if (!d->m_pConnectionThread->wait(QRMO_CONNECTION_WAIT_TIMEOUT_MSEC)) {
             qDebug() << "m_pConnectionThread->isRunning()=" << d->m_pConnectionThread->isRunning();
-            throw QRmoConnectionException("~QRmoConnection() m_pConnectionThread->wait failed");
+            // throw QRmoConnectionException("~QRmoConnection() m_pConnectionThread->wait failed");
         }
     }
     // wait for SendThread to finish
 	if (d->m_pSendThread->isRunning()) {
         if (!d->m_pSendThread->wait(QRMO_CONNECTION_WAIT_TIMEOUT_MSEC)) {
             qDebug() << "m_pSendThread->isRunning()=" << d->m_pSendThread->isRunning();
-            throw QRmoConnectionException("~QRmoConnection() m_pSendThread->wait failed");
+            // throw QRmoConnectionException("~QRmoConnection() m_pSendThread->wait failed");
         }
     }
     // wait for RecvThread to finish
 	if (d->m_pRecvThread->isRunning()) {
         if (!d->m_pRecvThread->wait(QRMO_CONNECTION_WAIT_TIMEOUT_MSEC)) {
             qDebug() << "m_pRecvThread->isRunning()=" << d->m_pRecvThread->isRunning();
-            throw QRmoConnectionException("~QRmoConnection() m_pRecvThread->wait failed");
+            // throw QRmoConnectionException("~QRmoConnection() m_pRecvThread->wait failed");
         }
     }
     // m_pConnectionThreadWorker, m_pSendThreadWorker, m_pRecvThreadWorker objectes will be deleted by deleteLater() slot
@@ -107,7 +107,7 @@ void QRmoConnection::reconnect(QString sHost, int iPort) {
 
 	if (iPort != qBound(1,iPort,65535) || sHost.isEmpty()) {
 		qDebug() << "QRmoConnection::reconnect(). Invalid host/port: " << sHost << ":" << iPort;
-        throw QRmoConnectionException("QRmoConnection::reconnect(). Invalid host/port: ");
+        // throw QRmoConnectionException("QRmoConnection::reconnect(). Invalid host/port: ");
 	}
 	if (d->m_sHost != sHost || d->m_iPort != iPort) {
 		d->m_sHost = sHost;

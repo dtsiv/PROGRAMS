@@ -231,9 +231,16 @@ void SpeedDialog::onRefresh() {
 			nBytesSent+=(*i)->m_iSent_total;
 		}
 	}
+    qreal dMBytesSent=1.0e0*nBytesSent/(1024*1024);
+    if (dMBytesSent<1.0e3) {
+        dMBytesSent=1.0e-3*qRound(1.0e3*dMBytesSent);
+    }
+    else { // over 1000MB
+        dMBytesSent=qRound(dMBytesSent);
+    }
 	ui.lbBytesSent->setText(QString("%1 %3 (%2 %4)")
 		.arg(nBytesSent)
-		.arg(1.0e-3*qRound(1.0e3*nBytesSent/1024.0e0/1024.0e0))
+        .arg(dMBytesSent)
 		.arg(QString::fromLocal8Bit("а"))
 		.arg(QString::fromLocal8Bit("ла")));
 

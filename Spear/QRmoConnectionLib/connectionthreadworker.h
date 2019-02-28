@@ -71,7 +71,7 @@ private:
     ConnNS::ProtocolHeader m_receiveHeader;
     ConnNS::ProtocolHeader m_sendHeader;
     bool m_bIsNextBlockHeader;
-    QByteArray m_baPartialBuffer;
+    QByteArray *m_pbaPartialBuffer;
     qint64 m_iTotalBytesRead;
 };
 
