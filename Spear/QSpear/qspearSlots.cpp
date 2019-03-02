@@ -245,10 +245,6 @@ void QSpear::onStartup() {
 
     // initially disable constrols until connected
     onModelChanged(QSpearModel::flConnected);
-
-    // start video stream
-    if (m_pInstance) m_pMedia = new VlcMedia(m_qsIPCamURL, m_pInstance);
-    if (m_pMedia) m_pPlayer->open(m_pMedia);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

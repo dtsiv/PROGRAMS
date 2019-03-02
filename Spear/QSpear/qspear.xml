@@ -2,11 +2,10 @@
 <PARAMETERS>
     <cannonAzimuth>12.1</cannonAzimuth>
     <cannonElevation>23</cannonElevation>
-    <frequency>9600</frequency>
-    <geometry>AAAAAAAAABcAAAUDAAADig==</geometry>
-    <remoteAntennaAzimuth>0</remoteAntennaAzimuth>
+    <frequency>9500</frequency>
+    <geometry>AAAAZAAAAGQAAAW2AAAD1w==</geometry>
+    <remoteAntennaAzimuth>12.1</remoteAntennaAzimuth>
     <remoteAntennaElevation>23</remoteAntennaElevation>
-    <rotationSpeed>2</rotationSpeed>
-    <serverAddress>127.0.0.1</serverAddress>
-    <serverPort>7776</serverPort>
+    <rotationSpeed>1</rotationSpeed>
+    <videoCameraURL>http://95.215.176.83:8084/mjpg/video.mjpg</videoCameraURL>
 </PARAMETERS>
