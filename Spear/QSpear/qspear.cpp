@@ -51,14 +51,6 @@ QSpear::QSpear(QWidget *parent, Qt::WindowFlags flags)
     m_qlMainControls << m_ppbIrradiation << m_ppbRazvernuti << m_ppbFK  << m_ppbPrepareData
          << m_ppbStrelba << m_ppbObrabotka << m_ppbSvernuti;
     m_qlWin1Controls << m_pgbJustirovka << m_pgbExit << m_pgbCoordinates << m_pgbFrequency;
-    // all controls are disabled until connection
-    for (int i=0; i<m_qlMainControls.size(); i++) {
-        m_qlMainControls.at(i)->setEnabled(false);
-    }
-    for (int i=0; i<m_qlWin1Controls.size(); i++) {
-        m_qlWin1Controls.at(i)->setEnabled(false);
-    }
-
 
 	// TCP connection
 	m_pConnection=new QRmoConnection(m_qsServerAddress,m_iServerPort);
@@ -74,7 +66,6 @@ QSpear::QSpear(QWidget *parent, Qt::WindowFlags flags)
 		m_pConnection,
 		SIGNAL(receive(QByteArray*,int)),
         SLOT(onReceive(QByteArray*,int)));
-
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

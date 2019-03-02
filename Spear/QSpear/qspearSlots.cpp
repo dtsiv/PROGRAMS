@@ -242,6 +242,13 @@ void QSpear::onStartup() {
 	m_pModel->startWork(false);
 	QObject::connect(&this->m_workTimer,SIGNAL(timeout()),SLOT(onWorkTimeout()));
 	m_workTimer.start(1000);
+
+    // initially disable constrols until connected
+    onModelChanged(QSpearModel::flConnected);
+
+    // start video stream
+    if (m_pInstance) m_pMedia = new VlcMedia(m_qsIPCamURL, m_pInstance);
+    if (m_pMedia) m_pPlayer->open(m_pMedia);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
