@@ -1,4 +1,9 @@
 #include "qspear.h"
+#include <vlc-qt/WidgetVideo.h>
+#include <vlc-qt/Common.h>
+#include <vlc-qt/Instance.h>
+#include <vlc-qt/Media.h>
+#include <vlc-qt/MediaPlayer.h>
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -87,20 +92,15 @@ QLayout * QSpear::helperLayoutJustirovka() {
     pglJustirovka->setRowStretch(12,1);
 	pHLayout->addLayout(pglJustirovka);
 
-    m_webView = new QWebView;
-    //m_webView->setSizePolicy(QSizePolicy::Expanding);
+    m_pVideo = new VlcWidgetVideo(ui.centralWidget);
+    m_pVideo->setObjectName(QString::fromUtf8("video"));
+    m_pInstance = new VlcInstance(VlcCommon::args(), this);
+    m_pPlayer = new VlcMediaPlayer(m_pInstance);
+    m_pPlayer->setVideoWidget(m_pVideo);
+    m_pVideo->setMediaPlayer(m_pPlayer);
+    pHLayout->addWidget(m_pVideo);
 
-	//webView->setUrl(QUrl("http://user:passw123@192.168.100.16:80/Streaming/Channels/1/picture"));
-	// webView->setUrl(QUrl("http://cam.sokolniki.com:201/axis-cgi/jpg/image.cgi?fps=4&resolution=800x600"));
-	// m_webView->setUrl(QUrl("http://95.215.176.83:10090/image101.jpg?resolution=730x410&fps="));
-    m_webView->setUrl(QUrl(this->m_qsIPCamURL));
-    QPalette pal = m_webView->page()->palette();
-    QColor col=QApplication::palette().color(QPalette::Window);
-    pal.setColor(QPalette::Base,col);
-    m_webView->page()->setPalette(pal);
-    pHLayout->addWidget(m_webView);
 	pHLayout->setStretch(1,1);
-	// pHLayout->addStretch();
     return(pHLayout);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -394,9 +394,6 @@ void QSpear::arrangeControls() {
     aboutAct->setStatusTip(tr("About"));
 	aboutAct->setText(tr("About"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(onAbout()));
-
-	QObject::connect(&m_timerReload,SIGNAL(timeout()),m_webView,SLOT(reload()));
-	m_timerReload.start(5000);
 
 	ui.mainToolBar->addAction(exitAct);
 	ui.mainToolBar->addAction(aboutAct);

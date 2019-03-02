@@ -22,7 +22,12 @@ QSpear::QSpear(QWidget *parent, Qt::WindowFlags flags)
 		, m_pConnection(NULL)
 		, m_qsServerAddress("127.0.0.1")
 		, m_iServerPort(2001)
-		, m_pModel(NULL) {
+		, m_pModel(NULL) 
+		, m_pVideo(NULL)
+		, m_pInstance(NULL)
+		, m_pMedia(NULL)
+		, m_pPlayer(NULL)
+{
     // basi UI setup
 	ui.setupUi(this);
     setWindowIcon(QIcon(QPixmap(":/Resources/spear.ico")));
@@ -81,6 +86,10 @@ QSpear::~QSpear() {
         if (bWait) delete (m_pConnection);
 	}
     // QProcess::execute("shutdown",QStringList("/i"));
+    // if (m_pInstance) delete m_pInstance;
+    // if (m_pMedia) delete m_pMedia;
+    // if (m_pPlayer) delete m_pPlayer;
+    // if (m_pVideo) delete m_pVideo;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

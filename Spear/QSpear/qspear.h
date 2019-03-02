@@ -6,8 +6,7 @@
 #include <QtWidgets>
 #endif
 #include <QMainWindow>
-#include <QtWebKit>
-#include <QWebView>
+
 #include "ui_qspear.h"
 #include "rmoexception.h"
 #include "qexceptiondialog.h"
@@ -18,6 +17,10 @@
 #define QSPEAR_VER_MAJOR                  2
 #define QSPEAR_VER_MINOR                  3
 
+class VlcWidgetVideo;
+class VlcInstance;
+class VlcMedia;
+class VlcMediaPlayer;
 
 class QRmoLineEdit;
 class QRmoValidator;
@@ -149,7 +152,6 @@ private:
 	QTranslator    *m_pappTranslator;
 	QRmoConnection *m_pConnection;
 
-    QWebView       *m_webView;
     QList<QWidget*> m_qlMainControls,m_qlWin1Controls;
 
     // parameters values
@@ -162,7 +164,10 @@ private:
 	QTimer         m_workTimer;
     QString        m_qsErrorMessage;
 
-   	QTimer         m_timerReload;
+    VlcWidgetVideo *m_pVideo;
+    VlcInstance *m_pInstance;
+    VlcMedia *m_pMedia;
+    VlcMediaPlayer *m_pPlayer;
 
     friend class QSpearModel;
     friend class UserControlInputFilter;

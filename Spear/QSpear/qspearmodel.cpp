@@ -75,6 +75,7 @@ QSpearModel::~QSpearModel() {
         m_pSettings->setValue(SETTINGS_KEY_CANNON_AZIM, m_cgIni.AzCannon);
         m_pSettings->setValue(SETTINGS_KEY_CANNON_ELEV, m_cgIni.ElCannon);
         m_pSettings->setValue(SETTINGS_KEY_ROT_SPEED, m_cgRotate.Speed);
+        m_pSettings->setValue(SETTINGS_KEY_IPCAM_URL, m_pOwner->m_qsIPCamURL);
 	    m_pSettings->endGroup();
         delete m_pSettings;
     }
