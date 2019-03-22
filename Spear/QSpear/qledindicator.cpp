@@ -1,4 +1,6 @@
 #include "qledindicator.h"
+
+#  define Q_DECL_IMPORT
 #include "rmoexception.h"
 #include <QPainter>
 #include <QTimer>

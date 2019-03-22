@@ -1,8 +1,12 @@
 #include <QApplication>
+#include <QtCore/qglobal.h>
+#  define Q_DECL_IMPORT
 
 #include "speeddialog.h"
 #include "qrmoconnection.h"
 #include "qexceptiondialog.h"
+
+#include <Windows.h>
 
 class MyApplication : public QApplication {
 public:
@@ -22,13 +26,7 @@ public:
 };
 
 int main(int argc, char *argv[]) {
-    QStringList paths = QCoreApplication::libraryPaths();
-    paths.append(".");
-    paths.append("imageformats");
-    paths.append("platforms");
-    paths.append("sqldrivers");
-    QCoreApplication::setLibraryPaths(paths);
-
+    SetErrorMode(SEM_FAILCRITICALERRORS);
     MyApplication a(argc, argv);
     SpeedDialog w;
     w.show();

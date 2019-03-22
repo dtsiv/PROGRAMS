@@ -5,6 +5,7 @@ TEMPLATE = lib
 DEFINES = RMOEXCEPTION_LIBRARY
 
 # CONFIG += debug
+CONFIG += staticlib
 
 GeneratedFiles = ../Build/$$TARGET
 !system([ -d "$$GeneratedFiles" ]):system(mkdir $$GeneratedFiles)

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
-    <cannonAzimuth>12.1</cannonAzimuth>
+    <cannonAzimuth>12.1000004</cannonAzimuth>
     <cannonElevation>23</cannonElevation>
-    <frequency>9500</frequency>
-    <geometry>AAAAZAAAAGQAAAW2AAAD1w==</geometry>
-    <remoteAntennaAzimuth>12.1</remoteAntennaAzimuth>
+    <frequency>9600</frequency>
+    <geometry>AAAAFAAAABYAAAZTAAADmQ==</geometry>
+    <remoteAntennaAzimuth>0</remoteAntennaAzimuth>
     <remoteAntennaElevation>23</remoteAntennaElevation>
-    <rotationSpeed>1</rotationSpeed>
-    <videoCameraURL>http://95.215.176.83:8084/mjpg/video.mjpg</videoCameraURL>
+    <rotationSpeed>3</rotationSpeed>
+    <serverAddress>127.0.0.1</serverAddress>
+    <serverPort>7776</serverPort>
+    <videoCameraURL>rtsp://user:pass1234@192.168.100.16:554/Streaming/Channels/101</videoCameraURL>
+    <videoCameraURL1>rtsp://user1:12345678@46.0.207.39:570</videoCameraURL1>
 </PARAMETERS>

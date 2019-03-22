@@ -1,9 +1,11 @@
 #include "qspear.h"
-#include <vlc-qt/WidgetVideo.h>
-#include <vlc-qt/Common.h>
-#include <vlc-qt/Instance.h>
-#include <vlc-qt/Media.h>
-#include <vlc-qt/MediaPlayer.h>
+
+#  define Q_DECL_IMPORT
+#include <VLCQtWidgets/WidgetVideo.h>
+#include <VLCQtCore/Common.h>
+#include <VLCQtCore/Instance.h>
+#include <VLCQtCore/Media.h>
+#include <VLCQtCore/MediaPlayer.h>
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -401,8 +403,16 @@ void QSpear::arrangeControls() {
 	ui.mainToolBar->setMovable(false);
 	ui.mainToolBar->setAllowedAreas(Qt::TopToolBarArea);
 
-	m_pqlStatusMsg=new QLabel(tr("Connecting..."));
-	statusBar()->addPermanentWidget(m_pqlStatusMsg);
+        //the blank widget. You can set your width with 'setFixedWidth(int)'
+        m_pqlStatusMsg=new QLabel(tr("Connecting..."));
+        statusBar()->addPermanentWidget(m_pqlStatusMsg);
+        QWidget *pSeparator = new QWidget;
+        pSeparator->setFixedWidth(50);
+        pSeparator->setHidden(1);
+        pSeparator->setVisible(1);
+        statusBar()->addPermanentWidget(pSeparator);
+        m_pqlWorkTimeTotal=new QLabel(tr("00:00"));
+        statusBar()->addPermanentWidget(m_pqlWorkTimeTotal);
 
 	// catch user input enter event
 	QCoreApplication *pCoreApp = QCoreApplication::instance();

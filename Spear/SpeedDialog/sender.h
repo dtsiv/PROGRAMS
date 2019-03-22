@@ -12,6 +12,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+#  define Q_DECL_IMPORT
 #include "qrmoconnection.h"
 
 class Sender : public QObject

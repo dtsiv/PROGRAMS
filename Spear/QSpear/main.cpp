@@ -5,6 +5,8 @@
 #endif
 #include <QStyleFactory>
 
+#include <Windows.h>
+
 class MyApplication : public QApplication {
 public:
   MyApplication(int& argc, char ** argv) :
@@ -23,6 +25,7 @@ public:
 };
 
 int main(int argc, char *argv[]) {
+    SetErrorMode(SEM_FAILCRITICALERRORS) ;
 
     QStringList paths = QCoreApplication::libraryPaths();
     paths.append(".");

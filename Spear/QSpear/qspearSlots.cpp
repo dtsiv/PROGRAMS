@@ -1,8 +1,9 @@
 //================= slots =================
-#include <vlc-qt/Common.h>
-#include <vlc-qt/Instance.h>
-#include <vlc-qt/Media.h>
-#include <vlc-qt/MediaPlayer.h>
+#  define Q_DECL_IMPORT
+#include <VLCQtCore/Common.h>
+#include <VLCQtCore/Instance.h>
+#include <VLCQtCore/Media.h>
+#include <VLCQtCore/MediaPlayer.h>
 
 #include "qspear.h"
 #include "codogramsa.h"
@@ -259,7 +260,9 @@ void QSpear::onStartup() {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QSpear::onWorkTimeout() {
-	m_pqlWorkTime->setText(m_pModel->workTime());
+    bool bTotal;
+    m_pqlWorkTime->setText(m_pModel->workTime(bTotal=false));
+    m_pqlWorkTimeTotal->setText(m_pModel->workTime(bTotal=true));
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

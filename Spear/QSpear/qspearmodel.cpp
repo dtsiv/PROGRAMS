@@ -1,5 +1,7 @@
 #include "qspearmodel.h"
 #include "qspear.h"
+
+#  define Q_DECL_IMPORT
 #include "rmoexception.h"
 #include "codogramsa.h"
 
@@ -20,8 +22,9 @@ QSpearModel::QSpearModel(QSpear *pOwner, QObject *parent/* =0 */)
 		: QObject(parent)
 	    , m_pSettings(NULL)
         , m_pOwner(pOwner)
-	    , m_dtWorkStart(QDateTime()) 
-        , m_bConnected(false) 
+        , m_dtWorkStart(QDateTime())
+        , m_uWorkSecsTotal(0)
+        , m_bConnected(false)
         , m_bInitError(false)
         , m_dASysLat(55.0)
         , m_dASysLon(37.0)
@@ -230,19 +233,26 @@ void QSpearModel::onStaleStatus() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-QString QSpearModel::workTime() {
-	if (!m_dtWorkStart.isValid()) return "0:00";
-	QDateTime dtCurrent = QDateTime::currentDateTime();
-	int iDays = m_dtWorkStart.daysTo(dtCurrent);
-	int iSecs = m_dtWorkStart.secsTo(dtCurrent.addDays(-iDays));
-	if (iDays < 0 || iSecs < 0 || iSecs > 24*3600) {
-		throw RmoException(QString("Model: bad date %1").arg(m_dtWorkStart.toString("hh:mm dd.MM.yyyy")));
-		return "Error";
-	}
-	QTime qtDisplayTime(0,0);
-	QString qsTime = qtDisplayTime.addSecs(iSecs).toString("m:ss");
-	int iHours=iDays*24+iSecs/3600;
-	return iHours?(QString("%1:%2").arg(iHours).arg(qsTime)):qsTime;
+QString QSpearModel::workTime(bool bTotal /*=false*/) {
+    // total number of seconds
+    int iSecs=0;
+    int iSecsPerHour=3600;
+    // total work time requested
+    if (bTotal) iSecs=m_uWorkSecsTotal;
+    // work is on now
+    if (m_dtWorkStart.isValid()) {
+        QDateTime dtCurrent = QDateTime::currentDateTime();
+        iSecs += m_dtWorkStart.secsTo(dtCurrent);
+    }
+    // number of whole hours since new day
+    int iHours=iSecs/iSecsPerHour;
+    // seconds since new hour
+    int iSecsSinceNewHour=iSecs%iSecsPerHour;
+    // Format iSecsSinceNewDay as time string minues:seconds
+    QTime qtDisplayTime(0,0);
+    QString qsTime = qtDisplayTime.addSecs(iSecsSinceNewHour).toString("mm:ss");
+    // append hours, if any
+    return iHours?(QString("%1:%2").arg(iHours).arg(qsTime)):qsTime;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -521,8 +531,12 @@ bool QSpearModel::setCoordinates(QStringList qslCoord) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QSpearModel::startWork(bool bStart /*=true*/) {
-    if (bStart) 
-        m_dtWorkStart=QDateTime::currentDateTime();
-    else        
+    QDateTime dtCurrent = QDateTime::currentDateTime();
+    if (bStart) {
+        m_dtWorkStart=dtCurrent;
+    }
+    else {
+        m_uWorkSecsTotal+=m_dtWorkStart.secsTo(dtCurrent);
         m_dtWorkStart=QDateTime();
+    }
 }

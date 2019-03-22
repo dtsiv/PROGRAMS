@@ -15,13 +15,15 @@ DESTDIR = ../Release
 
 QT += network xml widgets
 
-QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter \
-                  -Wformat=0 -Wno-unused-variable -Wno-switch \
-                  -Wno-unused-but-set-variable 
+#QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter \
+#                  -Wformat=0 -Wno-unused-variable -Wno-switch \
+#                  -Wno-unused-but-set-variable
 
 INCLUDEPATH += /usr/include
 INCLUDEPATH += ../qrmoconnectionlib
 INCLUDEPATH += ../qexceptiondialoglib
+
+INCLUDEPATH += %ProgramFiles(x86)%/Microsoft SDKs/Windows/7.1A/Include
 
 SOURCES = main.cpp \
           receiver.cpp \

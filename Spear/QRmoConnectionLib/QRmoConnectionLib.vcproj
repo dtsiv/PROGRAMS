@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="QRmoConnection"
 	ProjectGUID="{0AD44142-BC6A-4127-9348-1BBFD1D3D76D}"
 	RootNamespace="QRmoConnection"
@@ -465,7 +465,7 @@
 		/>
 		<Global
 			Name="QtVersion Win32"
-			Value="4.7.2"
+			Value="4.8.4"
 		/>
 		<Global
 			Name="RccDir"

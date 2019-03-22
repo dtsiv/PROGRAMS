@@ -84,7 +84,7 @@ public:
 	// setters-getters
 	QByteArray*         getCodogramByType(int iType);
 	bool                recvCodogram(int iType, QByteArray *pba);
-	QString             workTime();
+        QString             workTime(bool bTotal=false);
     bool                isConnected();
     bool                bInitError() { return m_bInitError; }
     void                setConnected(bool);
@@ -131,6 +131,7 @@ private:
     CG_INI         m_cgIni;        //0x2004
 
 	QDateTime      m_dtWorkStart;
+    quint64  m_uWorkSecsTotal;
 
 	bool           m_bConnected;
     bool           m_bInitError;

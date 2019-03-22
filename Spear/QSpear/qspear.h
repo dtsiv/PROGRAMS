@@ -7,6 +7,7 @@
 #endif
 #include <QMainWindow>
 
+#  define Q_DECL_IMPORT
 #include "ui_qspear.h"
 #include "rmoexception.h"
 #include "qexceptiondialog.h"
@@ -103,7 +104,8 @@ private:
 	QRmoLineEdit  *m_pleAntH;
 
 	QLabel        *m_pqlWorkTime;
-	QLabel        *m_pqlStatusMsg;
+        QLabel        *m_pqlWorkTimeTotal;
+        QLabel        *m_pqlStatusMsg;
     QLabel        *m_pqlASAzim;
     QLabel        *m_pqlASElev;
     QLabel        *m_pqlIrradiation;

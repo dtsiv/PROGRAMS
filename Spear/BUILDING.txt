@@ -1,0 +1,32 @@
+1. IP camera window uses VLC library version 3.0.6 with corrections for
+   Windows MSVC compiler (see vlc-sdk.zip)
+2. Qt version used: 5.6.3 compiled with keys:
+     configure.bat -verbose ^
+          -I C:\PROGRAMS\PgSQL-9.4.21-win32\include ^
+		  -L C:\PROGRAMS\PgSQL-9.4.21-win32\lib ^
+		  -I C:\PROGRAMS\sqlite ^
+		  -I "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include" ^
+		  -L "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib" ^
+		  -static -static-runtime ^
+		  -opensource -confirm-license -mp -release -qmake ^
+		  -prefix C:\Qt5\5.6.3 -target xp ^
+		  -opengl dynamic -no-angle ^
+		  -platform win32-msvc2017 -accessibility ^
+		  -qt-sql-psql -qt-sql-sqlite ^
+		  -no-directwrite -no-icu -no-nis -no-cups -no-evdev -no-ssl -no-openssl -no-native-gestures -no-dbus -skip qtconnectivity
+	(see file configure-qt.txt for details)
+	
+3. Compiler used: MSVC 2017 (Community edition) & Microsoft SDKs Windows v7.1A
+4. Also used: CMake, Python 2.7, Perl 6.4
+5. VLC-Qt library version 1.1.1 was compiled with keys:
+	cmake .. -DCMAKE_INSTALL_PREFIX=C:\PROGRAMS\libvlc-qt_1.1.1_handmade_Dima ^
+				-Wno-dev -G "Visual Studio 15 2017" -A Win32 ^
+				-DSTATIC=ON ^
+				-DLIBVLC_VERSION=0x030006 ^
+				-DCMAKE_BUILD_TYPE=Release ^
+				-DLIBVLC_LIBRARY="C:\PROGRAMS\vlc-3.0.6\sdk\lib\libvlc.lib" ^
+				-DLIBVLCCORE_LIBRARY="C:\PROGRAMS\vlc-3.0.6\sdk\lib\libvlccore.lib" ^
+				-DLIBVLC_INCLUDE_DIR="C:\PROGRAMS\vlc-3.0.6\sdk\include"
+
+Note: it should be possible to use VLC under Windows XP, BUT it did not work
+with this VLC-Qt library compilation (TBD maybe...)

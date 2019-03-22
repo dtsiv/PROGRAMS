@@ -1,0 +1,434 @@
+
+================================== Qt configuration script ========================================
+
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
+SET _ROOT=C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3
+SET PATH=%_ROOT%\qtbase\bin;%_ROOT%\gnuwin32\bin;C:\Qt5\jom;C:\Python27;C:\Perl64\bin;%PATH%
+SET PATH=%PATH%;C:\Qt5\5.6.3\bin;C:\Qt5\5.6.3\plugins
+REM Uncomment the below line when using a git checkout of the source repository
+REM SET PATH=%_ROOT%\qtrepotools\bin;%PATH%
+SET QMAKESPEC=win32-msvc2017
+SET _ROOT=
+chcp 866
+REM for XP
+set INCLUDE=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Include;%INCLUDE%
+set LIB=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Lib;%LIB%
+set PATH=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Bin;%PATH%
+set CL=/D_USING_V140_SDK71_;%CL%
+REM Applications targeting the x86 version of Windows XP must specify subsystem version 5.01
+REM This is done inside (<qt-source-5.6.3>\qtbase\mkspecs\win32-msvc2017\qmake.conf) :  set LINK=/SUBSYSTEM:CONSOLE,5.01 %LINK%
+REM  -nomake examples -nomake tests
+call C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\configure.bat -verbose ^
+          -I C:\PROGRAMS\PgSQL-9.4.21-win32\include ^
+		  -L C:\PROGRAMS\PgSQL-9.4.21-win32\lib ^
+		  -I C:\PROGRAMS\sqlite ^
+		  -I "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include" ^
+		  -L "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib" ^
+		  -static -static-runtime ^
+		  -opensource -confirm-license -mp -release -qmake ^
+		  -prefix C:\Qt5\5.6.3 -target xp ^
+		  -opengl dynamic -no-angle ^
+		  -platform win32-msvc2017 -accessibility ^
+		  -qt-sql-psql -qt-sql-sqlite ^
+		  -no-directwrite -no-icu -no-nis -no-cups -no-evdev -no-ssl -no-openssl -no-native-gestures -no-dbus -skip qtconnectivity
+
+
+================================== end of Qt configuration script ========================================
+
+
+Output of configure:
+====================
+C:\PROGRAMS\qt-5.6.3-build>call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" 
+**********************************************************************
+** Visual Studio 2017 Developer Command Prompt v15.9.7
+** Copyright (c) 2017 Microsoft Corporation
+**********************************************************************
+Active code page: 866
++ cd qtbase
++ C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\configure.bat -top-level -verbose           -I C:\PROGRAMS\PgSQL-9.4.21-win32\include 		  -L C:\PROGRAMS\PgSQL-9.4.21-win32\lib 		  -I C:\PROGRAMS\sqlite 		  -I "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include" 		  -L "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib" 		  -static -static-runtime 		  -opensource -confirm-license -mp -release -qmake 		  -prefix C:\Qt5\5.6.3 -target xp 		  -opengl dynamic -no-angle 		  -platform win32-msvc2017 -accessibility 		  -qt-sql-psql -qt-sql-sqlite 		  -no-directwrite -no-icu -no-nis -no-cups -no-evdev -no-ssl -no-openssl -no-native-gestures -no-dbus -skip qtconnectivity
+
+This is the Qt for Windows Open Source Edition.
+
+You have already accepted the terms of the license.
+
+Creating qmake...
+	cl -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS -c -Yc -Fpqmake_pch.pch -TP C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\qmake_pch.h
+qmake_pch.h
+	cl -c -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qstring_compat.cpp
+qstring_compat.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\project.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\main.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\option.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\property.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\meta.cpp 
+project.cpp
+main.cpp
+option.cpp
+property.cpp
+meta.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library\ioutils.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library\proitems.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library\qmakevfs.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library\qmakeglobals.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library\qmakeparser.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library\qmakeevaluator.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library\qmakebuiltins.cpp 
+ioutils.cpp
+proitems.cpp
+qmakevfs.cpp
+qmakeglobals.cpp
+qmakeparser.cpp
+qmakeevaluator.cpp
+qmakebuiltins.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\makefile.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\projectgenerator.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\makefiledeps.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\metamakefile.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\xmloutput.cpp 
+makefile.cpp
+projectgenerator.cpp
+makefiledeps.cpp
+metamakefile.cpp
+xmloutput.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix\unixmake.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix\unixmake2.cpp 
+unixmake2.cpp
+unixmake.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\mingw_make.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\winmakefile.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\msvc_nmake.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\msvc_vcproj.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\msvc_vcxproj.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\msvc_objectmodel.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\msbuild_objectmodel.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32\cesdkhandler.cpp 
+mingw_make.cpp
+winmakefile.cpp
+msvc_nmake.cpp
+msvc_vcproj.cpp
+msvc_vcxproj.cpp
+msvc_objectmodel.cpp
+msbuild_objectmodel.cpp
+cesdkhandler.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared\windows\registry.cpp 
+registry.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qbitarray.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qcryptographichash.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qarraydata.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qbytearray.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qvsnprintf.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qbytearraymatcher.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qdatetime.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qhash.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qringbuffer.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qlist.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qlinkedlist.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qlocale.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qlocale_tools.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qlocale_win.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qmap.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qregexp.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qstring.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qstringlist.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qstringbuilder.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\tools\qvector.cpp 
+qbitarray.cpp
+qcryptographichash.cpp
+qarraydata.cpp
+qbytearray.cpp
+qvsnprintf.cpp
+qbytearraymatcher.cpp
+qdatetime.cpp
+qhash.cpp
+qringbuffer.cpp
+qlist.cpp
+qlinkedlist.cpp
+qlocale.cpp
+qlocale_tools.cpp
+qlocale_win.cpp
+qmap.cpp
+qregexp.cpp
+qstring.cpp
+qstringlist.cpp
+qstringbuilder.cpp
+qvector.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qbuffer.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfilesystementry.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfilesystemengine.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfilesystemengine_win.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfilesystemiterator_win.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfsfileengine.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfsfileengine_iterator.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qdir.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qdiriterator.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfiledevice.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfile.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qtemporaryfile.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qabstractfileengine.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfsfileengine_win.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qfileinfo.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qiodevice.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qdebug.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qtextstream.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qdatastream.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qsettings.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\io\qsettings_win.cpp 
+qbuffer.cpp
+qfilesystementry.cpp
+qfilesystemengine.cpp
+qfilesystemengine_win.cpp
+qfilesystemiterator_win.cpp
+qfsfileengine.cpp
+qfsfileengine_iterator.cpp
+qdir.cpp
+qdiriterator.cpp
+qfiledevice.cpp
+qfile.cpp
+qtemporaryfile.cpp
+qabstractfileengine.cpp
+qfsfileengine_win.cpp
+qfileinfo.cpp
+qiodevice.cpp
+qdebug.cpp
+qtextstream.cpp
+qdatastream.cpp
+qsettings.cpp
+qsettings_win.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\plugin\qsystemlibrary.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\plugin\quuid.cpp 
+qsystemlibrary.cpp
+quuid.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\global\qglobal.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\global\qmalloc.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\global\qlibraryinfo.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\global\qnumeric.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\global\qlogging.cpp 
+qglobal.cpp
+qmalloc.cpp
+qlibraryinfo.cpp
+qnumeric.cpp
+qlogging.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\codecs\qtextcodec.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\codecs\qutfcodec.cpp 
+qtextcodec.cpp
+qutfcodec.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\kernel\qsystemerror.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\kernel\qvariant.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\kernel\qmetatype.cpp 
+qsystemerror.cpp
+qvariant.cpp
+qmetatype.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\xml\qxmlstream.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\xml\qxmlutils.cpp 
+qxmlstream.cpp
+qxmlutils.cpp
+	cl -Yuqmake_pch.h -FIqmake_pch.h -Fpqmake_pch.pch -c -Fo./ -Fdqmake.pdb  -W3 -nologo -O1  /MP /D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /Zc:strictStrings /w44456 /w44457 /w44458 /wd4577   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\library -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\unix -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\win32 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\mac -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\qmake\generators\integrity  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3 -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\include\QtCore\5.6.3\QtCore  -I..\src\corelib\global -DHAVE_QCONFIG_CPP  -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\mkspecs\win32-msvc2017   -IC:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\tools\shared  -DQT_VERSION_STR=\"5.6.3\" -DQT_VERSION_MAJOR=5 -DQT_VERSION_MINOR=6 -DQT_VERSION_PATCH=3  -DQT_BUILD_QMAKE -DQT_BOOTSTRAPPED -DPROEVALUATOR_FULL  -DQT_NO_TEXTCODEC -DQT_NO_UNICODETABLES -DQT_NO_COMPONENT -DQT_NO_COMPRESS  -DQT_NO_THREAD -DQT_NO_QOBJECT -DQT_NO_GEOM_VARIANT -DQT_NO_DATASTREAM  -DUNICODE -DQT_CRYPTOGRAPHICHASH_ONLY_SHA1 -DQT_JSON_READONLY -DQT_NO_STANDARDPATHS  C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\json\qjson.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\json\qjsondocument.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\json\qjsonparser.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\json\qjsonarray.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\json\qjsonobject.cpp C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\src\corelib\json\qjsonvalue.cpp 
+qjson.cpp
+qjsondocument.cpp
+qjsonparser.cpp
+qjsonarray.cpp
+qjsonobject.cpp
+qjsonvalue.cpp
+	link  -OUT:qmake.exe project.obj main.obj ioutils.obj proitems.obj qmakevfs.obj  qmakeglobals.obj qmakeparser.obj qmakeevaluator.obj qmakebuiltins.obj  makefile.obj unixmake.obj unixmake2.obj mingw_make.obj  option.obj winmakefile.obj projectgenerator.obj property.obj meta.obj  makefiledeps.obj metamakefile.obj xmloutput.obj  msvc_nmake.obj msvc_vcproj.obj msvc_vcxproj.obj  msvc_objectmodel.obj msbuild_objectmodel.obj registry.obj  cesdkhandler.obj qbitarray.obj  qbuffer.obj  qcryptographichash.obj  qfilesystementry.obj  qfilesystemengine.obj  qfilesystemengine_win.obj  qfilesystemiterator_win.obj  qfsfileengine.obj  qfsfileengine_iterator.obj  qarraydata.obj  qbytearray.obj  qvsnprintf.obj  qbytearraymatcher.obj  qdatetime.obj  qdir.obj  qdiriterator.obj  qfiledevice.obj  qfile.obj  qtemporaryfile.obj  qabstractfileengine.obj  qfsfileengine_win.obj  qsystemlibrary.obj  qfileinfo.obj  qglobal.obj  qhash.obj  qiodevice.obj  qringbuffer.obj  qdebug.obj  qlist.obj  qlinkedlist.obj  qlocale.obj  qlocale_tools.obj  qlocale_win.obj  qmalloc.obj  qmap.obj  qregexp.obj  qtextcodec.obj  qutfcodec.obj  qstring.obj  qstring_compat.obj  qstringlist.obj  qstringbuilder.obj  qsystemerror.obj  qtextstream.obj  qdatastream.obj  quuid.obj  qvector.obj  qsettings.obj  qlibraryinfo.obj  qvariant.obj  qsettings_win.obj  qmetatype.obj  qxmlstream.obj  qxmlutils.obj  qnumeric.obj  qlogging.obj  qjson.obj  qjsondocument.obj  qjsonparser.obj  qjsonarray.obj  qjsonobject.obj  qjsonvalue.obj ole32.lib advapi32.lib shell32.lib qmake_pch.obj
+Microsoft (R) Incremental Linker Version 14.16.27027.1
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+	copy qmake.exe ..\bin\qmake.exe
+        1 file(s) copied.
+Running configuration tests...
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\atomic64 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\sse2 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\sse3 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\ssse3 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\sse4_1 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\sse4_2 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\avx 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\common\avx2 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\unix\iconv 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\unix\gnu-libiconv 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\unix\mtdev 
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\unix\tslib 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\unix\inotify 
+nmake /NOLOGO
+..\..\..\bin\qmake.exe C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\config.tests\unix\eventfd 
+nmake /NOLOGO
+Done running configuration tests.
+WARNING: Cannot use Windows Kit 8 to build Qt for Windows XP.
+WARNING: Windows SDK v7.1A is recommended.
+Environment:
+    INCLUDE=
+      C:\Program Files (x86)\Microsoft SDKs\Windows\7.1A\Include
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\include
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt
+      C:\Program Files (x86)\Microsoft SDKs\Windows\7.1A\Include
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\include
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt
+      C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt
+    LIB=
+      C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\lib\x86
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\lib\x86
+      C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\ucrt\x86
+      C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\um\x86
+      C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\lib\x86
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\lib\x86
+      C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\ucrt\x86
+      C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\um\x86
+      
+    PATH=
+      C:\Program Files (x86)\Microsoft SDKs\Windows\7.1A\Bin
+      C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\bin
+      C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\gnuwin32\bin
+      C:\Qt5\jom
+      C:\Python27
+      C:\Perl64\bin
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\HostX86\x86
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCPackages
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\bin\Roslyn
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Performance Tools
+      C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\
+      C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\
+      C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x86
+      C:\Program Files (x86)\Windows Kits\10\bin\x86
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\\MSBuild\15.0\bin
+      C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\
+      C:\Program Files (x86)\Microsoft SDKs\Windows\7.1A\Bin
+      C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase\bin
+      C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\gnuwin32\bin
+      C:\Qt5\jom
+      C:\Python27
+      C:\Perl64\bin
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\HostX86\x86
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCPackages
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\bin\Roslyn
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Performance Tools
+      C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\
+      C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\
+      C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x86
+      C:\Program Files (x86)\Windows Kits\10\bin\x86
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\\MSBuild\15.0\bin
+      C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\
+      C:\ProgramData\Oracle\Java\javapath
+      C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common
+      C:\Program Files (x86)\Intel\iCLS Client\
+      C:\Program Files\Intel\iCLS Client\
+      C:\WINDOWS\system32
+      C:\WINDOWS
+      C:\WINDOWS\System32\Wbem
+      C:\WINDOWS\System32\WindowsPowerShell\v1.0\
+      C:\Program Files\Intel\Intel(R) Management Engine Components\DAL
+      C:\Program Files\Intel\Intel(R) Management Engine Components\IPT
+      C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL
+      C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT
+      C:\Program Files\TortoiseGit\bin
+      C:\Program Files\MiKTeX 2.9\miktex\bin\x64\
+      C:\Program Files\Git\cmd
+      C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit
+      C:\Program Files\Microsoft SQL Server\110\Tools\Binn
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\HostX86\x86
+      C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin
+      C:\Qt5\5.6.3\bin
+      C:\Qt5\5.6.3\plugins
+      C:\Program Files\TortoiseGit\bin
+      c:\miktex\miktex\bin\x64
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
+      C:\Qt5\5.6.3\bin
+      C:\Qt5\5.6.3\plugins
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin
+      C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
+      C:\Qt5\5.6.3\bin
+      C:\Qt5\5.6.3\plugins
+Configuration:
+    precompile_header
+    pcre
+    release
+    compile_examples
+    msvc_mp
+Qt Configuration:
+    minimal-config
+    small-config
+    medium-config
+    large-config
+    full-config
+    release
+    static
+    static_runtime
+    zlib
+    dynamicgl
+    gif
+    jpeg
+    png
+    freetype
+    harfbuzz
+    accessibility
+    opengl
+    audio-backend
+    qpa
+    concurrent
+
+QMAKESPEC...................win32-msvc2017 (commandline)
+Target OS...................xp
+Architecture................i386, features: sse sse2
+Host Architecture...........i386, features: sse sse2
+Maketool....................nmake
+Debug.......................no
+Force debug info............no
+C++ language standard.......auto
+Link Time Code Generation...no
+Using PCH ..................yes
+Accessibility support.......yes
+RTTI support................yes
+SSE2 support................yes
+SSE3 support................yes
+SSSE3 support...............yes
+SSE4.1 support..............yes
+SSE4.2 support..............yes
+AVX support.................yes
+AVX2 support................yes
+NEON support................no
+OpenGL support..............yes
+Large File support..........yes
+NIS support.................no
+Iconv support...............no
+Evdev support...............no
+Mtdev support...............no
+Inotify support.............no
+eventfd(7) support..........no
+Glib support................no
+CUPS support................no
+OpenVG support..............no
+SSL support.................no
+OpenSSL support.............no
+libproxy support............no
+Qt D-Bus support............no
+Qt Widgets module support...yes
+Qt GUI module support.......yes
+QML debugging...............yes
+DirectWrite support.........no
+Use system proxies..........no
+
+QPA Backends:
+    GDI.....................yes
+    Direct2D................no
+
+Third Party Libraries:
+    ZLIB support............qt
+    GIF support.............yes
+    JPEG support............yes
+    PNG support.............yes
+    FreeType support........yes
+    Fontconfig support......no
+    HarfBuzz support........qt
+    PCRE support............qt
+    ICU support.............no
+    ANGLE...................no
+    Dynamic OpenGL..........yes
+
+Styles:
+    Windows.................yes
+    Windows XP..............yes
+    Windows Vista...........yes
+    Fusion..................yes
+    Windows CE..............no
+    Windows Mobile..........no
+
+Sql Drivers:
+    ODBC....................no
+    MySQL...................no
+    OCI.....................no
+    PostgreSQL..............yes
+    TDS.....................no
+    DB2.....................no
+    SQLite..................yes (qt)
+    SQLite2.................no
+    InterBase...............no
+
+Sources are in..............C:\PROGRAMS\qt-everywhere-opensource-src-5.6.3\qtbase
+Build is done in............C:\PROGRAMS\qt-5.6.3-build\qtbase
+Install prefix..............C:\Qt5\5.6.3
+Headers installed to........C:\Qt5\5.6.3\include
+Libraries installed to......C:\Qt5\5.6.3\lib
+Arch-dep. data to...........C:\Qt5\5.6.3
+Plugins installed to........C:\Qt5\5.6.3\plugins
+Library execs installed to..C:\Qt5\5.6.3\bin
+QML1 imports installed to...C:\Qt5\5.6.3\imports
+QML2 imports installed to...C:\Qt5\5.6.3\qml
+Binaries installed to.......C:\Qt5\5.6.3\bin
+Arch-indep. data to.........C:\Qt5\5.6.3
+Docs installed to...........C:\Qt5\5.6.3\doc
+Translations installed to...C:\Qt5\5.6.3\translations
+Examples installed to.......C:\Qt5\5.6.3\examples
+Tests installed to..........C:\Qt5\5.6.3\tests
+Include paths...............C:\PROGRAMS\PgSQL-9.4.21-win32\include C:\PROGRAMS\sqlite C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include 
+Additional libraries........-LC:\PROGRAMS\PgSQL-9.4.21-win32\lib -LC:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib 
+WARNING: Using static linking will disable the use of plugins.
+         Make sure you compile ALL needed modules into the library.
+
+Info: creating super cache file C:\PROGRAMS\qt-5.6.3-build\.qmake.super
+
+
+Qt is now configured for building. Just run nmake.
+To reconfigure, run nmake confclean and configure.
+
+
+		  

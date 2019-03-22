@@ -5,6 +5,7 @@ TEMPLATE = lib
 DEFINES = QRMOCONNECTION_LIBRARY
 
 # CONFIG += debug
+CONFIG += staticlib
 
 GeneratedFiles = ../Build/$$TARGET
 !system([ -d "$$GeneratedFiles" ]):system(mkdir $$GeneratedFiles)
@@ -17,9 +18,9 @@ DESTDIR = ../lib
 
 QT += network xml
 
-QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter \
-                  -Wformat=0 -Wno-unused-variable -Wno-switch \
-                  -Wno-unused-but-set-variable -Wno-sign-compare
+#QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter \
+#                  -Wformat=0 -Wno-unused-variable -Wno-switch \
+#                  -Wno-unused-but-set-variable
 
 INCLUDEPATH += ../rmoexceptionlib
 
