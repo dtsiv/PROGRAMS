@@ -498,7 +498,7 @@ void QVoiProcessor::filterStep(qint64 iTk, PPOITE pPoite) {
 		myString << "\0\0\0\0\0";
 
 	    qDebug() << "==================================================================";
-		qDebug() << QString::fromAscii(myString.str());
+        qDebug() << QString::fromLocal8Bit(myString.str());
 	}
 
 	//------------ save the posterior state estimate \hat{x}_{k(+)} ------------

@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QSettings>
+#include <QtWidgets>
 #include "ui_qproppages.h"
 #include "qgeoutils.h"
 #include "qpoimodel.h"

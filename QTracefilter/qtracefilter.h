@@ -1,7 +1,7 @@
 #ifndef QTraceFilter_H
 #define QTraceFilter_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QSettings>
 #include "ui_QTraceFilter.h"
 #include "qgeoutils.h"
@@ -23,7 +23,7 @@ class QTraceFilter : public QMainWindow
 	Q_OBJECT
 
 public:
-	QTraceFilter(QWidget *parent = 0, Qt::WFlags flags = 0);
+    QTraceFilter(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 	~QTraceFilter();
 
     void readSettings();
@@ -121,3 +121,19 @@ private:
 };
 
 #endif // QTraceFilter_H
+
+//*****************************************************************************
+//
+//*****************************************************************************
+class QStopper : public QSplashScreen {
+public:
+	QStopper();
+	~QStopper();
+
+protected:
+	virtual void drawContents (QPainter *painter);
+
+private:
+	QPixmap m_pmHarddisk;
+};
+

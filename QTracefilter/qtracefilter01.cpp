@@ -199,7 +199,13 @@ void QTraceFilter::arrangeControls() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTraceFilter::onStartup() {
 	if (QVoiProcessor::m_bUseGen == false) { // use data base as data source
-		connectToDatabase();
+        this->setVisible(false);
+		QStopper stopperWindow;
+		qApp->processEvents();
+        QVoiProcessor::m_bUseGen=true;
+        QTimer::singleShot(0,this,SLOT(onControlToggled()));
+        if (connectToDatabase()) QVoiProcessor::m_bUseGen=false;
+        this->setVisible(true);
 	}
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -256,6 +262,7 @@ bool QTraceFilter::connectToDatabase() {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTraceFilter::onControlToggled() {
+    this->setVisible(true);
 	bool bUseGen = prbGen->isChecked();
 	if (bUseGen != QVoiProcessor::m_bUseGen) { // DB connection state altered
 		m_pPoiModel->releaseDataSource(); // old data source not needed any more
@@ -355,4 +362,33 @@ void QTraceFilter::defaultParameterValues() {
 	m_qmParamDefaults[SETTINGS_KEY_IND_VIEWX0]          = QVariant(0.0e0);
 	m_qmParamDefaults[SETTINGS_KEY_IND_VIEWY0]          = QVariant(0.0e0);
 	m_qmParamDefaults[SETTINGS_KEY_IND_GRIDSTEP]        = QVariant(50.0e0);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QStopper::QStopper()
+: QSplashScreen(QPixmap(), Qt::WindowStaysOnTopHint)
+, m_pmHarddisk(QPixmap(":/Resources/hdd_exch.png")) {
+	setPixmap(m_pmHarddisk);
+	resize(m_pmHarddisk.width(),m_pmHarddisk.height());
+	move(x()-m_pmHarddisk.width()/2,y()-m_pmHarddisk.height()/2);
+	show();
+	repaint();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QStopper::drawContents (QPainter *painter) {
+    // qDebug() << "Inside draw contents";
+	// painter->drawPixmap(0,0,m_pmHarddisk);
+    painter->setBrush(QBrush(Qt::blue));
+    painter->setPen(Qt::blue);
+    painter->setFont(QFont("Arial", 16));
+	painter->drawText(QRect(0,m_pmHarddisk.height()-30,m_pmHarddisk.width(),30),Qt::AlignCenter,"Connecting to DB ...");
+//	painter->fillRect(10,10,100,100,Qt::SolidPattern);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QStopper::~QStopper() {
 }

@@ -1,5 +1,5 @@
 #include "QTraceFilter.h"
-#include <QtGui/QApplication>
+#include <QApplication>
 #include "nr.h"
 
 // members MatrixCach and LockCach are not supported any more

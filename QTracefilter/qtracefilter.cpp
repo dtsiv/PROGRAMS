@@ -12,7 +12,7 @@
 
 QList<double> qlChi2;
 
-QTraceFilter::QTraceFilter(QWidget *parent, Qt::WFlags flags)
+QTraceFilter::QTraceFilter(QWidget *parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags) 
 	, m_pSettings(NULL)
 	, m_pPoiModel(NULL)
@@ -179,7 +179,7 @@ void QTraceFilter::onSetup() {
 	bool bDataSourceChanged=false; // flag for SUCCESSFUL change of ACTIVE data source
 	if (!bUseGen) { // data base as data source
 		if (dbeEngineSelected == QPoiModel::DB_Engine_Postgres) {
-			if (m_pPoiModel->initPostgresDB(m_qsPgConnStr)) {
+            if (m_pPoiModel->initPostgresDB(qsPgConnStr)) {
 				if (m_dbeEngineSelected!=dbeEngineSelected || m_qsPgConnStr!=qsPgConnStr) {
 					bDataSourceChanged=true;
 				}
@@ -352,7 +352,7 @@ void QTraceFilter::onUpdate() {
 					P_exact+=dQuant*dDens;
 				}
 				QString qs("%1\t%2\t%3\n");
-				qfChi2.write(qs.arg(dChi2).arg(P_num).arg(P_exact).toAscii().data());
+                qfChi2.write(qs.arg(dChi2).arg(P_num).arg(P_exact).toLocal8Bit().data());
 			}
 			qfChi2.close();
 		}
@@ -489,7 +489,7 @@ void QTraceFilter::readSettings() {
 	int iNumColors=QIndicator::m_lsLegend.m_iNumColors;
 	QString qsSymbSizes=m_pSettings->value(SETTINGS_KEY_SYMBSIZES,
 		                 m_qmParamDefaults[SETTINGS_KEY_SYMBSIZES]).toString();
-	QByteArray baSymbSizes=QByteArray::fromBase64(qsSymbSizes.toAscii());
+    QByteArray baSymbSizes=QByteArray::fromBase64(qsSymbSizes.toLocal8Bit());
 	QDataStream dsSymbSizes(&baSymbSizes,QIODevice::ReadWrite);
 	for (int i=0; i<iNumColors; i++) {
 		QString qsKey=qslNames.at(i);

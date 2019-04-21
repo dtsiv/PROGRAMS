@@ -18,7 +18,7 @@ void QVoiProcessor::addItem(QFile &qf, double dVal, bool bIndent, bool bNewline,
 	QString qs;
 	if (bIndent) qs="\t";
 	qs+=QString("%1").arg(dVal,10,'e',iPrecision,' ');
-	qf.write(qs.toAscii().data());
+    qf.write(qs.toLocal8Bit().data());
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -687,7 +687,7 @@ void QVoiProcessor::covEigenvectors(int iTk /* =0 */ ) {
 			 .arg(a[0][0],0,'g',8)
 			 .arg(a[2][1],0,'g',8)
 			 .arg(a[0][1],0,'g',8)
-		 .toAscii().data()
+         .toLocal8Bit().data()
     );
 	qfPeigen.write("\n");
 }
@@ -852,13 +852,13 @@ void QVoiProcessor::exactStatistics() {
 	qfDistr.resize(0);
 	qfDistr.open(QIODevice::ReadWrite);
 	for(i=0;i<iMax-1;i++) {
-		qfDistr.write(QString("%1\t%2\n").arg(qlEst.at(i)).arg(1.0*i/iMax).toAscii());
+        qfDistr.write(QString("%1\t%2\n").arg(qlEst.at(i)).arg(1.0*i/iMax).toLocal8Bit());
 	}
     qfDistr.close();
 	QFile qfEigen("eigen.txt");
 	qfEigen.open(QIODevice::ReadWrite);
 	qfEigen.seek(qfEigen.size());
-	qfEigen.write(qs.toAscii().data());
+    qfEigen.write(qs.toLocal8Bit().data());
 	qfEigen.close();
 }
 

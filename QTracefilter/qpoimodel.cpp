@@ -41,15 +41,16 @@ QPoiModel::~QPoiModel() {
 bool QPoiModel::initPostgresDB(QString qsPgConnStr) {
 	char * conninfo;
 
-	conninfo = (char *)qsPgConnStr.toLocal8Bit().data();
-	/* Make a connection to the database:
+    QByteArray baPgConnStr=qsPgConnStr.toLocal8Bit();
+    conninfo = (char *)baPgConnStr.data();
+    /* Make a connection to the database:
 	*  pgclient "dbname=rmo user=postgres password=123 client_encoding=WIN1251"
 	*/
-	m_conn = PQconnectdb(conninfo);
+    m_conn = PQconnectdb(conninfo);
 	/* Check to see that the backend connection was successfully made */
 	if (PQstatus(m_conn) != CONNECTION_OK) {
 		QString qsDBError(PQerrorMessage(m_conn));
-		qDebug() << "Connection to database failed: " << qsDBError;
+        qDebug() << "Connection to database failed: " << qsDBError;
 		throw RmoException(QString("PostgreSQL database error: ")+qsDBError);
 		return false;
 	}
@@ -98,12 +99,14 @@ bool QPoiModel::openDB() {
 	}
 	else if (m_iDbEngine == QPoiModel::DB_Engine_Postgres) {
 		char * conninfo;
-		conninfo = (char *)m_qsPgConnStr.toLocal8Bit().data();
+        QByteArray baPgConnStr = m_qsPgConnStr.toLocal8Bit();
+        conninfo = (char *)baPgConnStr.data();
 		m_conn = PQconnectdb(conninfo);
+
 		/* Check to see that the backend connection was successfully made */
 		if (PQstatus(m_conn) != CONNECTION_OK) {
 			QString qsDBError(PQerrorMessage(m_conn));
-			qDebug() << "Connection to database failed: " << qsDBError;
+            qDebug() << "Connection to database failed: " << qsDBError;
 			throw RmoException(QString("PostgreSQL database error: ")+qsDBError);
 			return false;
 		}
@@ -159,7 +162,7 @@ bool QPoiModel::getMinMaxTime(quint64 &tFrom,quint64 &tTo) {
 			return false;
 		}
 		// time range query
-		char *sTimeQuery = "SELECT MIN(p.time_from) AS min_time, "
+        char *sTimeQuery = (char *)"SELECT MIN(p.time_from) AS min_time, "
 						   " MAX(p.time_from) AS max_time FROM poite p";
 		m_res = PQexecParams(m_conn,sTimeQuery,
 			0, /* 0 param */
@@ -342,7 +345,7 @@ bool QPoiModel::readPoite(quint64 tFrom, quint64 tTo, double dHeight) {
 			QString qsCodogram = query.value(qRec.indexOf("codogram")).toString();
 			if (!bOk) continue;
 
-			QByteArray baCodogram(qsCodogram.toAscii());
+            QByteArray baCodogram(qsCodogram.toLocal8Bit());
 			QByteArray baDecoded = QByteArray::fromBase64(baCodogram);
 			QByteArray baUncomp = qUncompress(baDecoded);
 			if (baUncomp.isEmpty()) {

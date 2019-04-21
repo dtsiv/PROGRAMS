@@ -31,7 +31,7 @@ QExceptionDialog::QExceptionDialog(QString exceptionWhat, QWidget *parent) :
     QRect rectDialog = this->frameGeometry();
     this->move((rectDesktop.width()-rectDialog.width())/2,
                (rectDesktop.height()-rectDialog.height())/2);
-    Qt::WFlags flags = Qt::WindowStaysOnTopHint
+    Qt::WindowFlags flags = Qt::WindowStaysOnTopHint
     #ifdef __linux
         | Qt::X11BypassWindowManagerHint
     #endif

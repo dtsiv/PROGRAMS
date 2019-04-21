@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
-    <DBEngine>1</DBEngine>
+    <DBEngine>2</DBEngine>
     <Filter_output>AAAAGAAAAAAAAADPAAAA/w==</Filter_output>
     <GeneratorAz0>-60</GeneratorAz0>
     <GeneratorDelay>30</GeneratorDelay>
@@ -15,17 +15,17 @@
     <GeneratorX0>-50</GeneratorX0>
     <GeneratorY0>-150</GeneratorY0>
     <Imitator_source>AAAAFgAAABgAAAAXAAAAgA==</Imitator_source>
-    <IndGeometry>///7EP///6n////vAAADUA==</IndGeometry>
+    <IndGeometry>///7kgAAABz///82AAACvg==</IndGeometry>
     <IndGridStep>50</IndGridStep>
-    <IndViewScale>0.0019</IndViewScale>
-    <IndViewX0>166.6</IndViewX0>
-    <IndViewY0>-2.8</IndViewY0>
+    <IndViewScale>0.0012999999999999999</IndViewScale>
+    <IndViewX0>8.5999999999999996</IndViewX0>
+    <IndViewY0>8.5999999999999996</IndViewY0>
     <KalmanChi2Prob>3</KalmanChi2Prob>
     <KalmanHeight>5</KalmanHeight>
     <KalmanMatRelax>2000</KalmanMatRelax>
     <KalmanMinStrob>100</KalmanMinStrob>
     <KalmanSigmaM>20</KalmanSigmaM>
-    <KalmanSigmaS>0.1</KalmanSigmaS>
+    <KalmanSigmaS>0.10000000000000001</KalmanSigmaS>
     <KalmanSpaceStrob>200</KalmanSpaceStrob>
     <KalmanStrobSpread>200</KalmanStrobSpread>
     <KalmanTolerance>1e-08</KalmanTolerance>
@@ -41,6 +41,6 @@
     <TickIndex>1</TickIndex>
     <TimeSlice>10</TimeSlice>
     <TrajectoryDuration>60</TrajectoryDuration>
-    <UseImitator>true</UseImitator>
-    <geometry>AAADkAAAAcAAAAWhAAAC9g==</geometry>
+    <UseImitator>false</UseImitator>
+    <geometry>AAABJwAAAKUAAAM4AAAB2w==</geometry>
 </PARAMETERS>

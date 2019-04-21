@@ -2,6 +2,7 @@
 #define QINDICATOR_H
 
 #include <QtGui>
+#include <QtWidgets>
 #include <QGLWidget>
 #include "tpoit.h"
 
