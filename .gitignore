@@ -8,7 +8,6 @@ Debug/
 Build/
 *.user
 PostgreSQL_9.4_32bit/
-include/
 *.db
 Makefile
 /VisualStudio/Templates

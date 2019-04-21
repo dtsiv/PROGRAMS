@@ -1,0 +1,8 @@
+,gitignore
+ChronicaParser.exe
+ChronicaParser.pro.user
+datad.txt
+datav.txt
+detection.txt
+Makefile.Debug
+Makefile.Release
