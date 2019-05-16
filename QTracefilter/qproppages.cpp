@@ -96,8 +96,15 @@ void QPropPages::addTab(int iIdx) {
 		QHBoxLayout *pHBoxLayout01=new QHBoxLayout;
 		QString qsSqliteDbFile=m_pOwner->m_qsSqliteFilePath;
 		QFileInfo fiSqliteDbFile(qsSqliteDbFile);
-		if (fiSqliteDbFile.exists() && fiSqliteDbFile.isFile()) {
-			qsSqliteDbFile=QDir::current().relativeFilePath(qsSqliteDbFile);
+        if (fiSqliteDbFile.isFile() && fiSqliteDbFile.isReadable()) {
+            QDir qdSqliteDbFile=fiSqliteDbFile.absoluteDir();
+            QDir qdCur=QDir::current();
+            if (qdCur.rootPath()==qdSqliteDbFile.rootPath()) { // same Windows drive
+                qsSqliteDbFile=qdCur.relativeFilePath(fiSqliteDbFile.absoluteFilePath());
+            }
+            else { // different Windows drives
+                qsSqliteDbFile=fiSqliteDbFile.absoluteFilePath();
+            }
 		}
 		m_pleSqliteDbFile=new QLineEdit(qsSqliteDbFile);
 		pHBoxLayout01->addWidget(m_pleSqliteDbFile);
@@ -130,14 +137,10 @@ void QPropPages::addTab(int iIdx) {
 
 		// Mainctrl file
 		QString qsMainctrlCfg=m_pOwner->m_qsMainctrlCfg;
-		QDir qdCur=QDir::current();
-		if (qdCur.exists(qsMainctrlCfg)) {
-			m_pOwner->m_qsMainctrlCfg=qdCur.absoluteFilePath(qsMainctrlCfg);
-			m_pleMainCtrl=new QLineEdit(qdCur.relativeFilePath(qsMainctrlCfg));
+        QFileInfo fiMainctrlCfg(qsMainctrlCfg);
+        m_pleMainCtrl=new QLineEdit(qsMainctrlCfg);
+        if (fiMainctrlCfg.isFile() && fiMainctrlCfg.isReadable()) {
 			showPosts(m_pOwner->m_qsMainctrlCfg);
-		}
-		else {
-			m_pleMainCtrl=new QLineEdit(qsMainctrlCfg);
 		}
 		QObject::connect(m_pleMainCtrl,SIGNAL(textEdited(QString)),
 			SLOT(onMainctrlChanged(QString)));
@@ -155,7 +158,7 @@ void QPropPages::addTab(int iIdx) {
 		
 		// system noise sigma (m/s)
 		pGridLayout->addWidget(new QLabel("System noise s2(m2/s3)"),0,0);
-		m_pleKalmanSigmaS=new QLineEdit(QString::number(QVoiProcessor::m_dFltSigmaS2,'e',1));
+        m_pleKalmanSigmaS=new QLineEdit(QString::number(QKalmanFilter::m_dFltSigmaS2,'e',1));
 		m_pleKalmanSigmaS->setMaximumWidth(PROP_LINE_WIDTH);
 		m_pleKalmanSigmaS->setValidator(new QDoubleValidator(0.0,
              999.0, 1, m_pleKalmanSigmaS));
@@ -163,7 +166,7 @@ void QPropPages::addTab(int iIdx) {
 
 		// meas noise sigma (m)
 		pGridLayout->addWidget(new QLabel("Measurement noise (m)"),0,3);
-		m_pleKalmanSigmaM=new QLineEdit(QString::number(QVoiProcessor::m_dFltSigmaM,'f',3));
+        m_pleKalmanSigmaM=new QLineEdit(QString::number(QKalmanFilter::m_dFltSigmaM,'f',3));
 		m_pleKalmanSigmaM->setMaximumWidth(PROP_LINE_WIDTH);
 		m_pleKalmanSigmaM->setValidator(new QDoubleValidator(0.0,
              999.0, 4, m_pleKalmanSigmaM));
@@ -171,7 +174,7 @@ void QPropPages::addTab(int iIdx) {
 
 		// Height
 		pGridLayout->addWidget(new QLabel("Target height (km)"),1,0);
-		m_pleKalmanHeight=new QLineEdit(QString::number(QVoiProcessor::m_dFltHeight,'f',1));
+        m_pleKalmanHeight=new QLineEdit(QString::number(QKalmanFilter::m_dFltHeight,'f',1));
 		m_pleKalmanHeight->setMaximumWidth(PROP_LINE_WIDTH);
 		m_pleKalmanHeight->setValidator(new QDoubleValidator(0.0,
              30.0, 1, m_pleKalmanHeight));
@@ -179,7 +182,7 @@ void QPropPages::addTab(int iIdx) {
 
 		// Strob min size km
 		pGridLayout->addWidget(new QLabel("Min strob (km)"),2,0);
-		m_pleKalmanMinStrob=new QLineEdit(QString::number(QVoiProcessor::m_dStrobSpreadMin,'e',1));
+        m_pleKalmanMinStrob=new QLineEdit(QString::number(QKalmanFilter::m_dStrobSpreadMin,'e',1));
 		m_pleKalmanMinStrob->setMaximumWidth(PROP_LINE_WIDTH);
 		m_pleKalmanMinStrob->setValidator(new QDoubleValidator(0.0,
              1.0e3, 1, m_pleKalmanMinStrob));
@@ -187,7 +190,7 @@ void QPropPages::addTab(int iIdx) {
 
 		// Strob spread m/s
 		pGridLayout->addWidget(new QLabel("Strob spread (m/s)"),3,0);
-		m_pleKalmanStrobSpread=new QLineEdit(QString::number(QVoiProcessor::m_dStrobSpreadSpeed,'e',1));
+        m_pleKalmanStrobSpread=new QLineEdit(QString::number(QKalmanFilter::m_dStrobSpreadSpeed,'e',1));
 		m_pleKalmanStrobSpread->setMaximumWidth(PROP_LINE_WIDTH);
 		m_pleKalmanStrobSpread->setValidator(new QDoubleValidator(0.0,
              1.0e3, 1, m_pleKalmanStrobSpread));
@@ -197,29 +200,71 @@ void QPropPages::addTab(int iIdx) {
 		pGridLayout->addWidget(new QLabel("Chi2 probability"),1,3);
 		m_pcbKalmanChi2Prob=new QComboBox;
 		m_pcbKalmanChi2Prob->setMaximumWidth(PROP_LINE_WIDTH);
-		int iMax=sizeof(QVoiProcessor::m_dChi2QuantProb)/sizeof(QVoiProcessor::m_dChi2QuantProb[0]);
+        int iMax=QKalmanFilter::CHI2_NUM_QUANTILES;
 		for (int i=0; i<iMax; i++) {
-			double dProb=QVoiProcessor::m_dChi2QuantProb[i];
+            double dProb=QKalmanFilter::m_dChi2QuantProb[i];
             m_pcbKalmanChi2Prob->addItem(QString("%1").arg(dProb,0,'f',3));
 		}
-		m_pcbKalmanChi2Prob->setCurrentIndex(qBound(0,QVoiProcessor::m_iChi2Prob,iMax));
+        m_pcbKalmanChi2Prob->setCurrentIndex(qBound(0,QKalmanFilter::m_iChi2Prob,iMax));
 		pGridLayout->addWidget(m_pcbKalmanChi2Prob,1,4);
 
 		// Use matrix relaxation
 		pGridLayout->addWidget(new QLabel("Covariations P"),2,3);
 		m_pcbKalmanUseRelax=new QCheckBox("use relaxation");
-		m_pcbKalmanUseRelax->setChecked(QVoiProcessor::m_bUseMatRelax);
+        m_pcbKalmanUseRelax->setChecked(QKalmanFilter::m_bUseMatRelax);
 		pGridLayout->addWidget(m_pcbKalmanUseRelax,2,4);
 
 		// Matrix relaxation time (sec)
 		pGridLayout->addWidget(new QLabel("P relaxation (s)"),3,3);
-		m_pleKalmanMatRelaxTime=new QLineEdit(QString::number(QVoiProcessor::m_dMatRelaxTime,'e',1));
+        m_pleKalmanMatRelaxTime=new QLineEdit(QString::number(QKalmanFilter::m_dMatRelaxTime,'e',1));
 		m_pleKalmanMatRelaxTime->setMaximumWidth(PROP_LINE_WIDTH);
 		m_pleKalmanMatRelaxTime->setValidator(new QDoubleValidator(0.0,
              1.0e5, 1, m_pleKalmanMatRelaxTime));
 		pGridLayout->addWidget(m_pleKalmanMatRelaxTime,3,4);
 
-		// stretch
+        // Stick trajectory to ModeS
+        pGridLayout->addWidget(new QLabel("Trajectory"),4,0);
+        m_pcbKalmanStickToModeS=new QCheckBox("stick to ModeS");
+        m_pcbKalmanStickToModeS->setChecked(QKalmanFilter::m_bStickTrajToModeS);
+        pGridLayout->addWidget(m_pcbKalmanStickToModeS,4,1);
+
+        // Cluster cutoff radius (km)
+        pGridLayout->addWidget(new QLabel("Cluster Rcut (km)"),4,3);
+        m_pleKalmanClusterCutoff=new QLineEdit(QString::number(QKalmanFilter::m_dClusterCutoff,'e',1));
+        m_pleKalmanClusterCutoff->setMaximumWidth(PROP_LINE_WIDTH);
+        m_pleKalmanClusterCutoff->setValidator(new QDoubleValidator(0.0,
+             2.0e2, 1, m_pleKalmanClusterCutoff));
+        pGridLayout->addWidget(m_pleKalmanClusterCutoff,4,4);
+
+        // Trajectoty max velocity (m/s)
+        pGridLayout->addWidget(new QLabel("Max velocity (m/s)"),5,0);
+        m_pleKalmanTrajVMax=new QLineEdit(QString::number(QKalmanFilter::m_dTrajMaxVelocity,'e',1));
+        m_pleKalmanTrajVMax->setMaximumWidth(PROP_LINE_WIDTH);
+        m_pleKalmanTrajVMax->setValidator(new QDoubleValidator(0.0,
+             2.0e3, 1, m_pleKalmanTrajVMax));
+        pGridLayout->addWidget(m_pleKalmanTrajVMax,5,1);
+
+        // Trajectoty timeout (min)
+        pGridLayout->addWidget(new QLabel("Traj timout (min)"),5,3);
+        m_pleKalmanTrajTimeout=new QLineEdit(QString::number(QKalmanFilter::m_dTrajTimeout,'e',1));
+        m_pleKalmanTrajTimeout->setMaximumWidth(PROP_LINE_WIDTH);
+        m_pleKalmanTrajTimeout->setValidator(new QDoubleValidator(0.0,
+             1.0e3, 1, m_pleKalmanTrajTimeout));
+        pGridLayout->addWidget(m_pleKalmanTrajTimeout,5,4);
+
+        // Minimum cluster to start new trajectory
+        pGridLayout->addWidget(new QLabel("Minimum cluster"),6,0);
+        m_pleKalmanClusterMinSz=new QLineEdit(QString::number(QKalmanFilter::m_iClusterMinSize));
+        m_pleKalmanClusterMinSz->setMaximumWidth(PROP_LINE_WIDTH);
+        m_pleKalmanClusterMinSz->setValidator(new QIntValidator(0,1000,m_pleKalmanClusterMinSz));
+        pGridLayout->addWidget(m_pleKalmanClusterMinSz,6,1);
+
+        pGridLayout->addWidget(new QLabel("Initial velocity"),6,3);
+        m_pcbKalmanEstIniVelo=new QCheckBox("estimate");
+        m_pcbKalmanEstIniVelo->setChecked(QKalmanFilter::m_bEstIniVelocity);
+        pGridLayout->addWidget(m_pcbKalmanEstIniVelo,6,4);
+
+        // stretch
 		pGridLayout->setColumnStretch(2,100);
 		pGridLayout->setColumnStretch(5,100);
 		pLayout->addLayout(pGridLayout);
@@ -322,6 +367,13 @@ void QPropPages::addTab(int iIdx) {
              360.0, 1, m_pleGenKinkAngle));
 		pGridLayout01->addWidget(m_pleGenKinkAngle,5,4);
 
+        // Minimum cluster to start new trajectory
+        pGridLayout01->addWidget(new QLabel("Minimum cluster"),6,0);
+        m_pleGenClusterMinSz=new QLineEdit(QString::number(QGenerator::m_iClusterMinSize));
+        m_pleGenClusterMinSz->setMaximumWidth(PROP_LINE_WIDTH);
+        m_pleGenClusterMinSz->setValidator(new QIntValidator(0,1000,m_pleGenClusterMinSz));
+        pGridLayout01->addWidget(m_pleGenClusterMinSz,6,1);
+
 		pGridLayout01->setColumnStretch(5,100);
 		pGridLayout01->setColumnStretch(2,100);
 		pLayout->addLayout(pGridLayout01);
@@ -417,14 +469,10 @@ void QPropPages::addTab(int iIdx) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QPropPages::onMainctrlChanged(QString qsNewText) {
 	m_scene.clear();
-	QDir qdCur=QDir::current();
-	if (!qdCur.exists(qsNewText)) return;
-	QString qsMainctrlCfg=qdCur.absoluteFilePath(qsNewText);
-	QFileInfo fi(qsMainctrlCfg);
-	if (fi.isFile() && fi.isReadable())	{
-        m_pOwner->m_qsMainctrlCfg=qsMainctrlCfg;
-        showPosts(m_pOwner->m_qsMainctrlCfg);
-	}
+    QFileInfo fiMainctrlCfg(qsNewText);
+    if (fiMainctrlCfg.isFile() && fiMainctrlCfg.isReadable()) {
+        showPosts(qsNewText);
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -437,15 +485,21 @@ void QPropPages::onSQLiteFileChoose() {
 	if (dialog.exec()) {
 		QStringList qsSelection=dialog.selectedFiles();
 		if (qsSelection.size() != 1) return;
-		QString qs=qsSelection.at(0);
-		QDir qdCur=QDir::current();
-		if (!qdCur.exists(qs)) return;
-		qs=qdCur.absoluteFilePath(qs);
-		QFileInfo fi(qs);
-		if (fi.isFile() && fi.isReadable())	{
-			QString qsSqlitePath=qdCur.absoluteFilePath(qs);
-			m_pleSqliteDbFile->setText(qdCur.relativeFilePath(qsSqlitePath));
+        QString qsSelFilePath=qsSelection.at(0);
+        QFileInfo fiSelFilePath(qsSelFilePath);
+        if (fiSelFilePath.isFile() && fiSelFilePath.isReadable())	{
+            QDir qdCur = QDir::current();
+            QDir qdSelFilePath = fiSelFilePath.absoluteDir();
+            if (qdCur.rootPath() == qdSelFilePath.rootPath()) { // same Windows drives
+                m_pleSqliteDbFile->setText(qdCur.relativeFilePath(fiSelFilePath.absoluteFilePath()));
+            }
+            else { // different Windows drives
+                m_pleSqliteDbFile->setText(fiSelFilePath.absoluteFilePath());
+            }
 		}
+        else {
+            m_pleSqliteDbFile->setText("error");
+        }
 	}
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -457,19 +511,28 @@ void QPropPages::onMainctrlChoose() {
 	dialog.setNameFilter(tr("MainCtrl files (*.cfg)"));
 	dialog.setDirectory(QDir::current());
 	if (dialog.exec()) {
-		QStringList qsSelection=dialog.selectedFiles();
+        m_scene.clear();
+        QStringList qsSelection=dialog.selectedFiles();
 		if (qsSelection.size() != 1) return;
-		QString qs=qsSelection.at(0);
-		QDir qdCur=QDir::current();
-		if (!qdCur.exists(qs)) return;
-		qs=qdCur.absoluteFilePath(qs);
-		QFileInfo fi(qs);
-		if (fi.isFile() && fi.isReadable())	{
-			m_pOwner->m_qsMainctrlCfg=qdCur.absoluteFilePath(qs);
-			m_pleMainCtrl->setText(qdCur.relativeFilePath(m_pOwner->m_qsMainctrlCfg));
-			showPosts(m_pOwner->m_qsMainctrlCfg);
-		}
-	}
+        QString qsSelFilePath=qsSelection.at(0);
+        QFileInfo fiSelFilePath(qsSelFilePath);
+        if (fiSelFilePath.isFile() && fiSelFilePath.isReadable()) {
+            QDir qdSelFilePath=fiSelFilePath.absoluteDir();
+            QDir qdCur=QDir::current();
+            QString qsCompactPath;
+            if (qdCur.rootPath()==qdSelFilePath.rootPath()) { // same Windows drive
+                qsCompactPath=qdCur.relativeFilePath(fiSelFilePath.absoluteFilePath());
+            }
+            else { // different Windows drives
+                qsCompactPath=fiSelFilePath.absoluteFilePath();
+            }
+            m_pleMainCtrl->setText(qsCompactPath);
+            showPosts(qsCompactPath);
+        }
+        else {
+            m_pleMainCtrl->setText("error");
+        }
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

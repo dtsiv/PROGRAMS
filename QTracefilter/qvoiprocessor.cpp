@@ -11,37 +11,9 @@
 
 #define QVOIPROCESSOR_DUMMY_DEFAULT -9999999.9e99
 
-double QVoiProcessor::m_dFltSigmaS2=QVOIPROCESSOR_DUMMY_DEFAULT;     // Kalman filter: system speed sigma2 m2/s3
-double QVoiProcessor::m_dFltSigmaM=QVOIPROCESSOR_DUMMY_DEFAULT;      // Kalman filter: measurement sigma m
-double QVoiProcessor::m_dFltHeight=QVOIPROCESSOR_DUMMY_DEFAULT;      // Kalman filter: height km
-double QVoiProcessor::m_dIntegrStep=1.0e0;                           // Time integration step s
 bool QVoiProcessor::m_bUseGen=true;                                  // use imitator instead of POITE db
 double QVoiProcessor::m_dTrajDuration=QVOIPROCESSOR_DUMMY_DEFAULT;   // trajectory duration min
 bool QVoiProcessor::m_pbSkipPost[5]={false,false,false,false,false};  // post id to skip
-double QVoiProcessor::m_dStrobSpreadSpeed=QVOIPROCESSOR_DUMMY_DEFAULT; // spread speed m/s
-double QVoiProcessor::m_dStrobSpreadMin=QVOIPROCESSOR_DUMMY_DEFAULT;   // min spread km
-int QVoiProcessor::m_iChi2Prob=0;                                   // chi2 statistics probability threshold
-bool QVoiProcessor::m_bUseMatRelax=true;                              // use cov relaxation
-double QVoiProcessor::m_dMatRelaxTime=1.0e3;                          // cov relax time
-
-extern QList<double> qlChi2;
-/*
-m & $\alpha=0.2$ & $\alpha=0.1$ & $\alpha=0.05$ & $\alpha=0.02$ & $\alpha=0.01$ & $\alpha=0.001$ 
-1 & 1.642        & 2.706        & 3.841         & 5.412         & 6.635         & 10.827         
-2 & 3.219        & 4.605        & 5.991         & 7.824         & 9.210         & 13.815         
-3 & 4.642        & 6.251        & 7.815         & 9.837         & 11.341        & 16.268         
-*/
-double QVoiProcessor::m_dChi2QuantProb[CHI2_NUM_QUANTILES]={
-	0.2, 0.1, 0.05, 0.02, 0.01, 0.001
-};
-double dChi2Quant[4][CHI2_NUM_QUANTILES] ={
-// $\alpha=0.2$ & $\alpha=0.1$ & $\alpha=0.05$ & $\alpha=0.02$ & $\alpha=0.01$ & $\alpha=0.001$ 
-	{0,             0,             0,              0,              0,              0 },        
-	{1.642,         2.706,         3.841,          5.412,          6.635,          10.827},     // m=1    
-	{3.219,         4.605,         5.991,          7.824,          9.210,          13.815},     // m=2    
-	{4.642,         6.251,         7.815,          9.837,          11.341,         16.268}      // m=3
-};
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,519 +23,399 @@ QVoiProcessor::QVoiProcessor(QTraceFilter *pOwner, QPoiModel *pPoiModel,QObject 
 , m_pOwner(pOwner)
 , m_pGen(NULL) 
 , m_pPoiModel(pPoiModel)
-, m_pPm(NULL)
-, m_pPp(NULL)
-, m_pQ(NULL)
-, m_pR(NULL)
-, m_pF(NULL)
-, m_pH(NULL) 
-, m_dMeasNonlinearity(0)
-, m_pHnum(NULL) 
-, m_pK(NULL)
-, m_pZ(NULL)
-, m_pZm(NULL)
-, m_pXp(NULL)
-, m_pXm(NULL)
-, m_bQinitialized(false)
-, m_bFinitialized(false)
-, m_bHinitialized(false)
-, m_iTlast (-1) 
 , m_bInit(false) 
-, m_iPt(0) {
-	m_dHei = m_dFltHeight*1.0e3;
+      {
 	m_iLegendTypePrimary = QIndicator::m_lsLegend.m_qlSettingNames.indexOf(QINDICATOR_LEGEND_PRIMARY);
 	m_iLegendTypeSource = QIndicator::m_lsLegend.m_qlSettingNames.indexOf(QINDICATOR_LEGEND_SOURCE);
 	m_iLegendTypeSourceAlarm = QIndicator::m_lsLegend.m_qlSettingNames.indexOf(QINDICATOR_LEGEND_SOURCE_ALARM);
 	m_iLegendTypeFilter = QIndicator::m_lsLegend.m_qlSettingNames.indexOf(QINDICATOR_LEGEND_FILTER);
+    m_iLegendTypeCluster = QIndicator::m_lsLegend.m_qlSettingNames.indexOf(QINDICATOR_LEGEND_CLUSTER);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QVoiProcessor::~QVoiProcessor() {
 	if (m_pGen) delete m_pGen;
-	if (m_pPm) delete m_pPm;
-	if (m_pPp) delete m_pPp;
-	if (m_pQ) delete m_pQ;
-	if (m_pR) delete m_pR;
-	if (m_pF) delete m_pF;
-	if (m_pK) delete m_pK;
-	if (m_pH) delete m_pH;
-	if (m_pHnum) delete m_pHnum;
-	if (m_pZ) delete m_pZ;
-	if (m_pZm) delete m_pZm;
-	if (m_pXp) delete m_pXp;
-	if (m_pXm) delete m_pXm;
+    while (m_qlKalmanFilters.size()) delete m_qlKalmanFilters.takeLast();
+    while (m_qlClusters.size()) delete m_qlClusters.takeLast();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool QVoiProcessor::init(QString qsMainctrlCfg) {
-	if (!m_geoUtils.readCfgFile(qsMainctrlCfg)) return false;
-	m_pMainCtrl=m_geoUtils.m_pMainCtrl;
-	m_geoUtils.getViewPoint(&m_blhViewPoint,m_pMainCtrl);
+void QVoiProcessor::start(quint64 iTfrom, quint64 iTto, bool bUseGen) {
 
-	MAINCTRL_P mp=m_pMainCtrl->p;
-	if (mp.dwPosCount<5) {
-		throw RmoException(QString("QVoiProcessor::mp.dwPosCount = %1").arg(mp.dwPosCount));
-		return false;
-	}
-	m_pGen = new QGenerator(&m_geoUtils,
-		QDateTime::fromString("02.06.2017-09.00.22.639",TIMESTAMP_FORMAT).toMSecsSinceEpoch(),
-		&m_blhViewPoint);
+    if (bUseGen) { // fabricate POITE from QGenerator
+        // running time
+        quint64 iTcur=iTfrom;
 
-	// reset seed of random number generators
-    m_pGen->resetRandomNumberGenerators();
+        // initialize POITE generator
+        if (!m_pGen) return;
+        m_pGen->resetTime(iTcur);
+        m_pGen->resetRandomNumberGenerators();
+        m_pGen->m_iTstart = m_iTstart= iTcur;
 
-	m_pPm = new Matrix(4,4);
-	m_pPp = new Matrix(4,4);
-	m_pQ = new Matrix(4,4);
-	m_pF = new Matrix(4,4);
-	// posterior state estimate \hat{x}_{k-1(+)}
-	m_pXp = new Matrix(4,1);
-	// prior state estimate \hat{x}_{k(-)}
-	m_pXm = new Matrix(4,1);
+        //=================== prepare next PPOITE pPoite ======================
+        iTcur += m_pGen->m_dGenDelay*1000.0e0; // msec
+        if (!m_pGen->propagate(iTcur)) return;
 
-    // unity
-    //    1.000e+00,	 0.000e+00,	 0.000e+00,	 0.000e+00,	 
-    //    0.000e+00,	 1.000e+00,	 0.000e+00,	 0.000e+00,	 
-    //    0.000e+00,	 0.000e+00,	 1.000e+00,	 0.000e+00,	 
-    //    0.000e+00,	 0.000e+00,	 0.000e+00,	 1.000e+00
+        while (iTcur < iTto) {
+            iTcur += m_pGen->m_dGenDelay*1000.0e0; // msec
+            if (!m_pGen->propagate(iTcur)) return;
+            PPOITE pPoite = m_pGen->getPoite(QVoiProcessor::m_pbSkipPost);
+            PBLH pblhGenSRC=m_pGen->getTg();
+            receiveCodogram (iTcur,pPoite,pblhGenSRC,-1);
+        }
+    }
+    else { // obtain experimental POITE from data base
+        for (int iRawIdx=0; iRawIdx<m_pPoiModel->getRawListSize(); iRawIdx++) {
+            qint64 iTime = m_pPoiModel->getPoiteTime(iRawIdx);
+            if (iTime<iTto && iTime>=iTfrom) {
+                // if (m_qlClusters.size()>10) break;
+                QByteArray baPoite = m_pPoiModel->getPPoite(iRawIdx);
+                if (baPoite.isEmpty()) continue;
+                PPOITE pPoite = (PPOITE) new char[baPoite.size()];
+                std::memcpy(pPoite,baPoite.data(),baPoite.size());
+                PBLH pblhGenSRC=NULL;
+                receiveCodogram (iTime,pPoite,pblhGenSRC,iRawIdx);
+            }
+        }
+    }
 
-	// system noise sigma 10 m/s???
-    //    1.041e-06,	 6.980e-02,	-1.870e-07,	-7.978e-03,	 
-    //    6.980e-02,	 8.905e+03,	-1.241e-02,	-9.532e+02,	
-    //    -1.870e-07,	-1.241e-02,	 3.714e-08,	 2.672e-03,	
-    //    -7.978e-03,	-9.532e+02,	 2.672e-03,	 7.710e+02
+    //----------------- update indicator view --------------------------
+    emit indicatorUpdate();
+    while (m_qlKalmanFilters.size()) delete m_qlKalmanFilters.takeLast();
+    while (m_qlClusters.size()) delete m_qlClusters.takeLast();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QVoiProcessor::receiveCodogram(quint64 iTcur, PPOITE pPoite, BLH *pblhGenSRC /* =NULL */, int iRawIdx /* =-1 */) {
 
-	// system noise sigma2 1 m2/s3
-	// 1.376e-07,	 3.806e-03,	-6.601e-08,	-1.186e-03,	 
-	// 3.806e-03,	 2.121e+02,	-1.797e-03,	-5.786e+01,	
-	// -6.601e-08,	-1.797e-03,	 3.247e-08,	 6.746e-04,	
-	// -1.186e-03,	-5.786e+01,	 6.746e-04,	 4.736e+01
+    // cluster cutoff radius (m)
+    double dRcutoff=QKalmanFilter::m_dClusterCutoff*1.0e3;
 
-	// 
-	// 1.376e-07,	 3.806e-03,	-6.601e-08,	-1.186e-03,	 
-	// 3.806e-03,	 2.121e+02,	-1.797e-03,	-5.786e+01,	
-	// -6.601e-08,	-1.797e-03,	 3.247e-08,	 6.746e-04,	
-	// -1.186e-03,	-5.786e+01,	 6.746e-04,	 4.736e+01
+    // initialize flag: 2D hyperbolic equation has solution (primary source point)
+    bool bPrimaryPointAvailable=true;
+    XYPOINT ptTg;
+    if (pPoite) {
+        if (pPoite->Count<1 || pPoite->Count>3) { delete [] pPoite; return;}
 
-	double dMatrixPeq[]={
-        1.000e+00,	 0.000e+00,	 0.000e+00,	 0.000e+00,	 
-        0.000e+00,	 1.000e+00,	 0.000e+00,	 0.000e+00,	 
-        0.000e+00,	 0.000e+00,	 1.000e+00,	 0.000e+00,	 
-        0.000e+00,	 0.000e+00,	 0.000e+00,	 1.000e+00
-	};
-	Matrix mMatrixPeq(4,4,dMatrixPeq);
-	(*m_pPp)=mMatrixPeq;
+        // topocentric view of noisy source
+        TPoiT *pTPoiT = new TPoiT(pPoite);
+        pTPoiT->dRMinimum=1.0e-1;
+        if (QPsVoi::m_UseTolerance) {
+            if (pTPoiT->CalculateXY()) {
+                ptTg = pTPoiT->m_pt;
+                emit indicatorPoint(ptTg.dX,ptTg.dY,m_iLegendTypePrimary,pTPoiT,iRawIdx);
+            }
+            else {
+                bPrimaryPointAvailable=false;
+                delete pTPoiT; // pTPoit was not passed to new owner QIndicator
+            }
+        }
+        else { // improved 2D solver
+            if (pTPoiT->CalculateXY_baseSelection()) {
+                pTPoiT->m_pt.dX = pTPoiT->m_x[0];
+                pTPoiT->m_pt.dY = pTPoiT->m_y[0];
+                ptTg = pTPoiT->m_pt;
+                emit indicatorPoint(ptTg.dX,ptTg.dY,m_iLegendTypePrimary,pTPoiT,iRawIdx);
+            }
+            else {
+                bPrimaryPointAvailable=false;
+                delete pTPoiT; // pTPoit was not passed to new owner QIndicator
+            }
+        }
+        if (qIsNaN(ptTg.dX) || qIsNaN(ptTg.dY)) {
+            throw RmoException("receiveCodogram: qIsNan(ptTg.dX) || qIsNan(ptTg.dY)");
+            return;
+        }
 
-	// raise init flag
-	m_bInit=true;
+        // topocentric view of exact tg position
+        if (pblhGenSRC) {
+            BLH blhGenSRC=*pblhGenSRC;    // m_dLat, dLon - radians; dHei - meters
+            XYZ xyzGenSRC;                // topocentric coordinates (meters)
+            m_geoUtils.toTopocentric(&m_blhViewPoint,&blhGenSRC,&xyzGenSRC);
+            TPoiT *pTPoitDummy = new TPoiT(pPoite);
+            if (!pTPoitDummy) throw RmoException("QVoiProcessor: new TPoiT(pPoite)==NULL");
+            if (bPrimaryPointAvailable) {
+                emit indicatorPoint(xyzGenSRC.dX,xyzGenSRC.dY,m_iLegendTypeSource,pTPoitDummy,-1);
+            }
+            else {
+                emit indicatorPoint(xyzGenSRC.dX,xyzGenSRC.dY,m_iLegendTypeSourceAlarm,pTPoitDummy,-1);
+            }
+        }
+    }
+    else throw RmoException("QVoiProcessor::receiveCodogram pPoite is NULL");
 
-	return true;
+    //=================== PPOITE pPoite is now ready for processing ======================
+    // test POITE data to fit an existing trajectory filter
+    if (m_qlKalmanFilters.size()) {
+        QList<double> qlLatOffsets; // primary point distances from the existing trajectories
+        QList<int> qlIdx; // index array
+        // list all lateral offsets
+        for (int i=0; i<m_qlKalmanFilters.size(); i++) {
+            QKalmanFilter *pKalmanFilter=m_qlKalmanFilters.at(i);
+            // dMaxLatOffset will be used for concurrent trajectory selection
+            double dMaxLatOffset;
+            bool bTimeout=false;
+            if (pKalmanFilter->spaceStrob(iTcur,pPoite,dMaxLatOffset,bTimeout)) {
+                qlLatOffsets.append(dMaxLatOffset);
+                qlIdx.append(i);
+            }
+            else if (bTimeout) {
+                delete m_qlKalmanFilters.takeAt(i);
+            }
+            if (i>=m_qlKalmanFilters.size()) break;
+        }
+        // sort lateral offsets ascending
+        int nFilters=qlIdx.size(); // trajectories near target
+        if (nFilters) { // there are filters for tg those pass space strob
+            for (int i=0; i<nFilters-1; i++) { // sort clusters from closest to farest
+                for (int j=i+1; j<nFilters; j++) {
+                    if (qlLatOffsets.at(i)>qlLatOffsets.at(j)) {
+                        qlLatOffsets.swap(i,j);
+                        qlIdx.swap(i,j);
+                    }
+                }
+            }
+            //------------- closest trajectory: filterStep() ---------------
+            int iIdxNearest=qlIdx.at(0); // closest trajectory
+            if (iIdxNearest>=m_qlKalmanFilters.size()) throw RmoException("QVoiProcessor: iIdxNearest>=m_qlKalmanFilters.size()");
+            QKalmanFilter *pKalmanFilter=m_qlKalmanFilters.at(iIdxNearest);
+            // perform filter step using new POITE data and issue m_iLegendTypeFilter indicatorPoint
+            bool bOverrun=false;
+            bool bTimeout=false;
+            if (pKalmanFilter->filterStep(iTcur,pPoite,bOverrun,bTimeout)) { // POITE accepted
+                XYZ xyzFlt=pKalmanFilter->getTgXYZ();
+                TPoiT *pTPoitDummy = new TPoiT(pPoite);
+                emit indicatorPoint(xyzFlt.dX,xyzFlt.dY,m_iLegendTypeFilter,pTPoitDummy,-1);
+            }
+            else { // POITE rejected => kill filter
+ //               qDebug() << QString("Killing trajectory: overrun=%1 timeout=%2").arg(bOverrun).arg(bTimeout);
+                delete m_qlKalmanFilters.takeAt(iIdxNearest);
+            }
+            delete [] pPoite; return; // POITE processed
+        }
+        // if there no passend filters => proceed with clustering
+    }
+
+    // POITE data did not match any existing trajectory => add to either existing or new cluster
+    if (!bPrimaryPointAvailable) { // if source point is not available - we cannot do clustering
+        delete [] pPoite; return;
+    }
+
+    // Source point obtained. starting clustering
+    double dTgX=ptTg.dX;
+    double dTgY=ptTg.dY;
+//    qDebug() << QString("Got src pt $(%1,%2). nClusters=%3 nFilters=%4")
+//                .arg(dTgX).arg(dTgY)
+//                .arg(m_qlClusters.size())
+//                .arg(m_qlKalmanFilters.size());
+    // check existing clusters for timeout
+    for (int i=0; i<m_qlClusters.size(); i++) {
+        if (m_qlClusters.at(i)->isStale(iTcur)) {
+//            qDebug() << "Deleting stale cluster: " << i;
+            delete m_qlClusters.takeAt(i);
+        }
+        if (i>=m_qlClusters.size()) break;
+    }
+
+    // search for closest cluster
+    QList<double> qlDist; // distances from the primary point
+    QList<int> qlIdx; // index array
+    for (int i=0; i<m_qlClusters.size(); i++) {
+        double rr=m_qlClusters.at(i)->distance(dTgX,dTgY);
+        if (rr > dRcutoff) {
+            // qDebug() << "rr=" << rr << " >dRcutoff=" << dRcutoff << " skipping...";
+            continue;
+        }
+        qlDist.append(rr);
+        qlIdx.append(i);
+    }
+    //------------- New cluster creation ---------------
+    int nClusters=qlIdx.size(); // clusters near target
+    if (nClusters==0) { // no primary points cluster found => create new one
+        m_qlClusters.append(new QPrimaryCluster(iTcur,dTgX,dTgY));
+        delete [] pPoite; return; // no cluster found near target, new cluster created
+    }
+    //------------- Nearest cluster: update ---------------
+    for (int i=0; i<nClusters-1; i++) { // sort clusters from closest to farest
+        for (int j=i+1; j<nClusters; j++) {
+            if (qlDist.at(i)>qlDist.at(j)) {
+                qlDist.swap(i,j);
+                qlIdx.swap(i,j);
+            }
+        }
+    }
+    int iIdxNearest=qlIdx.at(0); // closest cluster
+    // update and check current size
+    if (m_qlClusters.at(iIdxNearest)->appendPriPt(iTcur,dTgX,dTgY)) { // cluster is big enough
+        // create Kalman filter
+        // target position
+        double dS = _hypot(ptTg.dX, ptTg.dY);
+        double dA = atan2(ptTg.dX,ptTg.dY);
+        if(dA > 2. * M_PI) dA -= 2. * M_PI;
+        else if(dA < 0.) dA += 2. * M_PI;
+        double dLat,dLon;
+        TdCord::Dirct2(m_blhViewPoint.dLon, m_blhViewPoint.dLat, dA, dS, &dLat, &dLon, NULL);
+        BLH blhTg; // dLat, dLon (rad); dHei (meters)
+        blhTg.dLat=dLat; blhTg.dLon=dLon;
+        blhTg.dHei=0; // unused
+        double dVx=0.0e0,dVy=0.0e0;
+        if (QKalmanFilter::m_bEstIniVelocity) m_qlClusters.at(iIdxNearest)->getVelocityEst(dVx,dVy);
+        QKalmanFilter *pKalmanFilter=new QKalmanFilter(iTcur,m_geoUtils,blhTg,dVx,dVy);
+        if (!pKalmanFilter) throw RmoException("QVoiProcessor: new QKalmanFilter==NULL");
+//        qDebug() << QString("new flt @(%1, %2) vel (%3, %4)")
+//                    .arg(ptTg.dX).arg(ptTg.dY)
+//                    .arg(dVx).arg(dVy);
+        TPoiT *pTPoitDummy = new TPoiT(pPoite);
+        if (!pTPoitDummy) throw RmoException("QVoiProcessor: new TPoiT(pPoite)==NULL");
+        emit indicatorPoint(ptTg.dX, ptTg.dY,m_iLegendTypeFilter,pTPoitDummy,-1);
+        TPoiT *pTPoitDummy1 = new TPoiT(pPoite);
+        if (!pTPoitDummy1) throw RmoException("QVoiProcessor: new TPoiT(pPoite)==NULL");
+        XYPOINT ptClusterCntr=m_qlClusters.at(iIdxNearest)->massCenter();
+        emit indicatorPoint(ptClusterCntr.dX,ptClusterCntr.dY,m_iLegendTypeCluster,pTPoitDummy1,-1);
+        m_qlKalmanFilters.append(pKalmanFilter);
+        delete m_qlClusters.takeAt(iIdxNearest);
+    }
+    delete [] pPoite;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QList<int> QVoiProcessor::getActivePosts(PPOITE pPoite) {
+    QList<int> qlRetVal;
+    for (int i=0; i < pPoite -> Count; i++) {
+        qlRetVal.append(pPoite -> rx[i].uMinuIndx-1);
+        qlRetVal.append(pPoite -> rx[i].uSubtIndx-1);
+    }
+    return qlRetVal;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QVoiProcessor::listPosts() {
-	if (!m_bInit) return;
-	if (!m_pMainCtrl) return;
-	MAINCTRL_P mp=m_pMainCtrl->p;
-	if (mp.dwPosCount<5) {
-		throw RmoException(QString("QVoiProcessor::mp.dwPosCount = %1").arg(mp.dwPosCount));
-		return;
-	}
-	for (int i=1; i<=4; i++) {
-		BLH blhPost = mp.positions[i].blh;
-		blhPost.dLat*=DEG_TO_RAD;
-		blhPost.dLon*=DEG_TO_RAD;
-		XYZ xyzPost;
-		m_geoUtils.toTopocentric(&m_blhViewPoint,&blhPost,&xyzPost);
-		emit addPost(xyzPost.dX,xyzPost.dY,i);
-	}
+    if (!m_bInit) return;
+    if (!m_pMainCtrl) return;
+    MAINCTRL_P mp=m_pMainCtrl->p;
+    if (mp.dwPosCount<5) {
+        throw RmoException(QString("QVoiProcessor::mp.dwPosCount = %1").arg(mp.dwPosCount));
+        return;
+    }
+    for (int i=1; i<=4; i++) {
+        BLH blhPost = mp.positions[i].blh;
+        blhPost.dLat*=DEG_TO_RAD;
+        blhPost.dLon*=DEG_TO_RAD;
+        XYZ xyzPost;
+        m_geoUtils.toTopocentric(&m_blhViewPoint,&blhPost,&xyzPost);
+        emit addPost(xyzPost.dX,xyzPost.dY,i);
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QVoiProcessor::startSimulation(quint64 tFrom, quint64 tTo) {
-	QList<int> qlWinIdxs = m_pPoiModel->buildSlidingWindow(tFrom,tTo);
-	for (int i=0; i<qlWinIdxs.size(); i++) {
-		qint64 iTime = m_pPoiModel->getPoiteTime(qlWinIdxs.at(i));
-		TPoiT* pTPoit = m_pPoiModel->getTPoiT(qlWinIdxs.at(i));
-		pTPoit->dRMinimum=1.0e-1;
-		XYPOINT ptTg = pTPoit->m_pt;
-		// qDebug() << "ptTg.dX,ptTg.dY=" << ptTg.dX << " " << ptTg.dY;
-		emit indicatorPoint(ptTg.dX,ptTg.dY,m_iLegendTypePrimary,pTPoit);
-	}
+bool QVoiProcessor::init(QString qsMainctrlCfg) {
+
+    // init m_geoUtils
+    if (!m_geoUtils.readCfgFile(qsMainctrlCfg)) return false;
+    m_pMainCtrl=m_geoUtils.m_pMainCtrl;
+    m_geoUtils.getViewPoint(&m_blhViewPoint,m_pMainCtrl);
+    MAINCTRL_P mp=m_pMainCtrl->p;
+    if (mp.dwPosCount<5) {
+        throw RmoException(QString("QVoiProcessor::mp.dwPosCount = %1").arg(mp.dwPosCount));
+        return false;
+    }
+
+    // init random numbers generator
+    m_pGen = new QGenerator(&m_geoUtils,
+        QDateTime::fromString("02.06.2017-09.00.22.639",TIMESTAMP_FORMAT).toMSecsSinceEpoch(),
+        &m_blhViewPoint);
+
+    // reset seed of random number generators
+    m_pGen->resetRandomNumberGenerators();
+
+    // raise init flag
+    m_bInit=true;
+
+    return true;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QVoiProcessor::startImitator(quint64 iTfrom, quint64 iTto) {
-	if (!m_pGen) return;
-
-	// reset imitator time 
-	quint64 iTcur=iTfrom;
-    m_pGen->resetTime(iTcur);
-
-	// reset seed of random number generators
-	m_pGen->resetRandomNumberGenerators();
-
-    // cleanup matrix debug files
-	matrixDebugOutput(false);
-
-	// initialize the state vector
-	BLH blhTg; // m_dLat, dLon - radians; dHei - meters
-	double dVx,dVy; // (meters / sec)
-	blhTg = *m_pGen -> getTg();
-	m_pGen -> getTgVel(dVx,dVy);
-
-	// posterior state estimate \hat{x}_{k-1(+)}
-	Matrix mXp = (*m_pXp);
-	mXp[0][0] = blhTg.dLat;
-	mXp[1][0] = dVy;
-	mXp[2][0] = blhTg.dLon;
-	mXp[3][0] = dVx;
-    (*m_pXp)= mXp;
-
-	//ostrstream myString;
-    //myString << "mXp:" << endl;
-	//myString << mXp;
-	//qDebug() << QString::fromAscii(myString.str());
-
-	m_iTlast = iTcur;
-	m_iTstart= iTcur;
-	m_bMatRelaxed=false;
-	m_qlErrB.clear(); m_qlErrL.clear();
-	m_qlZ[0].clear();m_qlZ[1].clear();m_qlZ[2].clear();
-	m_pGen->m_iTstart = m_iTstart;
-	while (iTcur < iTto) {
-					
-		// qDebug() << "Imitator time loop ";
-
-		iTcur += m_pGen->m_dGenDelay*1000.0e0; // msec
-		if (!m_pGen->propagate(iTcur)) return;
-		int iIdlePostNumber=std::rand()%4+1;
-
-		// DEBUGGING KALMAN FILTER!!!
-		// iIdlePostNumber = 2;
-		iIdlePostNumber = -1;
-
-		PPOITE pPoite = m_pGen->getPoite(QVoiProcessor::m_pbSkipPost);
-		if (!pPoite) { 
-		    qDebug() << "QVoiProcessor::pPoite==NULL";
-			return;
-		}
-
-		// Implement skipped posts
-		if (pPoite->Count<1 || pPoite->Count>3) continue;
-
-		// filter step
-		filterStep(iTcur,pPoite);
-
-		XYZ xyzFlt; BLH blhFlt;
-	    // posterior state estimate \hat{x}_{k(+)}
-		Matrix mXp = (*m_pXp);
-		blhFlt.dLat=mXp[0][0];
-		blhFlt.dLon=mXp[2][0];
-		blhFlt.dHei=m_dHei;
-		m_geoUtils.toTopocentric(&m_blhViewPoint,&blhFlt,&xyzFlt);
-		TPoiT *pTPoitDummy1 = new TPoiT(pPoite);
-		qDebug() << "pTPoitDummy1->m_iMatchCount=" << pTPoitDummy1->m_iMatchCount;
-		emit indicatorPoint(xyzFlt.dX,xyzFlt.dY,m_iLegendTypeFilter,pTPoitDummy1);
-
-        // topocentric view of filter input (primary points)
-		bool bSourceAvailable=true;
-		TPoiT *pTPoit = new TPoiT(pPoite);
-		pTPoit->dRMinimum=1.0e-1;
-		if (pTPoit->CalculateXY()) { // 2D equation
-			XYPOINT ptTg = pTPoit->m_pt;
-			emit indicatorPoint(ptTg.dX,ptTg.dY,m_iLegendTypePrimary,pTPoit);
-		}
-		else {
-			bSourceAvailable=false;
-			// qDebug() << "!pTPoit->CalculateXY()";
-		}
-
-        // topocentric view of source
-		BLH blhGenSRC=*m_pGen->getTg();
-		XYZ xyzGenSRC;
-		m_geoUtils.toTopocentric(&m_blhViewPoint,&blhGenSRC,&xyzGenSRC);
-		TPoiT *pTPoitDummy2 = new TPoiT(pPoite);
-		qDebug() << "pTPoitDummy2->m_iMatchCount=" << pTPoitDummy2->m_iMatchCount;
-		if (bSourceAvailable) {
-		    emit indicatorPoint(xyzGenSRC.dX,xyzGenSRC.dY,m_iLegendTypeSource,pTPoitDummy2);
-		}
-		else {
-		    emit indicatorPoint(xyzGenSRC.dX,xyzGenSRC.dY,m_iLegendTypeSourceAlarm,pTPoitDummy2);
-		}
-
-		//---!!! to be deleted inside qindicator !!!
-		//delete pTPoit;
-		//delete pTPoitDummy1;
-		//delete pTPoitDummy2;
-		delete[] pPoite;
-	}
-
-	//----------------- build sample distributions ---------------------
-	exactStatistics();
-
-	//----------------- update indicator view --------------------------
-	emit indicatorUpdate();
+QPrimaryCluster::QPrimaryCluster(qint64 iTk, double dTgX, double dTgY)
+      : m_iTimeout(QKalmanFilter::m_dTrajTimeout*60000)
+      , m_iStart(iTk) {
+    int iClusterMinSize = QKalmanFilter::m_iClusterMinSize;
+    if (QVoiProcessor::m_bUseGen) iClusterMinSize = QGenerator::m_iClusterMinSize;
+    if ((iClusterMinSize)<2 || (iClusterMinSize)>1000) throw RmoException("QPrimaryCluster: bad m_iClusterMinSize");
+    m_qlTk.append(iTk);
+    m_qlTgX.append(dTgX);
+    m_qlTgY.append(dTgY);
+    m_iSize=1;
+    m_dCenterX=dTgX;
+    m_dCenterY=dTgY;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QVoiProcessor::filterStep(qint64 iTk, PPOITE pPoite) {
-	m_iPt++;
+bool QPrimaryCluster::isStale(qint64 iTk) {
+    if (iTk-m_iStart<0) throw RmoException(QString("QPrimaryCluster: iTk (%1) < m_iStart (%2). Diff=%3").arg(iTk).arg(m_iStart).arg(m_iStart-iTk));
+    // qDebug() << QString("iTk(%1) > m_iStart(%2)+m_iTimeout(%3)").arg(iTk).arg(m_iStart).arg(m_iTimeout);
+    return (iTk > m_iStart+m_iTimeout);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool QPrimaryCluster::appendPriPt(qint64 iTk, double dTgX, double dTgY) {
+    m_qlTk.append(iTk);
+    m_qlTgX.append(dTgX);
+    m_qlTgY.append(dTgY);
+    m_dCenterX=m_dCenterX*m_iSize+dTgX;
+    m_dCenterY=m_dCenterY*m_iSize+dTgY;
+    m_iSize++;
+    m_dCenterX/=m_iSize;
+    m_dCenterY/=m_iSize;
+    if (m_qlTk.size() != m_iSize || m_qlTgX.size() != m_iSize || m_qlTgY.size() != m_iSize) throw RmoException("QPrimaryCluster size mismatch");
+    int iClusterMinSize = QKalmanFilter::m_iClusterMinSize;
+    if (QVoiProcessor::m_bUseGen) iClusterMinSize = QGenerator::m_iClusterMinSize;
+    return (m_iSize>=iClusterMinSize);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+double QPrimaryCluster::distance(double dTgX, double dTgY) {
+    double xx=m_dCenterX-dTgX; xx=xx*xx;
+    double yy=m_dCenterY-dTgY; yy=yy*yy;
+    return sqrt(xx+yy);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QPrimaryCluster::getVelocityEst(double &dVx,double &dVy) {
+    if (m_iSize<2) throw RmoException("QPrimaryCluster: m_iSize<2");
 
-	//---------------------------- time interval evaluation --------------------------
-	if (m_iTlast==-1 || iTk<=m_iTlast) {
-		throw RmoException("QVoiProcessor::filterStep m_iTlast==-1 || iTk<=m_iTlast");
-		return;
-	}
-    m_dDeltaT=(iTk-m_iTlast)*1.0e-3; // seconds
-	if (m_dDeltaT>10.0e0*60*60 || m_dDeltaT<=0.0e0) {
-		throw RmoException(QString("QVoiProcessor::filterStep m_dDeltaT=%1 sec").arg(m_dDeltaT));
-		return;
-	}
+    double dXT=0.0e0;
+    double dX=0.0e0;
+    double dYT=0.0e0;
+    double dY=0.0e0;
+    double dT=0.0e0;
+    double dT2=0.0e0;
 
-	//---------------------------- auxilary geodetic vars --------------------------
-    refreshGeodeticParams();
-
-	//---------------------------- measurement validation --------------------------
-	if (!spaceStrob(iTk,pPoite)) {
-	    // throw RmoException("Space strob rejected!");
-	    return;
-	}
-
-	//---------------------------- system force matrix --------------------------
-	if (!m_bFinitialized) {
-		// m_bFinitialized=true;
-        refreshMatrixF();
-	}
-
-	//---------------------------- system noise covariation --------------------------
-	if (!m_bQinitialized) {
-        // m_bQinitialized=true;
-        refreshMatrixQ(m_dDeltaT);
-		//ostrstream myString;
-		//myString << (*m_pQ);
-	    //qDebug() << "mQ:" << endl << QString::fromAscii(myString.str());
-		//qDebug() << "m_dGeoE=" << m_dGeoE;
-		//qDebug() << "m_dGeoG=" << m_dGeoG;
-		//qDebug() << "m_dGeoCosB=" << m_dGeoCosB;
-		//qDebug() << "m_dGeoSinB=" << m_dGeoSinB;
-		//
-		//qDebug() << "m_dGeoEPrime=" << m_dGeoEPrime;
-		//qDebug() << "m_dGeoE2=" << m_dGeoE2;
-		//qDebug() << "m_dKalf1=" << m_dKalf1;
-		//qDebug() << "m_dKalf3=" << m_dKalf3;
-		//qDebug() << "m_dGeoTgB=" << m_dGeoTgB;
-		//qDebug() << "m_dGeoG2=" << m_dGeoG2;
-		//qDebug() << "m_dGeoXi3=" << m_dGeoXi3;
-		//qDebug() << "m_dGeoEps2=" << m_dGeoEps2;
-		//qDebug() << "m_dKalf3=" << m_dKalf3;
-	}
-
-	//---------------------------- measurement covariation --------------------------
-	refreshMatrixR(pPoite);
-
-	//---------------------------- parse POITE --------------------------
-	assign_mZ(pPoite);
-
-	//------------ posprior estimate of state: \hat{x}_{k-1(+)} ----------------
-	Matrix mXp = (*m_pXp); 
-
-	//------------ state vector increment ------------
-	Matrix mXprimeDt(4,1);
-	mXprimeDt[0][0] = m_dDeltaT * m_dKalf1;
-	mXprimeDt[1][0] = 0.0e0;
-	mXprimeDt[2][0] = m_dDeltaT * m_dKalf3;
-	mXprimeDt[3][0] = 0.0e0;
-
-	//------------ a priori estimate of state: \hat{x}_{k(-)} -----------------
-	Matrix mXm = (*m_pXm);
-	mXm = mXp + mXprimeDt;
-    (*m_pXm) = mXm;
-
-    //------------------ measurement sensitivity matrix -----------------------
-	if (!m_bHinitialized) {
-		// m_bHinitialized=true;
-	    refreshMatrixH(pPoite);
-	    refreshMatrixHnum(pPoite);
-	}
-
-	//--------------- system noise covariation P_{k(-)} evolution ------------------
-	if (m_bUseMatRelax && !m_bMatRelaxed) {
-        refreshMatrixK(pPoite);
-        matrixRelaxation(m_dMatRelaxTime);
-        m_bMatRelaxed=true;
-	}
-    matrixEvolution(m_dDeltaT);
-	Matrix mKalQ = (*m_pQ);
-	Matrix mKalPm= (*m_pPm);
-	mKalPm = mKalPm + mKalQ;
-    (*m_pPm)=mKalPm;
-
-	//------------ Kalman gain ----------------
-    refreshMatrixK(pPoite);
-
-    //--------------- system noise posterior covariation P_{k(+)} ------------------
-	Matrix mKalPp= (*m_pPp);
-	Matrix mKalK = (*m_pK);
-	Matrix mKalH = (*m_pH);
-	Matrix mKalR = (*m_pR);
-
-	//------------ posterior covariations ------------
-	double dIdentity[]={1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
-	Matrix mBracket(4,4,dIdentity);
-	mBracket= mBracket-mKalK*mKalH;
-    mKalPp = mBracket * mKalPm * (~mBracket)
-	    + mKalK * mKalR * (~mKalK);
-	(*m_pPp)= mKalPp;
-
-	//------------ make the actual filter step ------------
-	Matrix mZ    = (*m_pZ);
-	// posterior measurement estimate \hat{z}_{k(-)}
-	Matrix mZm   = (*m_pZm);
-    // mismatch correction
-    Matrix mMismatchCorr=mKalK*(mZ-mZm);
-    mXp = mXm + mMismatchCorr;
-
-	//------------ state estimate errors ------------------
-	PBLH pTgBLH=m_pGen->getTg();
-	Matrix mTildeX(4,1);
-	Matrix mTildeZ=mZ;
-	mTildeX[1][0]=mTildeX[3][0]=0.0e0;
-    mTildeX[0][0]=mXp[0][0]-pTgBLH->dLat;
-    mTildeX[2][0]=mXp[2][0]-pTgBLH->dLon;
-	m_qlErrB.append(mXp[0][0]-pTgBLH->dLat);
-	m_qlErrL.append(mXp[2][0]-pTgBLH->dLon);
-	if (mTildeZ.rowno()==3) {
-		// Matrix mKalHnum=(*m_pHnum);
-        mTildeZ=mKalH*mTildeX;
-		for (int i=0; i<mTildeZ.rowno(); i++) {
-			m_qlZ[i].append(mTildeZ[i][0]);
-		}
-	}
-
-    //------------ statistics chi-squared -----------------
-    Matrix mMismatch = (mZ - mZm) - mKalH*mMismatchCorr;
-	Matrix mMismatchCov = mKalH*mKalPp*(~mKalH) + mKalR;
-	if (mMismatchCov.det() < QVOIPROCESSOR_EPS) throw RmoException(QString("mMismatchCov.det()=%1").arg(mMismatchCov.det()));
-	Matrix mStatChi2 = (~mMismatch)*(!mMismatchCov)*mMismatch;
-
-	int nDim=qBound(1,(int)mZ.colsize(),3);
-	if (m_iChi2Prob>=sizeof(dChi2Quant[nDim])/sizeof(dChi2Quant[nDim][0])) {
-		throw RmoException("Illegal m_iChi2Prob");
-	}
-	double dChi2Thresh=dChi2Quant[nDim][m_iChi2Prob];
-	if (mStatChi2[0][0]>dChi2Thresh) {
-		qDebug() << m_iPt << " Chi2 statistics " << mStatChi2[0][0] << "  over thresh " << dChi2Thresh;
-	}
-    qlChi2 << mStatChi2[0][0];
-	if (0) {
-		Matrix mKalF=(*m_pF);
-		Matrix mKalQ=(*m_pQ);
-		Matrix mKalH=(*m_pH);
-		Matrix mKalR=(*m_pR);
-
-		Matrix mKalPp=(*m_pPp);
-		Matrix mKalPm(4,4);
-
-		ostrstream myString;
-
-		myString << "mXm\n" << mXm << endl;
-		myString << "m_dDeltaT\n" << m_dDeltaT << endl;
-		myString << "mXprimeDt\n" << mXprimeDt << endl;
-		myString << "mKalR\n" << mKalR << endl;
-		myString << "mKalQ\n" << mKalQ << endl;
-		myString << "(*m_pPm)\n " << (*m_pPm) << endl;
-		myString << "(*m_pPp)\n " << (*m_pPp) << endl;
-		myString << "mKalH\n" << mKalH << endl;
-		if (m_pHnum) {
-			Matrix mKalHnum=(*m_pHnum);
-			myString << "mKalHnum\n" << mKalHnum << endl;
-		}
-        myString << "MeasNonlinearity\n" << m_dMeasNonlinearity << endl;
-		myString << "mKalK\n" << mKalK << endl;
-		//myString << "mKalH*mXprimeDt\n" << mKalH*mXprimeDt << endl;
-		myString << "mKalK*mKalH\n" << mKalK*mKalH << endl;
-		//myString << "mBracket\n" << mBracket << endl;
-		//myString << "m_dDeltaT * mKalF \n " << (m_dDeltaT * mKalF) << endl;
-		myString << "mZ\n" << mZ << endl;
-		myString << "mZm\n" << mZm << endl;
-		myString << "mZ-mZm\n" << mZ-mZm << endl;
-		myString << "mKalK*(mZ-mZm)\n" << mKalK*(mZ-mZm) << endl;
-		myString << "\0\0\0\0\0";
-
-	    qDebug() << "==================================================================";
-        qDebug() << QString::fromLocal8Bit(myString.str());
-	}
-
-	//------------ save the posterior state estimate \hat{x}_{k(+)} ------------
-	(*m_pXp) = mXp;
-
-	//------------------- write matrices to text files -----------------------
-	matrixDebugOutput(true,iTk);
-    covEigenvectors(iTk);
-
-	//------------------- update current system time  -----------------------
-	m_iTlast=iTk;
-
-//------------------
-	if (mKalH.rowno()==3) {
-        int i,j,k;
-		const int NP=3;
-		const DP TINY=1.0e-6;
-		Vec_DP d(NP),e(NP),f(NP);
-		Mat_DP a(NP,NP),c(NP,NP);
-		Matrix mCov=mKalH*mKalPp*(~mKalH);
-		for(i=0;i<NP;i++) for(j=0;j<NP;j++) {
-			a[i][j]=mCov[i][j];
-		}
-		NR::tred2(a,d,e);
-		NR::tqli(d,e,a);
-		for (i=0;i<NP-1;i++) {
-			for (j=i+1;j<NP;j++) {
-				if (d[i]>d[j]) {
-					double dTmp;
-					dTmp=d[i]; d[i]=d[j]; d[j]=dTmp;
-					for (k=0;k<NP;k++) {
-						dTmp=a[k][i]; a[k][i]=a[k][j]; a[k][j]=dTmp;
-					}
-				}
-			}
-		}
-		//qDebug() << "HP~H eigenval " << d[0] << " " << d[1] << " " << d[2];
-		//qDebug() << "evec[0] " << a[0][0] << " " << a[1][0] << " " << a[2][0];
-		//qDebug() << "evec[1] " << a[0][1] << " " << a[1][1] << " " << a[2][1];
-		//qDebug() << "evec[2] " << a[0][2] << " " << a[1][2] << " " << a[2][2];
-	}
-
-	//------------------- cleanup -------------------------------------------
-	if (m_pZ) {
-		delete m_pZ;
-		m_pZ = NULL;
-	}
-	if (m_pZm) {
-		delete m_pZm;
-		m_pZm = NULL;
-	}
-	if (m_pK) {
-		delete m_pK;
-		m_pK = NULL;
-	}
-	if (m_pH) {
-		delete m_pH;
-		m_pH = NULL;
-	}
-	if (m_pHnum) {
-		delete m_pHnum;
-		m_pHnum = NULL;
-	}
-	if (m_pR) {
-		delete m_pR;
-		m_pR = NULL;
-	}
+    for (int i=0; i<m_iSize; i++) {
+        double dTimeSecs = (m_qlTk.at(i)-m_qlTk.at(0))*1.0e-3;
+        dXT+=m_qlTgX.at(i)*dTimeSecs;
+        dYT+=m_qlTgY.at(i)*dTimeSecs;
+        dX+=m_qlTgX.at(i);
+        dY+=m_qlTgY.at(i);
+        dT+=dTimeSecs;
+        dT2+=dTimeSecs*dTimeSecs;
+    }
+    double dDenom=m_iSize*dT2-dT*dT;
+    if (abs(dDenom)<QKALMANFILTER_EPS) {
+        throw RmoException(QString("QPrimaryCluster: dDenom<QKALMANFILTER_EPS: m_iSize=%1 dT2=%2 dT=%3")
+                           .arg(m_iSize).arg(dT2).arg(dT));
+    }
+    // output velocity estimate (m/s)
+    dVx = (m_iSize*dXT-dX*dT)/dDenom;
+    dVy = (m_iSize*dYT-dY*dT)/dDenom;
 }

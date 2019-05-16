@@ -1,8 +1,8 @@
 //******************************************************************************
 //
-//  файл qrctrl.h - компонент приложения   qavtadu.exe - модуля
-//     управления изделием Avtobaza-m Copyright by Tristan 2013
-//     описывает главную структуру управления MAINCTRL, кодограммы обмена с СНЦ,
+//  С„Р°Р№Р» qrctrl.h - РєРѕРјРїРѕРЅРµРЅС‚ РїСЂРёР»РѕР¶РµРЅРёСЏ   qavtadu.exe - РјРѕРґСѓР»СЏ
+//     СѓРїСЂР°РІР»РµРЅРёСЏ РёР·РґРµР»РёРµРј Avtobaza-m Copyright by Tristan 2013
+//     РѕРїРёСЃС‹РІР°РµС‚ РіР»Р°РІРЅСѓСЋ СЃС‚СЂСѓРєС‚СѓСЂСѓ СѓРїСЂР°РІР»РµРЅРёСЏ MAINCTRL, РєРѕРґРѕРіСЂР°РјРјС‹ РѕР±РјРµРЅР° СЃ РЎРќР¦,
 //
 //******************************************************************************
 #ifndef RCTRLH
@@ -31,19 +31,19 @@ typedef struct BLH_
 } BLH, * PBLH;
 
 //******************************************************************************
-//  структура MAINCTRL_O
-//  компонент главной структуры управления MAINCTRL
-//  отвечающий за программу обзора
+//  СЃС‚СЂСѓРєС‚СѓСЂР° MAINCTRL_O
+//  РєРѕРјРїРѕРЅРµРЅС‚ РіР»Р°РІРЅРѕР№ СЃС‚СЂСѓРєС‚СѓСЂС‹ СѓРїСЂР°РІР»РµРЅРёСЏ MAINCTRL
+//  РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РїСЂРѕРіСЂР°РјРјСѓ РѕР±Р·РѕСЂР°
 //
 //******************************************************************************
 typedef struct MAINCTRL_O_
-{   DWORD dwFlags;                  // флаги O_FLAG_XXXXX
-    wchar_t sName[48];              // имя режима
-    struct S_ {						// массив стробов (макс 32) для данного режима
-	DWORD dwFlags;					// флаги O_FLAG_S_XXXXX
+{   DWORD dwFlags;                  // С„Р»Р°РіРё O_FLAG_XXXXX
+    wchar_t sName[48];              // РёРјСЏ СЂРµР¶РёРјР°
+    struct S_ {						// РјР°СЃСЃРёРІ СЃС‚СЂРѕР±РѕРІ (РјР°РєСЃ 32) РґР»СЏ РґР°РЅРЅРѕРіРѕ СЂРµР¶РёРјР°
+	DWORD dwFlags;					// С„Р»Р°РіРё O_FLAG_S_XXXXX
 	BYTE bActionID, bCallID, bAcmCode, bUVSMask;
-	DWORD dwTimeIncrim;				// прибавка к счетчику времени в 100 нс квантах (100 mks for timer)
-	DWORD dwDuration;				// длительность в 100 нс квантах
+	DWORD dwTimeIncrim;				// РїСЂРёР±Р°РІРєР° Рє СЃС‡РµС‚С‡РёРєСѓ РІСЂРµРјРµРЅРё РІ 100 РЅСЃ РєРІР°РЅС‚Р°С… (100 mks for timer)
+	DWORD dwDuration;				// РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РІ 100 РЅСЃ РєРІР°РЅС‚Р°С…
 #ifndef DSP_BIOS
 	union {
 		struct {
@@ -81,27 +81,27 @@ typedef struct MAINCTRL_O_
 	BYTE bWbaCode;
 	BYTE bReserved[7];
 	} s[32];
-    int iSNum;						// число сигналов в этом режиме
+    int iSNum;						// С‡РёСЃР»Рѕ СЃРёРіРЅР°Р»РѕРІ РІ СЌС‚РѕРј СЂРµР¶РёРјРµ
 
-	int iOCou;                      // сколько раз дкржать этот режим
-    int iONext;                     // на какой режим перейти потом
+	int iOCou;                      // СЃРєРѕР»СЊРєРѕ СЂР°Р· РґРєСЂР¶Р°С‚СЊ СЌС‚РѕС‚ СЂРµР¶РёРј
+    int iONext;                     // РЅР° РєР°РєРѕР№ СЂРµР¶РёРј РїРµСЂРµР№С‚Рё РїРѕС‚РѕРј
 } MAINCTRL_O, * PMAINCTRL_O;
 
 #ifndef DSP_BIOS
 typedef struct MAINCTRL_O_::S_ SCAN_PROG_S, * PSCAN_PROG_S;
 #endif	// DSP_BIOS
 
-#define    O_FLAG_S_CALL			0x1    // это вызов 
-#define    O_FLAG_S_ACTION			0x2    // это действие
-#define    O_FLAG_S_GOTO			0x4    // это ветвление
-#define    O_FLAG_S_FORK			0x8    // это fork ветвление
-#define    O_FLAG_S_ENABLE			0x10   // строб разрешен
-#define    O_FLAG_S_USEF0			0x20   // использовать код частоты сигнала
-#define    O_FLAG_S_USEFI0			0x40   // использовать индекс частоты сигнала
+#define    O_FLAG_S_CALL			0x1    // СЌС‚Рѕ РІС‹Р·РѕРІ 
+#define    O_FLAG_S_ACTION			0x2    // СЌС‚Рѕ РґРµР№СЃС‚РІРёРµ
+#define    O_FLAG_S_GOTO			0x4    // СЌС‚Рѕ РІРµС‚РІР»РµРЅРёРµ
+#define    O_FLAG_S_FORK			0x8    // СЌС‚Рѕ fork РІРµС‚РІР»РµРЅРёРµ
+#define    O_FLAG_S_ENABLE			0x10   // СЃС‚СЂРѕР± СЂР°Р·СЂРµС€РµРЅ
+#define    O_FLAG_S_USEF0			0x20   // РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РєРѕРґ С‡Р°СЃС‚РѕС‚С‹ СЃРёРіРЅР°Р»Р°
+#define    O_FLAG_S_USEFI0			0x40   // РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РёРЅРґРµРєСЃ С‡Р°СЃС‚РѕС‚С‹ СЃРёРіРЅР°Р»Р°
 #define    O_FLAG_S_MODFR0			0x80	
 #define    O_FLAG_S_MODFRFR0		0x100	
-#define    O_FLAG_S_USEF1			0x2000   // использовать код частоты сигнала
-#define    O_FLAG_S_USEFI1			0x4000   // использовать индекс частоты сигнала
+#define    O_FLAG_S_USEF1			0x2000   // РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РєРѕРґ С‡Р°СЃС‚РѕС‚С‹ СЃРёРіРЅР°Р»Р°
+#define    O_FLAG_S_USEFI1			0x4000   // РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РёРЅРґРµРєСЃ С‡Р°СЃС‚РѕС‚С‹ СЃРёРіРЅР°Р»Р°
 #define    O_FLAG_S_MODFR1			0x8000	
 #define    O_FLAG_S_MODFRFR1		0x10000	
 #define    O_FLAG_S_USECNTINDX		0x20000	
@@ -114,14 +114,14 @@ typedef struct MAINCTRL_O_::S_ SCAN_PROG_S, * PSCAN_PROG_S;
 #define    O_FLAG_S_USECNDINDX		0x1000000	
 #define    O_FLAG_S_USECNDFTBLINDX  0x2000000	
 
-#define    O_FLAG_LOOP        0x10  // повторять этот режим безконца
-#define    O_FLAG_HIDE        0x20  // не показывать этот режим оператору РМО
-#define    O_FLAG_START       0x40  // этот режим стартовый
+#define    O_FLAG_LOOP        0x10  // РїРѕРІС‚РѕСЂСЏС‚СЊ СЌС‚РѕС‚ СЂРµР¶РёРј Р±РµР·РєРѕРЅС†Р°
+#define    O_FLAG_HIDE        0x20  // РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ СЌС‚РѕС‚ СЂРµР¶РёРј РѕРїРµСЂР°С‚РѕСЂСѓ Р РњРћ
+#define    O_FLAG_START       0x40  // СЌС‚РѕС‚ СЂРµР¶РёРј СЃС‚Р°СЂС‚РѕРІС‹Р№
 
 #define    O_ACTION_NON				0		// non
 #define    O_ACTION_NOP				1		// nop
 #define    O_ACTION_SETTIME			2		// 
-#define    O_ACTION_STOP			3		// встать в состояние пауза
+#define    O_ACTION_STOP			3		// РІСЃС‚Р°С‚СЊ РІ СЃРѕСЃС‚РѕСЏРЅРёРµ РїР°СѓР·Р°
 #define    O_ACTION_IFADDUVS		4		// 
 #define    O_ACTION_IFCNDANY		5		// 
 #define    O_ACTION_IFCNDALL		6		// 
@@ -152,7 +152,7 @@ typedef struct MAINCTRL_O_::S_ SCAN_PROG_S, * PSCAN_PROG_S;
 #define    O_ACTION_DECCND			31		// 
 
 
-#define    O_CONDITION_RUB400		0x1		// пришел статус 400
+#define    O_CONDITION_RUB400		0x1		// РїСЂРёС€РµР» СЃС‚Р°С‚СѓСЃ 400
 #define    O_CONDITION_NEWBUS0		0x2		// BUS 0 got connection
 #define    O_CONDITION_NEWBUS1		0x4		// BUS 1 got connection
 #define    O_CONDITION_ADJ_FINISED	0x8		// Adjust finished
@@ -176,13 +176,13 @@ typedef struct CHANTABENTRY_
 {	USHORT usBandCode;
 	USHORT usNCOCode;
 	USHORT usFrequCode;
-	USHORT usFlags;				// флаги CHAN_FLAG_XXXXX
+	USHORT usFlags;				// С„Р»Р°РіРё CHAN_FLAG_XXXXX
 	CHANTABPARAM p[8];
 } CHANTABENTRY, * PCHANTABENTRY;
 
 
 typedef struct MAINCTRL_C_
-{   DWORD dwFlags;                  // флаги C_FLAG_XXXXX
+{   DWORD dwFlags;                  // С„Р»Р°РіРё C_FLAG_XXXXX
 	DWORD dwChanId;					
 	CHANTABENTRY c[16];
 } MAINCTRL_C, * PMAINCTRL_C;
@@ -191,7 +191,7 @@ typedef struct CHANTABPOSTENTRY_
 {	USHORT usBandCode;
 	USHORT usNCOCode;
 	USHORT usFrequCode;
-	USHORT usFlags;				// флаги CHAN_FLAG_XXXXX
+	USHORT usFlags;				// С„Р»Р°РіРё CHAN_FLAG_XXXXX
 	USHORT usTrashHold;
 	USHORT usPar0;
 	USHORT usPar1;
@@ -200,7 +200,7 @@ typedef struct CHANTABPOSTENTRY_
 } CHANTABPOSTENTRY, * PCHANTABPOSTENTRY;
 
 typedef struct CHANNELTBL_
-{   DWORD dwFlags;                  // флаги C_FLAG_XXXXX
+{   DWORD dwFlags;                  // С„Р»Р°РіРё C_FLAG_XXXXX
 	DWORD dwPostId;					
 	DWORD dwChanId;					
 	CHANTABPOSTENTRY c[16];
@@ -278,17 +278,17 @@ typedef struct MAINCTRL_A_
 
 #define SNC_TBL_FLAG_USEKU		0x1
 //******************************************************************************
-//  Собственно сама главная структура управления MAINCTRL
-//  отвечает за управление всем, заряжается при старте и сохраняется на выходе в
-//  файле конфигурации с именем из проектных параметров (по умолчанию mainctrl.cfg)
+//  РЎРѕР±СЃС‚РІРµРЅРЅРѕ СЃР°РјР° РіР»Р°РІРЅР°СЏ СЃС‚СЂСѓРєС‚СѓСЂР° СѓРїСЂР°РІР»РµРЅРёСЏ MAINCTRL
+//  РѕС‚РІРµС‡Р°РµС‚ Р·Р° СѓРїСЂР°РІР»РµРЅРёРµ РІСЃРµРј, Р·Р°СЂСЏР¶Р°РµС‚СЃСЏ РїСЂРё СЃС‚Р°СЂС‚Рµ Рё СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РЅР° РІС‹С…РѕРґРµ РІ
+//  С„Р°Р№Р»Рµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЃ РёРјРµРЅРµРј РёР· РїСЂРѕРµРєС‚РЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ mainctrl.cfg)
 //
 //******************************************************************************
 #ifndef DSP_BIOS
 typedef struct MAINCTRL_
-{   DWORD dwFlags;                  // флаги управления MAIN_FLAG_ХХХХ
-    DWORD dwOStart;                 // кандидат в стартовые режимы
-    DWORD dwONum;                   // число определенных режимов (макс 64)
-    MAINCTRL_O o[64];               // массив структур режимов (программа обзора)
+{   DWORD dwFlags;                  // С„Р»Р°РіРё СѓРїСЂР°РІР»РµРЅРёСЏ MAIN_FLAG_РҐРҐРҐРҐ
+    DWORD dwOStart;                 // РєР°РЅРґРёРґР°С‚ РІ СЃС‚Р°СЂС‚РѕРІС‹Рµ СЂРµР¶РёРјС‹
+    DWORD dwONum;                   // С‡РёСЃР»Рѕ РѕРїСЂРµРґРµР»РµРЅРЅС‹С… СЂРµР¶РёРјРѕРІ (РјР°РєСЃ 64)
+    MAINCTRL_O o[64];               // РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ СЂРµР¶РёРјРѕРІ (РїСЂРѕРіСЂР°РјРјР° РѕР±Р·РѕСЂР°)
 	unsigned __int64 quForvardTime;
 	DWORD aUvsAddress[8];
 	int iUvsPort[8];
@@ -320,17 +320,17 @@ typedef struct MAINCTRL_
 #define    MAIN_FLAG_UVSENAB_CHANGE		0x80
 #define    MAIN_FLAG_LNASTAT_CHANGE		0x100
 #define    MAIN_FLAG_FREQUTBL_CHANGE	0x200
-#define    MAIN_FLAG_RTL_CHANGE			0x400			// запрос на синхронизацию TL
+#define    MAIN_FLAG_RTL_CHANGE			0x400			// Р·Р°РїСЂРѕСЃ РЅР° СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЋ TL
 #define    MAIN_FLAG_PAUSE_CHANGE		0x800			// used
-#define    MAIN_FLAG_CHANTBL_CHANGE		0x1000			// запрос на chantbl
-#define    MAIN_FLAG_ATTTBL_CHANGE		0x2000			// запрос на atttbl
-#define    MAIN_FLAG_POSTINFO_CHANGE	0x4000			// запрос на обновление postinfo
-#define    MAIN_FLAG_PAUSE				0x8000          // пауза
+#define    MAIN_FLAG_CHANTBL_CHANGE		0x1000			// Р·Р°РїСЂРѕСЃ РЅР° chantbl
+#define    MAIN_FLAG_ATTTBL_CHANGE		0x2000			// Р·Р°РїСЂРѕСЃ РЅР° atttbl
+#define    MAIN_FLAG_POSTINFO_CHANGE	0x4000			// Р·Р°РїСЂРѕСЃ РЅР° РѕР±РЅРѕРІР»РµРЅРёРµ postinfo
+#define    MAIN_FLAG_PAUSE				0x8000          // РїР°СѓР·Р°
                                                  //
-#define    MAIN_FLAG_SNCCTLF		   0x1000000 // Боевая кодограмма	
+#define    MAIN_FLAG_SNCCTLF		   0x1000000 // Р‘РѕРµРІР°СЏ РєРѕРґРѕРіСЂР°РјРјР°	
 
 //******************************************************************************
-//					Кодограммы ADU CTL
+//					РљРѕРґРѕРіСЂР°РјРјС‹ ADU CTL
 //******************************************************************************
 #define		ADU_TYPE_STATUS		0xb00
 #define		ADU_TYPE_MCTRL		0xb01
@@ -340,18 +340,18 @@ typedef struct MAINCTRL_
 #define		ADU_TYPE_SLEVEL		0xb05
 
 typedef struct ADUCLI_STATUS_
-{	unsigned __int64 uqTime;		// Время UTC (100ns ticks)
-	double dSncBufStat;				// Запас стробов в сек
-	double dCliBufStat;				// Запас стробов в сек
-	double dUvsBufStat;				// Запас стробов в сек
-	double dAduBufStat;				// Запас стробов в сек
-	double dOut0BufStat;			// Запас в сек
-	double dOut1BufStat;			// Запас в сек
-	double dSpeedIn;				// Поток на прием мбит в сек
-	double dSpeedOut;				// Поток на передачу мбит в сек
-	double dOutLoad;				// Процент заполтуния выходного буфера
+{	unsigned __int64 uqTime;		// Р’СЂРµРјСЏ UTC (100ns ticks)
+	double dSncBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dCliBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dUvsBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dAduBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dOut0BufStat;			// Р—Р°РїР°СЃ РІ СЃРµРє
+	double dOut1BufStat;			// Р—Р°РїР°СЃ РІ СЃРµРє
+	double dSpeedIn;				// РџРѕС‚РѕРє РЅР° РїСЂРёРµРј РјР±РёС‚ РІ СЃРµРє
+	double dSpeedOut;				// РџРѕС‚РѕРє РЅР° РїРµСЂРµРґР°С‡Сѓ РјР±РёС‚ РІ СЃРµРє
+	double dOutLoad;				// РџСЂРѕС†РµРЅС‚ Р·Р°РїРѕР»С‚СѓРЅРёСЏ РІС‹С…РѕРґРЅРѕРіРѕ Р±СѓС„РµСЂР°
 	double dReserved;				//
-	DWORD dwFlags;                  // флаги UVS_STAT_FLAG_XXXXX
+	DWORD dwFlags;                  // С„Р»Р°РіРё UVS_STAT_FLAG_XXXXX
 	DWORD dwErrCount;
 	DWORD dwDoneCount;
 	DWORD dwSatellCou;
@@ -363,7 +363,7 @@ typedef struct ADUCLI_STATUS_
 	BLH blh;
 	DWORD dwClientId;
 	double dLastTCorr;
-	unsigned __int64 uqLastUpdateTime;		// Время UTC (100ns ticks)
+	unsigned __int64 uqLastUpdateTime;		// Р’СЂРµРјСЏ UTC (100ns ticks)
 	BYTE bAcmStatus[24];
 	DWORD dwChannelMask;
 	BYTE bWbr0MagicNumber;
@@ -429,14 +429,14 @@ typedef struct SIGNALLEVEL_
 	int iReserved[7];
 } SIGNALLEVEL, * PSIGNALLEVEL;
 //******************************************************************************
-//					Кодограммы СНЦ
+//					РљРѕРґРѕРіСЂР°РјРјС‹ РЎРќР¦
 //******************************************************************************
 
 #define		SNC_TYPE_COMMAND	0xa000
 #define		SNC_TYPE_STROB		0xa000
 #define		SNC_TYPE_GETTIME	0xa010
 #define		SNC_TYPE_INITATBL	0xa011
-#define		SNC_TYPE_STATUS		0xa012	// передается из СНЦ по разным поводам
+#define		SNC_TYPE_STATUS		0xa012	// РїРµСЂРµРґР°РµС‚СЃСЏ РёР· РЎРќР¦ РїРѕ СЂР°Р·РЅС‹Рј РїРѕРІРѕРґР°Рј
 #define		SNC_TYPE_GPS		0xa021
 #define		SNC_TYPE_RUBID		0xa022
 #define		ACL_TYPE_STATUS		0xe000
@@ -520,10 +520,10 @@ typedef struct SIFLONGPAPAMS_
 #endif
 
 typedef struct SNC_STROB_
-{   unsigned __int64 uqExecTime;	// Время исполнения UTC (100ns ticks)
-	DWORD dwDuration;               // длительность (100ns ticks)
+{   unsigned __int64 uqExecTime;	// Р’СЂРµРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ UTC (100ns ticks)
+	DWORD dwDuration;               // РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (100ns ticks)
 	DWORD dwPostId;
-	DWORD dwFlags;                  // флаги управления SNC_STROB_FLAG_ХХХХ
+	DWORD dwFlags;                  // С„Р»Р°РіРё СѓРїСЂР°РІР»РµРЅРёСЏ SNC_STROB_FLAG_РҐРҐРҐРҐ
 	BYTE bIndx;
 	BYTE bIndxWba;
 	BYTE bReserved[2];
@@ -567,12 +567,12 @@ typedef struct SNC_STROB_
 } SNC_STROB, * PSNC_STROB;
 
 typedef struct SNC_STROBA_
-{   DWORD dwSize;					// размер пакета в байтах, по нему можно понять количество стробов
+{   DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…, РїРѕ РЅРµРјСѓ РјРѕР¶РЅРѕ РїРѕРЅСЏС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕР±РѕРІ
 	DWORD dwType;					// SNC_TYPE_STROB
 #ifndef DSP_BIOS
-	SNC_STROB s[];					// массив стробов
+	SNC_STROB s[];					// РјР°СЃСЃРёРІ СЃС‚СЂРѕР±РѕРІ
 #else
-	SNC_STROB s[1];					// массив стробов
+	SNC_STROB s[1];					// РјР°СЃСЃРёРІ СЃС‚СЂРѕР±РѕРІ
 #endif
 } SNC_STROBA, * PSNC_STROBA;
 
@@ -583,10 +583,10 @@ typedef struct SNC_STROBA_
 //******************************************************************************
 #ifndef DSP_BIOS
 typedef struct ADU_STROB_
-{   unsigned __int64 uqExecTime;	// Время исполнения UTC (100ns ticks)
-	DWORD dwDuration;               // длительность (100ns ticks)
+{   unsigned __int64 uqExecTime;	// Р’СЂРµРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ UTC (100ns ticks)
+	DWORD dwDuration;               // РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (100ns ticks)
 	DWORD dwPostId;
-	DWORD dwFlags;                  // флаги управления SNC_STROB_FLAG_ХХХХ
+	DWORD dwFlags;                  // С„Р»Р°РіРё СѓРїСЂР°РІР»РµРЅРёСЏ SNC_STROB_FLAG_РҐРҐРҐРҐ
 	BYTE bIndx;
 	BYTE bIndxWba;
 	BYTE bReserved[2];
@@ -623,10 +623,10 @@ typedef struct ADU_STROB_
 } ADU_STROB, * PADU_STROB;
 
 typedef struct ADU_STROBA_
-{   DWORD dwSize;					// размер пакета в байтах, по нему можно понять количество стробов
+{   DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…, РїРѕ РЅРµРјСѓ РјРѕР¶РЅРѕ РїРѕРЅСЏС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕР±РѕРІ
 	DWORD dwType;					// SNC_TYPE_STROB
 #ifndef DSP_BIOS
-	ADU_STROB s[];					// массив стробов
+	ADU_STROB s[];					// РјР°СЃСЃРёРІ СЃС‚СЂРѕР±РѕРІ
 #endif
 } ADU_STROBA, * PADU_STROBA;
 #endif
@@ -648,16 +648,16 @@ typedef struct ADU_STROBA_
 #define		FDH_BALANCE				0x3000
 #define		FDH_PELENG_MODE			0x8000
 #define		FDH_CHAN_OSC_AF			0x4000
-//{ <SMA> добавлены определения
-#define		FDH_MATHSTAT			(FDH_AJUST | FDH_FDK)			// биты вычисления статистик
-#define		KU_FROM_FDH(x)			((x) << 16)						// получение кода KU из FDH
-#define		FDH_FROM_KU(x)			((x) >> 16)						// получение кода FDH из KU
-#define		KU_IS_MATHSTAT(x)		(x & KU_FROM_FDH(FDH_MATHSTAT))					// проверка необходимости вычисления статистик
-#define		KU_IS_FDK(x)			(KU_IS_MATHSTAT(x) == KU_FROM_FDH(FDH_FDK))		// проверка режима ФДК
-#define		KU_IS_AJUST(x)			(KU_IS_MATHSTAT(x) == KU_FROM_FDH(FDH_AJUST))	// проверка режима калибровки
-#define		KU_IS_BALANCE(x)		(KU_IS_MATHSTAT(x) == KU_FROM_FDH(FDH_BALANCE))	// проверка режима балансировки
-// В логике aduclient и uvsserver статистики вычисляются при ФК и калибровке.
-// Калибровка и ФК проводятся только при установке одного из битов
+//{ <SMA> РґРѕР±Р°РІР»РµРЅС‹ РѕРїСЂРµРґРµР»РµРЅРёСЏ
+#define		FDH_MATHSTAT			(FDH_AJUST | FDH_FDK)			// Р±РёС‚С‹ РІС‹С‡РёСЃР»РµРЅРёСЏ СЃС‚Р°С‚РёСЃС‚РёРє
+#define		KU_FROM_FDH(x)			((x) << 16)						// РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° KU РёР· FDH
+#define		FDH_FROM_KU(x)			((x) >> 16)						// РїРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° FDH РёР· KU
+#define		KU_IS_MATHSTAT(x)		(x & KU_FROM_FDH(FDH_MATHSTAT))					// РїСЂРѕРІРµСЂРєР° РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІС‹С‡РёСЃР»РµРЅРёСЏ СЃС‚Р°С‚РёСЃС‚РёРє
+#define		KU_IS_FDK(x)			(KU_IS_MATHSTAT(x) == KU_FROM_FDH(FDH_FDK))		// РїСЂРѕРІРµСЂРєР° СЂРµР¶РёРјР° Р¤Р”Рљ
+#define		KU_IS_AJUST(x)			(KU_IS_MATHSTAT(x) == KU_FROM_FDH(FDH_AJUST))	// РїСЂРѕРІРµСЂРєР° СЂРµР¶РёРјР° РєР°Р»РёР±СЂРѕРІРєРё
+#define		KU_IS_BALANCE(x)		(KU_IS_MATHSTAT(x) == KU_FROM_FDH(FDH_BALANCE))	// РїСЂРѕРІРµСЂРєР° СЂРµР¶РёРјР° Р±Р°Р»Р°РЅСЃРёСЂРѕРІРєРё
+// Р’ Р»РѕРіРёРєРµ aduclient Рё uvsserver СЃС‚Р°С‚РёСЃС‚РёРєРё РІС‹С‡РёСЃР»СЏСЋС‚СЃСЏ РїСЂРё Р¤Рљ Рё РєР°Р»РёР±СЂРѕРІРєРµ.
+// РљР°Р»РёР±СЂРѕРІРєР° Рё Р¤Рљ РїСЂРѕРІРѕРґСЏС‚СЃСЏ С‚РѕР»СЊРєРѕ РїСЂРё СѓСЃС‚Р°РЅРѕРІРєРµ РѕРґРЅРѕРіРѕ РёР· Р±РёС‚РѕРІ
 //}
 
 #define		KU_HB_DIRECT			0x0001
@@ -671,7 +671,7 @@ typedef struct ADU_STROBA_
 #define		KU_KRM_2				0x0100
 #define		KU_VDM_0				0x0200
 #define		KU_VDM_1				0x0400
-//{ <SMA> добавлены константы 
+//{ <SMA> РґРѕР±Р°РІР»РµРЅС‹ РєРѕРЅСЃС‚Р°РЅС‚С‹ 
 #define		KU_KRM_MASK				(KU_KRM_0 | KU_KRM_1 | KU_KRM_2)
 #define		KU_KRM_SHIFT			6
 #define		KU_VDM_MASK				(KU_VDM_0 | KU_VDM_1)
@@ -688,13 +688,13 @@ typedef struct ADU_STROBA_
 //					SNC_TYPE_GETTIME
 //******************************************************************************
 typedef struct SNC_GETTIME_
-{   DWORD dwSize;					// размер пакета в байтах
+{   DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…
 	DWORD dwType;					// SNC_TYPE_GETTIME
-    unsigned __int64 uqServerTime;	// Время ADU UTC (100ns ticks)
-    unsigned __int64 uqUvsTime;		// Время UVS UTC (100ns ticks)
-    unsigned __int64 uqClientTime;	// Время ADUclient UTC (100ns ticks)
-    unsigned __int64 uqSNCTime;		// Время SNC UTC (100ns ticks)
-	DWORD dwFlags;                  // флаги
+    unsigned __int64 uqServerTime;	// Р’СЂРµРјСЏ ADU UTC (100ns ticks)
+    unsigned __int64 uqUvsTime;		// Р’СЂРµРјСЏ UVS UTC (100ns ticks)
+    unsigned __int64 uqClientTime;	// Р’СЂРµРјСЏ ADUclient UTC (100ns ticks)
+    unsigned __int64 uqSNCTime;		// Р’СЂРµРјСЏ SNC UTC (100ns ticks)
+	DWORD dwFlags;                  // С„Р»Р°РіРё
 	DWORD dwPostId;
 } SNC_GETTIME, * PSNC_GETTIME;
 
@@ -705,10 +705,10 @@ typedef struct SNC_GETTIME_
 //					SNC_TYPE_INITATBL
 //******************************************************************************
 typedef struct SNC_INITATBL_
-{   DWORD dwSize;					// размер пакета в байтах
+{   DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…
 	DWORD dwType;					// SNC_TYPE_INITATBL
 	DWORD dwTblId;                  // ID
-	DWORD dwFlags;                  // флаги INITATBL_FLAG_XXX
+	DWORD dwFlags;                  // С„Р»Р°РіРё INITATBL_FLAG_XXX
 	DWORD dwPostId;
 	DWORD dwReserved[11];
 } SNC_INITATBL, * PSNC_INITATBL;
@@ -718,10 +718,10 @@ typedef struct SNC_INITATBL_
 //					SNC_TYPE_STATUS
 //******************************************************************************
 typedef struct SNC_STATUS_
-{	DWORD dwSize;					// размер пакета в байтах
+{	DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…
 	DWORD dwType;					// SNC_TYPE_STATUS
-	unsigned __int64 uqTime;		// Время UTC (100ns ticks)
-	DWORD dwFlags;					// флаги FLAG_SNC_STATUS_XXXXX
+	unsigned __int64 uqTime;		// Р’СЂРµРјСЏ UTC (100ns ticks)
+	DWORD dwFlags;					// С„Р»Р°РіРё FLAG_SNC_STATUS_XXXXX
 	DWORD CountErr;
 	DWORD CountDone;
 	DWORD dwSatellCou;
@@ -745,7 +745,7 @@ typedef struct SNC_STATUS_
 //******************************************************************************
 
 typedef struct RUB_COM_
-{	DWORD dwSize;					// размер пакета в байтах
+{	DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…
 	DWORD dwType;
 	DWORD CountErr;
 	DWORD res;
@@ -753,7 +753,7 @@ typedef struct RUB_COM_
 } RUB_COM, *pRUB_COM;
 
 typedef struct GPS_COM_
-{	DWORD dwSize;					// размер пакета в байтах
+{	DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…
 	DWORD dwType;
 	DWORD CountErr;
 	DWORD res;
@@ -769,7 +769,7 @@ typedef struct GPS_COM_
 #define	FLAG_ACMSTATUS_TABL		4
 
 typedef struct ACMSTATUS_
-{	DWORD dwSize;					// размер пакета в байтах
+{	DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…
 	DWORD dwType;					// ACM_TYPE_STATUS
 	BYTE bChannelId;	
 	BYTE bProcId;	
@@ -780,7 +780,7 @@ typedef struct ACMSTATUS_
 } ACMSTATUS, * PACMSTATUS;
 
 typedef struct ACMCHANTBL_
-{	DWORD dwSize;					// размер пакета в байтах
+{	DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С…
 	DWORD dwType;					// ACM_TYPE_CHANTBL
 	DWORD dwFlags;
 	BYTE bChannelId;	
@@ -793,7 +793,7 @@ typedef struct ACMCHANTBL_
 //					ACM_TYPE_STROB
 //******************************************************************************
 typedef struct COMBOPOINTS_
-{   unsigned int uT;       // uT - Временное смещение от начала СЛ в нс
+{   unsigned int uT;       // uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
 #ifndef DSP_BIOS
 	struct {
 		short sRe;
@@ -803,20 +803,20 @@ typedef struct COMBOPOINTS_
 } COMBOPOINTS, * PCOMBOPOINTS;
 
 typedef struct ACMIMPULS_
-{   unsigned int uT;       // uT - Временное смещение от начала СЛ в нс
+{   unsigned int uT;       // uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
 	DWORD dwFlags;			// FLAG_IMHULS_XXXX
 	int iAmp;				// 0 - 32000
-	int iDur;				// 10ns кванты
+	int iDur;				// 10ns РєРІР°РЅС‚С‹
 	int iFreq;				// KHz
-	short sFreq0, sFreq1;	// KHz от центральной. для ШАС 10КГц 
+	short sFreq0, sFreq1;	// KHz РѕС‚ С†РµРЅС‚СЂР°Р»СЊРЅРѕР№. РґР»СЏ РЁРђРЎ 10РљР“С† 
 	DWORD dwFrSigma2;
-	DWORD dwPeriod;			// период в пачке в нс
-	int icount;				// число импульсов в пачке
+	DWORD dwPeriod;			// РїРµСЂРёРѕРґ РІ РїР°С‡РєРµ РІ РЅСЃ
+	int icount;				// С‡РёСЃР»Рѕ РёРјРїСѓР»СЊСЃРѕРІ РІ РїР°С‡РєРµ
 #ifndef DSP_BIOS
 	union {
 		struct {
 #endif	// DSP_BIOS
-		DWORD dwC1_D4;		// код SIF
+		DWORD dwC1_D4;		// РєРѕРґ SIF
 		BYTE bModeSData[16];
 		int iModeSDataCount;
 #ifndef DSP_BIOS
@@ -834,12 +834,12 @@ typedef struct ACMIMPULS_
 #define	FLAG_IMHULS_MATHSTAT	0x10
 
 typedef struct ACMHEADER_ {
-	unsigned __int64 uqExecTime;	// Время исполнения UTC (100ns ticks)
-	DWORD dwDuration;               // длительность (100ns ticks)
+	unsigned __int64 uqExecTime;	// Р’СЂРµРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ UTC (100ns ticks)
+	DWORD dwDuration;               // РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (100ns ticks)
 	USHORT usPostId;
 	BYTE bIndx;
 	BYTE bIndxWba;
-	DWORD dwFlags;                  // флаги FLAG_ACMSTROB_XXXX
+	DWORD dwFlags;                  // С„Р»Р°РіРё FLAG_ACMSTROB_XXXX
 	DWORD dwKuCode;					// KU_CODE_FLAG_XXX
 	DWORD dwKuAttCode;
 	DWORD dwAzCode0;
@@ -850,13 +850,13 @@ typedef struct ACMHEADER_ {
 	USHORT usBandCode;
 	USHORT usNCOCode;
 	USHORT usFrequCode;
-	USHORT usFlags;					// флаги CHAN_FLAG_XXXXX
+	USHORT usFlags;					// С„Р»Р°РіРё CHAN_FLAG_XXXXX
 	USHORT usTrashHold;
 	USHORT usPar0;
 	USHORT usPar1;
 	USHORT usPar2;
 	USHORT usAtt;
-	USHORT usPostMask;				// вставляется в АДУ инфа о падсоединенных постах 
+	USHORT usPostMask;				// РІСЃС‚Р°РІР»СЏРµС‚СЃСЏ РІ РђР”РЈ РёРЅС„Р° Рѕ РїР°РґСЃРѕРµРґРёРЅРµРЅРЅС‹С… РїРѕСЃС‚Р°С… 
 	BYTE bChannelId;	
 	BYTE bProcId;	
 	BYTE bBoardId;	
@@ -875,7 +875,7 @@ typedef struct ACMHEADER_ {
 #define		FLAG_ACMSTROB_RAW1			0x8
 
 typedef struct ACMSTROB_
-{	DWORD dwSize;					// размер пакета в байтах (включая ACMHEADER)
+{	DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С… (РІРєР»СЋС‡Р°СЏ ACMHEADER)
 	DWORD dwType;					// ACM_TYPE_STROB
 	ACMHEADER s;
 #ifndef DSP_BIOS
@@ -884,8 +884,8 @@ typedef struct ACMSTROB_
 } ACMSTROB, * PACMSTROB;
 
 typedef struct ACMSRAW_
-{	DWORD dwSize;					// размер пакета в байтах (включая ACMHEADER)
-	DWORD dwType;					// ACM_TYPE_RAW16 или ACM_TYPE_RAW1
+{	DWORD dwSize;					// СЂР°Р·РјРµСЂ РїР°РєРµС‚Р° РІ Р±Р°Р№С‚Р°С… (РІРєР»СЋС‡Р°СЏ ACMHEADER)
+	DWORD dwType;					// ACM_TYPE_RAW16 РёР»Рё ACM_TYPE_RAW1
 	ACMHEADER s;
 #ifndef DSP_BIOS
 	USHORT usData[];

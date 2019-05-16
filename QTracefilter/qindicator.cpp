@@ -1,4 +1,7 @@
+#include "qpoimodel.h"
 #include "qindicator.h"
+#include "rmoexception.h"
+#include "qvoiprocessor.h"
 #include <QtGlobal>
 #include <QKeyEvent>
 
@@ -26,20 +29,37 @@ int QIndicator::m_iGridMaxTicks=200;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-QIndicator::QIndicator(QIcon &icon, QWidget *parent)
- :QGLWidget(parent) 
-, m_bIndDragging(false)
-, m_iHighlighted(-1) {
+QIndicator::QIndicator(QIcon &icon, QPoiModel *pPoiModel, QWidget *parent /* =0 */)
+        :QGLWidget(parent)
+        , m_bIndDragging(false)
+        , m_iHighlighted(-1)
+        , m_pPoiModel(pPoiModel)
+        , m_pFormular (NULL) {
     setWindowIcon(icon);
     setGeometry(m_qrIndGeometry);
 	m_dViewX0Pix = m_dViewX0*1.0e3*m_dScale;
 	m_dViewY0Pix = m_dViewY0*1.0e3*m_dScale;
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(this,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onCustomContextMenu(const QPoint &)));
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QIndicator::~QIndicator() {
     m_qrIndGeometry = geometry();
+    if (m_pFormular) {
+        delete m_pFormular;
+        m_pFormular=NULL;
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QIndicator::closeEvent(QCloseEvent* pe) {
+    if (m_pFormular) {
+        delete m_pFormular;
+        m_pFormular=NULL;
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -96,8 +116,8 @@ void QIndicator::drawPoints(QPainter &painter) {
 	int iXC=szIndicator.width()/2,iYC=szIndicator.height()/2;
 	for (int i=0; i<m_qlPoints.count(); i++) {
 		TPoiT *pTPoiT=m_qlPTPoiT.at(i);
-		QByteArray baModes((char*)&pTPoiT->m_pRxInfoe->bModeSData[0],sizeof(pTPoiT->m_pRxInfoe->usSifMode));
-		if (!m_qsHighlightedModes.isEmpty() && m_qsHighlightedModes!=QString(baModes.toHex())) continue;
+        QByteArray baModes((char*)&pTPoiT->m_pRxInfoe->bModeSData[0],sizeof(pTPoiT->m_pRxInfoe->bModeSData));
+        if (!m_qsHighlightedModes.isEmpty() && m_qsHighlightedModes!=QString(baModes.toBase64().constData())) continue;
 		QPointF pt=m_qlPoints.at(i);
 		pt.rx()*=m_dScale;
 		pt.ry()*=m_dScale;
@@ -107,15 +127,22 @@ void QIndicator::drawPoints(QPainter &painter) {
 		if (iType<m_lsLegend.m_iNumColors) {
 			int iSize=m_lsLegend.m_qlSizes.at(iType);
             QColor qcColor=m_lsLegend.m_qlColors.at(iType);
-			if (i == m_iHighlighted) {
-				iSize=20;
-				qcColor=Qt::red;
-			}
+            if (i == m_iHighlighted) continue;
 			QPen qpPen(qcColor,iSize,Qt::SolidLine,Qt::RoundCap);
 		    painter.setPen(qpPen);
 		}
 		painter.drawPoint(iXC+pt.x(),iYC-pt.y());
 	}
+    if (m_iHighlighted>=0 && m_iHighlighted<m_qlPoints.count()) {
+        QPointF pt=m_qlPoints.at(m_iHighlighted);
+        pt.rx()*=m_dScale;
+        pt.ry()*=m_dScale;
+        pt.rx()+=m_dViewX0Pix;
+        pt.ry()+=m_dViewY0Pix;
+        QPen qpPen(Qt::red,20,Qt::SolidLine,Qt::RoundCap);
+        painter.setPen(qpPen);
+        painter.drawPoint(iXC+pt.x(),iYC-pt.y());
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -328,10 +355,11 @@ void QIndicator::indicatorUpdate() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QIndicator::addPoint(double x,double y, int iType, TPoiT *pTPoiT) {
+void QIndicator::addPoint(double x,double y, int iType, TPoiT *pTPoiT, int iRawIdx) {
 	m_qlPoints.append(QPoint(x,y));
 	m_qlPntTypes.append(iType);
 	m_qlPTPoiT.append(pTPoiT);
+    m_qlIdxPoite.append(iRawIdx);
     // updateGL();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -354,75 +382,6 @@ void QIndicator::addPost(double x, double y, int iId) {
         m_qpLastPoint = pe->pos();
         m_bIndDragging = true;
     }
-	if (pe->button() == Qt::RightButton) {
-		int iXC,iYC; // view widget center
-		QSize szIndicator = size();
-		iXC=szIndicator.width()/2.0e0;
-		iYC=szIndicator.height()/2.0e0;
-        QPoint qpPos = pe->pos();
-		int iLegendTypePrimary = QIndicator::m_lsLegend.m_qlSettingNames.indexOf(QINDICATOR_LEGEND_PRIMARY);
-        
-		QList<double> qlRnn;
-		QList<int> qlInn;
-		for (int i=0; i<m_qlPoints.count(); i++) {
-			QPointF pt=m_qlPoints.at(i);
-			double dTgX=pt.rx();
-			double dTgY=pt.ry();
-			pt.rx()*=m_dScale;
-			pt.ry()*=m_dScale;
-			pt.rx()+=m_dViewX0Pix;
-			pt.ry()+=m_dViewY0Pix;
-			int iType=m_qlPntTypes.at(i);
-			if (!m_qsHighlightedModes.isEmpty()) {
-				TPoiT *pTPoiT=m_qlPTPoiT.at(i);
-				QByteArray baModes((char*)&pTPoiT->m_pRxInfoe->bModeSData[0],sizeof(pTPoiT->m_pRxInfoe->usSifMode));
-				QString qsModes=QString(baModes.toHex());
-				if (m_qsHighlightedModes!=qsModes) continue;
-			}
-			if (iType == iLegendTypePrimary) {
-				double xx=iXC+pt.x()-qpPos.x();
-				double yy=iYC-pt.y()-qpPos.y();
-				qlRnn.append(abs(xx)+abs(yy));
-				qlInn.append(i);
-			}
-		}
-		if (qlRnn.count()==0) {
-			m_iHighlighted=-1;
-			return;
-		}
-		if (qlRnn.count()>1) {
-			for (int i=0; i<qlRnn.count()-1; i++) {
-				for (int j=i+1; j<qlRnn.count(); j++) {
-					if (qlRnn.at(i)>qlRnn.at(j)) {
-						qlRnn.swap(i,j);
-						qlInn.swap(i,j);
-					}
-				}
-			}
-		}
-		m_iHighlighted=qlInn.at(0);
-        repaint();
-		QPointF pt=m_qlPoints.at(m_iHighlighted);
-		double dTgX=pt.rx();
-		double dTgY=pt.ry();
-		TPoiT *pTPoiT=m_qlPTPoiT.at(m_iHighlighted);
-		QByteArray baModes((char*)&pTPoiT->m_pRxInfoe->bModeSData[0],sizeof(pTPoiT->m_pRxInfoe->usSifMode));
-		QString qsModes=QString(baModes.toHex());
-		QString qsCoord("(%1, %2) F=%4 A=%5 ModeS=%3");
-		if (QMessageBox::information(0,"",qsCoord.arg(dTgX).arg(dTgY)
-			.arg(qsModes)
-			.arg(pTPoiT->m_pRxInfoe->dF)
-			.arg(pTPoiT->m_pRxInfoe->dAmp),
-			QMessageBox::Cancel|QMessageBox::Ok)==QMessageBox::Ok) {
-				
-			m_qsHighlightedModes=qsModes;
-		}
-		else {
-            m_qsHighlightedModes=QString();
-		}
-		m_iHighlighted=-1;
-        repaint();
-	}
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -431,6 +390,33 @@ void QIndicator::addPost(double x, double y, int iId) {
 	if ((pe->buttons() & Qt::LeftButton) && m_bIndDragging) {
         indicatorDrag(pe->pos());
 	}
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QIndicator::onFormularAccepted() {
+    if (m_pFormular) {
+        m_qsHighlightedModes=m_pFormular->m_qsModeSData;
+        delete m_pFormular;
+        m_pFormular=NULL;
+    }
+    else {
+        m_qsHighlightedModes=QString();
+    }
+    m_iHighlighted=-1;
+    repaint();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QIndicator::onFormularRejected() {
+    if (m_pFormular) {
+        delete m_pFormular;
+        m_pFormular=NULL;
+    }
+    m_qsHighlightedModes=QString();
+    m_iHighlighted=-1;
+    repaint();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -485,4 +471,381 @@ void QIndicator::indicatorDrag(const QPoint &qpEndPoit) {
 		m_dViewY0 = m_dViewX0Pix*1.0e-3/m_dScale;
 		repaint();
 	}
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QIndicator::onCustomContextMenu(const QPoint &qpPos) {
+
+    if (QVoiProcessor::m_bUseGen) return;
+
+    int iXC,iYC; // view widget center
+    QSize szIndicator = size();
+    iXC=szIndicator.width()/2.0e0;
+    iYC=szIndicator.height()/2.0e0;
+    int iLegendTypePrimary = QIndicator::m_lsLegend.m_qlSettingNames.indexOf(QINDICATOR_LEGEND_PRIMARY);
+
+    QList<double> qlRnn;
+    QList<int> qlInn;
+    for (int i=0; i<m_qlPoints.count(); i++) {
+        QPointF pt=m_qlPoints.at(i);
+        double dTgX=pt.rx();
+        double dTgY=pt.ry();
+        pt.rx()*=m_dScale;
+        pt.ry()*=m_dScale;
+        pt.rx()+=m_dViewX0Pix;
+        pt.ry()+=m_dViewY0Pix;
+        int iType=m_qlPntTypes.at(i);
+        if (!m_qsHighlightedModes.isEmpty()) {
+            TPoiT *pTPoiT=m_qlPTPoiT.at(i);
+            QByteArray baModes((char*)&pTPoiT->m_pRxInfoe->bModeSData[0],sizeof(pTPoiT->m_pRxInfoe->bModeSData));
+            QString qsModes=QString(baModes.toBase64().constData());
+            if (m_qsHighlightedModes!=qsModes) continue;
+        }
+        if (iType == iLegendTypePrimary) {
+            double xx=iXC+pt.x()-qpPos.x();
+            double yy=iYC-pt.y()-qpPos.y();
+            qlRnn.append(abs(xx)+abs(yy));
+            qlInn.append(i);
+        }
+    }
+    if (qlRnn.count()==0) {
+        m_qsHighlightedModes = QString();
+        m_iHighlighted=-1;
+        repaint();
+        return;
+    }
+    if (qlRnn.count()>1) {
+        for (int i=0; i<qlRnn.count()-1; i++) {
+            for (int j=i+1; j<qlRnn.count(); j++) {
+                if (qlRnn.at(i)>qlRnn.at(j)) {
+                    qlRnn.swap(i,j);
+                    qlInn.swap(i,j);
+                }
+            }
+        }
+    }
+    m_iHighlighted=qlInn.at(0);
+    repaint();
+    QPointF pt=m_qlPoints.at(m_iHighlighted);
+    TPoiT *pTPoiT=m_qlPTPoiT.at(m_iHighlighted);
+    int iIdxPoite=m_qlIdxPoite.at(m_iHighlighted);
+    QByteArray baPoite;
+    if (iIdxPoite >= 0 && iIdxPoite<m_pPoiModel->getRawListSize()) {
+        baPoite=m_pPoiModel->getPPoite(iIdxPoite);
+    }
+    else {
+        throw RmoException(QString("iIdxPoite(%1) >= 0 && iIdxPoite<m_pPoiModel->getRawListSize() (%2)")
+                           .arg(iIdxPoite).arg(m_pPoiModel->getRawListSize()));
+    }
+    if (m_pFormular) {
+        delete m_pFormular;
+        m_pFormular = NULL;
+    }
+    qint64 iTime=m_pPoiModel->m_qlPoiteTime.at(iIdxPoite);
+    // show formular only if baPoite is valid POITE
+    if (!baPoite.isEmpty()) {
+        m_pFormular = new QFormular(iTime,pt,pTPoiT,baPoite,this);
+        QObject::connect(m_pFormular,SIGNAL(accepted()),this,SLOT(onFormularAccepted()));
+        QObject::connect(m_pFormular,SIGNAL(rejected()),this,SLOT(onFormularRejected()));
+        m_pFormular->show();
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QFormular::QFormular(qint64 iTime, QPointF pfLoc, TPoiT *pTPoiT, QByteArray baPoite,
+                     QIndicator *pOwner,QWidget *parent /*= 0*/)
+        : QDialog(parent,Qt::MSWindowsFixedSizeDialogHint)
+        , m_baPoite(baPoite)
+        , m_pOwner(pOwner)
+        , m_qsSmodeCall(QString())
+        , m_qsSmodeAdr(QString())
+        , m_qsModeSData(QString())
+        {
+    // setup UI
+    setWindowIcon(QIcon(QPixmap(":/Resources/formular.ico")));
+    QPushButton *ppbOk = new QPushButton(tr("Ok"));
+    QPushButton *ppbCancel = new QPushButton(tr("Cancel"));
+    QVBoxLayout *pLayout=new QVBoxLayout;
+
+    // m_qsModeSData
+    QByteArray baModes((char*)&pTPoiT->m_pRxInfoe->bModeSData[0],sizeof(pTPoiT->m_pRxInfoe->bModeSData));
+    m_qsModeSData=QString(baModes.toBase64().constData());
+
+    // formular table widget
+    m_pTable=new QTableWidget(this);
+    m_pTable->setColumnCount(2);
+    m_pTable->horizontalHeader()->hide();
+    m_pTable->verticalHeader()->hide();
+    m_pTable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_pTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    int iRowNum=0;
+    m_pTable->insertRow(iRowNum);
+    m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("Time stamp")));
+    m_pTable->setItem(iRowNum,1,new QTableWidgetItem(QDateTime::fromMSecsSinceEpoch(iTime).toString("hh:mm:ss.zzz")));
+    iRowNum++;
+    m_pTable->insertRow(iRowNum);
+    m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("Coord km")));
+    m_pTable->setItem(iRowNum,1,new QTableWidgetItem(QString("(%1, %2)").arg(pfLoc.rx()*1.0e-3,0,'f',1).arg(pfLoc.ry()*1.0e-3,0,'f',1)));
+    iRowNum++;
+    m_pTable->insertRow(iRowNum);
+    m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("Freq MHz")));
+    m_pTable->setItem(iRowNum,1,new QTableWidgetItem(QString("%1").arg(pTPoiT->m_pRxInfoe->dF)));
+    iRowNum++;
+    m_pTable->insertRow(iRowNum);
+    m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("Ampl dB")));
+    m_pTable->setItem(iRowNum,1,new QTableWidgetItem(QString("%1").arg(pTPoiT->m_pRxInfoe->dAmp)));
+    iRowNum++;
+    m_pTable->insertRow(iRowNum);
+    m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("bModeSData[]")));
+    m_pTable->setItem(iRowNum,1,new QTableWidgetItem(m_qsModeSData.mid(0,12)+"..."));
+    // add detailed info from POITE structure
+    // +   unsigned short uMinuIndx, uSubtIndx;  // Гео координаты постов (ссылки к blh)
+    // -   int iIndex;             // номер имп. в пачке от 0
+    // -   unsigned long uT;       // uT - Временное смещение от начала СЛ в нс
+    //    union {
+    //    double Az;				// Азимут а радианах
+    // +  double D;				// рх в м
+    //    };
+    //    union {
+    //    double sAz;				// СКО азимута в рад
+    // -  double sD;				// СКО рх в м
+    //    };
+    // +    double dAmp;			// Амплитуда дБ
+    // +    double dTau;			// Длит имп мкс
+    // +    double dF;				// Цент. частота Мгц
+    // -    DWORD dwFrSigma2;
+    // -    DWORD dwStrobEQuad;
+    // +    DWORD dwPeriod;			// период в пачке в нс
+    // +   USHORT usImpCount;		// число имп. в пачке
+    // +   short sFreq0, sFreq1;	// KHz от центральной
+    //    USHORT usStrobE;
+    //    union {
+    //    struct {
+    //        DWORD D4_C1_UBD;
+    //        DWORD DP1;
+    //        DWORD DP2;
+    //        DWORD DP3; };
+    // +   BYTE bModeSData[16]; };
+    // +    USHORT usSifMode;
+    //     USHORT usFlags;
+    // -   int iNTacan;
+
+    if (!baPoite.isEmpty()) {
+        PPOITE pPoite = (PPOITE) m_baPoite.data();
+        iRowNum++;
+        m_pTable->insertRow(iRowNum);
+        m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("flags")));
+        m_pTable->setItem(iRowNum,1,new QTableWidgetItem(QString("%1").arg(pPoite->uFlags,0,16)));
+        iRowNum++;
+        if (pPoite->iSmodeAdr!=-1) m_qsSmodeAdr=QString("0x%1").arg(pPoite->iSmodeAdr,0,16);
+        m_pTable->insertRow(iRowNum);
+        m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("S-Mode address")));
+        m_pTable->setItem(iRowNum,1,new QTableWidgetItem(m_qsSmodeAdr));
+        if (pPoite->bSmodeCall[0]!='\0') {
+            QByteArray ba(&pPoite->bSmodeCall[0], 8);
+            m_qsSmodeCall = QString(ba);
+        }
+        iRowNum++;
+        m_pTable->insertRow(iRowNum);
+        m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("S-Mode call")));
+        m_pTable->setItem(iRowNum,1,new QTableWidgetItem(m_qsSmodeCall));
+        iRowNum++;
+        m_pTable->insertRow(iRowNum);
+        m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("Bases")));
+        m_pTable->setItem(iRowNum,1,new QTableWidgetItem(pTPoiT->getBasesString()));
+        if (pPoite->Count == pTPoiT->m_iMatchCount) {
+            RXINFOE *prx;
+            // path diffs
+            QString qsPathDiffs("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                qsPathDiffs.append(QString(" %1,").arg(prx->D,0,'f',0));
+                prx++;
+            }
+            qsPathDiffs.chop(1);
+            qsPathDiffs.append("]");
+            iRowNum++;
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("PathDiffs")));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsPathDiffs));
+            // calc path diffs
+            iRowNum++;
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("CalcPathDiffs")));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(pTPoiT->calculatedPathDiffs(pfLoc.rx(),pfLoc.ry())));
+            // freq
+            QString qsFreq("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                double dFreq=qBound(-1.,prx->dF,100000.);
+                qsFreq.append(QString(" %1,").arg(dFreq,0,'f',1));
+                prx++;
+            }
+            qsFreq.chop(1); qsFreq.append("]");
+            iRowNum++;
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(tr("Freq MHz")));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsFreq));
+            // all kinds of data
+            QString qsData, qsDataTitle;
+            int iRowNum;
+            // Az
+            iRowNum=8; qsDataTitle=QString("Azimuth"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                double dData=qBound(-100000.,prx->Az,100000.);
+                qsData.append(QString(" %1,").arg(dData,0,'f',1));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            iRowNum++;
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // Tau
+            iRowNum++; qsDataTitle=QString("Tau"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                double dData=qBound(-100000.,prx->dTau,100000.);
+                qsData.append(QString(" %1,").arg(dData,0,'f',1));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // usSifMode
+            iRowNum++; qsDataTitle=QString("SIF mode"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                qsData.append(QString(" %1,").arg(prx->usSifMode));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // ModeS data
+            iRowNum++; qsDataTitle=QString("ModeS data"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                QByteArray baModesData((char*)&prx->bModeSData[0],sizeof(prx->bModeSData));
+                QString qsModesData(baModesData.toBase64().constData());
+                qsData.append(QString(" %1..,").arg(qsModesData.mid(0,4)));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // imp index
+            iRowNum++; qsDataTitle=QString("rx.iIndex"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                qsData.append(QString(" %1,").arg(prx->iIndex));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // Amp
+            iRowNum++; qsDataTitle=QString("Ampl dB"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                double dData=qBound(-100000.,prx->dAmp,100000.);
+                qsData.append(QString(" %1,").arg(dData,0,'f',1));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // usImpCount
+            iRowNum++; qsDataTitle=QString("ImpCount"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                qsData.append(QString(" %1,").arg(prx->usImpCount));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // dwPeriod
+            iRowNum++; qsDataTitle=QString("Period"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                double dData=qBound(-100000.,1.*prx->dwPeriod,100000.);
+                qsData.append(QString(" %1,").arg(dData,0,'f',1));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // sFreq0
+            iRowNum++; qsDataTitle=QString("F0 kHz"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                qsData.append(QString(" %1,").arg(prx->sFreq0));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+            // sFreq1
+            iRowNum++; qsDataTitle=QString("F1 kHz"); qsData=QString("[");
+            prx= &pPoite->rx[0];
+            for (int i=0; i<pPoite->Count; i++) {
+                qsData.append(QString(" %1,").arg(prx->sFreq1));
+                prx++;
+            }
+            qsData.chop(1); qsData.append("]");
+            m_pTable->insertRow(iRowNum);
+            m_pTable->setItem(iRowNum,0,new QTableWidgetItem(qsDataTitle));
+            m_pTable->setItem(iRowNum,1,new QTableWidgetItem(qsData));
+        }
+    }
+    m_pTable->resizeColumnsToContents();
+    m_pTable->resizeRowsToContents();
+    pLayout->addWidget(m_pTable);
+    QHBoxLayout *pHLayout=new QHBoxLayout;
+    pHLayout->addStretch();
+    pHLayout->addWidget(ppbOk);
+    pHLayout->addWidget(ppbCancel);
+    pLayout->addLayout(pHLayout);
+    setLayout(pLayout);
+
+    QObject::connect(ppbOk,SIGNAL(pressed()),this,SLOT(accept()));
+    QObject::connect(ppbCancel,SIGNAL(pressed()),this,SLOT(reject()));
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QFormular::~QFormular() {
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QFormular::showEvent(QShowEvent *event) {
+    QRect rec = QApplication::desktop()->screenGeometry();
+    int iScrWid = rec.width();
+    int iTotWidth=0;
+    for (int i=0; i<m_pTable->columnCount(); i++) {
+        iTotWidth+=m_pTable->columnWidth(i);
+    }
+    int iTotHeight=0;
+    for (int i=0; i<m_pTable->rowCount(); i++) {
+        iTotHeight+=m_pTable->rowHeight(i);
+    }
+    iTotWidth+=m_pTable->lineWidth()*(m_pTable->columnCount()+1);
+    iTotWidth+=width()-m_pTable->width();
+    iTotHeight+=m_pTable->lineWidth()*(m_pTable->rowCount()+1);
+    iTotHeight+=height()-m_pTable->height();
+    resize(iTotWidth,iTotHeight);
+    move(iScrWid-frameSize().width()-3,3);
 }

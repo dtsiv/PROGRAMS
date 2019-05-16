@@ -159,15 +159,56 @@ void QTraceFilter::arrangeControls() {
 
     // application settings
 	QFile qfSettings(QDir::current().absolutePath()+"/QTraceFilter.xml");
-	QSettings::Format XmlFormat = QSerial::registerXmlFormat();
-	if (XmlFormat != QSettings::InvalidFormat && qfSettings.exists() && qfSettings.open(QIODevice::ReadWrite)) {
-		qfSettings.close();
-		QFileInfo fiSettings(qfSettings);
-		m_pSettings = new QSettings(fiSettings.absoluteFilePath(),XmlFormat);
-	}
-	else {
-		m_pSettings = new QSettings(COMPANY_NAME,APPLICATION_NAME);
-	}
+    // detect de facto open mode for settings xml file
+    QIODevice::OpenMode omSettings=QIODevice::NotOpen;
+    if (qfSettings.exists()) {
+        if (!qfSettings.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner
+                    | QFileDevice::ReadUser | QFileDevice::WriteUser
+                    | QFileDevice::ReadGroup | QFileDevice::WriteGroup
+                    | QFileDevice::ReadOther | QFileDevice::WriteOther)) {
+            qDebug() << "qfSettings.setPermissions failed!";
+        }
+        if (qfSettings.open(QIODevice::ReadWrite)) {
+            omSettings=QIODevice::ReadWrite;
+            qfSettings.close();
+        }
+        else if (qfSettings.open(QIODevice::ReadOnly)) {
+            omSettings=QIODevice::ReadOnly;
+            qfSettings.close();
+        }
+    }
+    // regisger xml format
+    QSettings::Format XmlFormat = QSerial::registerXmlFormat();
+    if (omSettings!=QIODevice::NotOpen && XmlFormat != QSettings::InvalidFormat) {
+        QFileInfo fiSettings(qfSettings);
+        if (omSettings==QIODevice::ReadOnly) { // for readOnly settings file - use registry
+            qDebug() << "omSettings==QIODevice::ReadOnly: possibly CD-ROM?";
+            QSettings tmpSettings(fiSettings.absoluteFilePath(),XmlFormat);
+            m_pSettings = new QSettings(COMPANY_NAME,APPLICATION_NAME);
+            // on fresh OS -- just copy from xml into registry
+            if (!m_pSettings->childGroups().contains(SETTINGS_GROUP_NAME)) {
+                tmpSettings.beginGroup(SETTINGS_GROUP_NAME);
+                m_pSettings->beginGroup(SETTINGS_GROUP_NAME);
+                QStringList qslKeys = tmpSettings.allKeys();
+                for (int i=0; i<qslKeys.size(); i++) {
+                    m_pSettings->setValue(qslKeys.at(i),tmpSettings.value(qslKeys.at(i)));
+                }
+                m_pSettings->endGroup();
+            }
+        }
+        else { // ReadWrite open mode
+            m_pSettings = new QSettings(fiSettings.absoluteFilePath(),XmlFormat);
+        }
+    }
+    else { // something is wrong with file access
+        if (XmlFormat == QSettings::InvalidFormat) { // xml format registering failed
+            qDebug() << "XmlFormat == QSettings::InvalidFormat";
+        }
+        else { // no access to xml file
+            qDebug() << "no settings xml file found! Using default settings";
+        }
+        m_pSettings = new QSettings(COMPANY_NAME,APPLICATION_NAME);
+    }
 
 	// fill list of defaults
     defaultParameterValues();
@@ -316,7 +357,13 @@ void QTraceFilter::defaultParameterValues() {
 	m_qmParamDefaults[SETTINGS_KEY_FLT_TOLERANCE]       = QVariant(1.0e-3);
 	m_qmParamDefaults[SETTINGS_KEY_FLT_MATRELAX]        = QVariant(1.0e3); // sec
 	m_qmParamDefaults[SETTINGS_KEY_FLT_USERELAX]        = QVariant(true);
-	m_qmParamDefaults[SETTINGS_KEY_GEN_SIGMAM]          = QVariant(18.0e0);
+    m_qmParamDefaults[SETTINGS_KEY_FLT_STICKMODES]      = QVariant(true);
+    m_qmParamDefaults[SETTINGS_KEY_FLT_RCLUSTER]        = QVariant(50.0e0); // km
+    m_qmParamDefaults[SETTINGS_KEY_FLT_CLUSTERSZ]       = QVariant(7); // minimum number of primary points
+    m_qmParamDefaults[SETTINGS_KEY_FLT_TRAJTIMEOUT]     = QVariant(100); // minutes to kill traj
+    m_qmParamDefaults[SETTINGS_KEY_FLT_TRAJVMAX]        = QVariant(2.0e3); // max velocity (m/s) to kill traj
+    m_qmParamDefaults[SETTINGS_KEY_FLT_ESTINIVELO]      = QVariant(true); // estimate ini velocity from pri cluster
+    m_qmParamDefaults[SETTINGS_KEY_GEN_SIGMAM]          = QVariant(18.0e0);
 	m_qmParamDefaults[SETTINGS_KEY_GEN_DELAY]           = QVariant(30.0e0);
 	m_qmParamDefaults[SETTINGS_KEY_GEN_X0]              = QVariant(-50.0e0);
 	m_qmParamDefaults[SETTINGS_KEY_GEN_Y0]              = QVariant(-150.0e0);
@@ -327,7 +374,8 @@ void QTraceFilter::defaultParameterValues() {
 	m_qmParamDefaults[SETTINGS_KEY_GEN_HEIGHT]          = QVariant(5.0e0);
 	m_qmParamDefaults[SETTINGS_KEY_GEN_KINKTIME]        = QVariant(10.0e0);
 	m_qmParamDefaults[SETTINGS_KEY_GEN_KINKANGLE]       = QVariant(30.0e0);
-	m_qmParamDefaults[SETTINGS_KEY_GEN_TRAJTYPE]        = QVariant((int)QGenerator::LinearWithKink);
+    m_qmParamDefaults[SETTINGS_KEY_GEN_CLUSTERSZ]       = QVariant(7); // minimum number of primary points
+    m_qmParamDefaults[SETTINGS_KEY_GEN_TRAJTYPE]        = QVariant((int)QGenerator::LinearWithKink);
 	m_qmParamDefaults[SETTINGS_KEY_PROP_TAB]            = QVariant(0);
 	m_qmParamDefaults[SETTINGS_KEY_GEOMETRY]            = QVariant(QSerial(QRect(200,200,200,200)).toBase64());
 	m_qmParamDefaults[SETTINGS_KEY_TIMESLICE]           = QVariant(10);
@@ -338,8 +386,9 @@ void QTraceFilter::defaultParameterValues() {
 		<< QINDICATOR_LEGEND_PRIMARY 
 		<< QINDICATOR_LEGEND_SOURCE 
 		<< QINDICATOR_LEGEND_SOURCE_ALARM 
-		<< QINDICATOR_LEGEND_FILTER;
-	QList<QColor> qlColors;
+        << QINDICATOR_LEGEND_FILTER
+        << QINDICATOR_LEGEND_CLUSTER;
+    QList<QColor> qlColors;
 	QList<int> qlSymbSizes;
 	QByteArray baSymbSizes;
 	QDataStream dsSymbSizes(&baSymbSizes,QIODevice::ReadWrite);

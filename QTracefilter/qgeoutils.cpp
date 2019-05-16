@@ -1,12 +1,13 @@
 #include "qgeoutils.h"
+#include "rmoexception.h"
 
 #include <QtDebug>
+#include <QFileInfo>
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-QGeoUtils::QGeoUtils(QObject *parent /*=0*/)
-	: QObject(parent) 
-	, NUMBER_OF_POSTS(4)
+QGeoUtils::QGeoUtils()
+    : NUMBER_OF_POSTS(4)
     , NPAIRS(5)
     , RAD_2_DEG(57.29577951308232)
     , DEG_2_RAD(.0174532925199432958)
@@ -18,16 +19,15 @@ QGeoUtils::QGeoUtils(QObject *parent /*=0*/)
     , SPEED_OF_LIGHT(0.299792458e0)
     , MISMATCH_THRESH(1.0e6)
     , EPS(1.0e-8)
-  {
+    , m_pMainCtrl(NULL) {
 	tc = new double[4*NUMBER_OF_POSTS];
 	gc = new double[4*NUMBER_OF_POSTS];
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-QGeoUtils::QGeoUtils(const QGeoUtils &guTemplate, QObject *parent /*=0*/)
-	: QObject(parent) 
-	, NUMBER_OF_POSTS(guTemplate.NUMBER_OF_POSTS)
+QGeoUtils::QGeoUtils(const QGeoUtils &guTemplate)
+    : NUMBER_OF_POSTS(guTemplate.NUMBER_OF_POSTS)
     , NPAIRS(guTemplate.NPAIRS)
     , RAD_2_DEG(guTemplate.RAD_2_DEG)
     , DEG_2_RAD(guTemplate.DEG_2_RAD)
@@ -39,15 +39,17 @@ QGeoUtils::QGeoUtils(const QGeoUtils &guTemplate, QObject *parent /*=0*/)
     , SPEED_OF_LIGHT(guTemplate.SPEED_OF_LIGHT)
     , MISMATCH_THRESH(guTemplate.MISMATCH_THRESH)
     , EPS(guTemplate.EPS)
-	, m_pMainCtrl(NULL)
-  {
+    , m_pMainCtrl(NULL) {
 	m_fMainctrlCfg.setFileName(guTemplate.m_fMainctrlCfg.fileName());
 	tc = new double[4*NUMBER_OF_POSTS];
 	memcpy(tc,guTemplate.tc,4*NUMBER_OF_POSTS*sizeof(double));
 	gc = new double[4*NUMBER_OF_POSTS];
 	memcpy(gc,guTemplate.gc,4*NUMBER_OF_POSTS*sizeof(double));
-	if (m_fMainctrlCfg.isOpen()) {
+    QFileInfo fiMainctrlCfg(m_fMainctrlCfg);
+    if (fiMainctrlCfg.exists() && fiMainctrlCfg.isFile() && fiMainctrlCfg.isReadable()) {
+        if (!m_fMainctrlCfg.open(QIODevice::ReadOnly)) throw RmoException("QGeoUtils: m_fMainctrlCfg.open() failed");
 		m_pMainCtrl=(PMAINCTRL)m_fMainctrlCfg.map(0,m_fMainctrlCfg.size());
+        m_fMainctrlCfg.close();
 	}
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,11 +117,11 @@ bool QGeoUtils::isValidConfig(int iIdlePost,bool bP[]) {
 	return false;
 }
 //******************************************************************************
-//                Прямой расчёт  геоцентрических координат X, Y, Z    [м]
-//                по известным   геодезическим координатам B, L, h
-//					B, L [градусы], h [м]				
-// m_dMajor м, большая полуось Земли
-// m_dESq квадрат эксцентриситета Земли
+//                РџСЂСЏРјРѕР№ СЂР°СЃС‡С‘С‚  РіРµРѕС†РµРЅС‚СЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚ X, Y, Z    [Рј]
+//                РїРѕ РёР·РІРµСЃС‚РЅС‹Рј   РіРµРѕРґРµР·РёС‡РµСЃРєРёРј РєРѕРѕСЂРґРёРЅР°С‚Р°Рј B, L, h
+//					B, L [РіСЂР°РґСѓСЃС‹], h [Рј]				
+// m_dMajor Рј, Р±РѕР»СЊС€Р°СЏ РїРѕР»СѓРѕСЃСЊ Р—РµРјР»Рё
+// m_dESq РєРІР°РґСЂР°С‚ СЌРєСЃС†РµРЅС‚СЂРёСЃРёС‚РµС‚Р° Р—РµРјР»Рё
 //******************************************************************************
 void QGeoUtils::BlhToXyz(double dLat, double dLon, double dHei,
 									double * pdX, double * pdY, double * pdZ)
@@ -144,8 +146,8 @@ void QGeoUtils::BlhToXyz(PBLH pblh, PXYZ pxyz)
 }
 
 //******************************************************************************
-//                Обратный расчёт геоцентрических координат   B, L,[градусы]; h, [м];
-//                по известным    геоцентрическим координатам X, Y, Z, [м].
+//                РћР±СЂР°С‚РЅС‹Р№ СЂР°СЃС‡С‘С‚ РіРµРѕС†РµРЅС‚СЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚   B, L,[РіСЂР°РґСѓСЃС‹]; h, [Рј];
+//                РїРѕ РёР·РІРµСЃС‚РЅС‹Рј    РіРµРѕС†РµРЅС‚СЂРёС‡РµСЃРєРёРј РєРѕРѕСЂРґРёРЅР°С‚Р°Рј X, Y, Z, [Рј].
 //                
 //******************************************************************************
 void QGeoUtils::XyzToBlh(double dX, double dY, double dZ,
@@ -158,20 +160,20 @@ void QGeoUtils::XyzToBlh(double dX, double dY, double dZ,
 
 	double  m  = sqrt(dX * dX + dY * dY);
 	double fi;
-	if(m) fi = atan(dZ / m);   // Надо позаботиться о нуле (исключительная ситуация), например, с помощью  функции atan2
+	if(m) fi = atan(dZ / m);   // РќР°РґРѕ РїРѕР·Р°Р±РѕС‚РёС‚СЊСЃСЏ Рѕ РЅСѓР»Рµ (РёСЃРєР»СЋС‡РёС‚РµР»СЊРЅР°СЏ СЃРёС‚СѓР°С†РёСЏ), РЅР°РїСЂРёРјРµСЂ, СЃ РїРѕРјРѕС‰СЊСЋ  С„СѓРЅРєС†РёРё atan2
 	else fi = 0.;
 	if(pdLon) *pdLon = RAD_2_DEG * atan2(dY, dX);
 
 	double  ksi;
-	double Q;                 // , м - Радиус кривизны меридианального сечения
+	double Q;                 // , Рј - Р Р°РґРёСѓСЃ РєСЂРёРІРёР·РЅС‹ РјРµСЂРёРґРёР°РЅР°Р»СЊРЅРѕРіРѕ СЃРµС‡РµРЅРёСЏ
 
-	double deltaBMeter = 1e10;       //  Текущая ошибка оценки B, выраженная в метрах.
-	double deltaHMeter = 1e10;       //  Текущая ошибка оценки Д, выраженная в метрах.
+	double deltaBMeter = 1e10;       //  РўРµРєСѓС‰Р°СЏ РѕС€РёР±РєР° РѕС†РµРЅРєРё B, РІС‹СЂР°Р¶РµРЅРЅР°СЏ РІ РјРµС‚СЂР°С….
+	double deltaHMeter = 1e10;       //  РўРµРєСѓС‰Р°СЏ РѕС€РёР±РєР° РѕС†РµРЅРєРё Р”, РІС‹СЂР°Р¶РµРЅРЅР°СЏ РІ РјРµС‚СЂР°С….
 
-			// 0.01 Максимально допустимая ошибка оценки B, выраженная в метрах.
-			// 0.01 Максимально допустимая ошибка оценки h, выраженная в метрах.
+			// 0.01 РњР°РєСЃРёРјР°Р»СЊРЅРѕ РґРѕРїСѓСЃС‚РёРјР°СЏ РѕС€РёР±РєР° РѕС†РµРЅРєРё B, РІС‹СЂР°Р¶РµРЅРЅР°СЏ РІ РјРµС‚СЂР°С….
+			// 0.01 РњР°РєСЃРёРјР°Р»СЊРЅРѕ РґРѕРїСѓСЃС‚РёРјР°СЏ РѕС€РёР±РєР° РѕС†РµРЅРєРё h, РІС‹СЂР°Р¶РµРЅРЅР°СЏ РІ РјРµС‚СЂР°С….
 
- 	int i = 0;                   // Счётчик числа итераций
+ 	int i = 0;                   // РЎС‡С‘С‚С‡РёРє С‡РёСЃР»Р° РёС‚РµСЂР°С†РёР№
 	double B, B_ = fi;
 	double H, H_ = 0.;
 

@@ -54,6 +54,7 @@ public:
 	static double m_dGenHeight; // gen height km
 	static double m_dGenKinkTime; // gen kink time min
 	static double m_dGenKinkAngle; // gen kink angle deg
+    static int m_iClusterMinSize;
 	static TrajectoryTypes m_ttGenTrajectory; // type of generator trajectory
 
 	// Gaussian random number seed

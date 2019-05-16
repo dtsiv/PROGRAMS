@@ -9,8 +9,7 @@
 #include <QMessageBox>
 
 #include "qvoiprocessor.h"
-
-QList<double> qlChi2;
+#include "qkalmanfilter.h"
 
 QTraceFilter::QTraceFilter(QWidget *parent, Qt::WindowFlags flags)
 	: QMainWindow(parent, flags) 
@@ -157,14 +156,13 @@ void QTraceFilter::onSetup() {
 	if (!bDlgRes) return;
 	// DB engines
 	QString qsSqliteFilePath=propDlg.m_pleSqliteDbFile->text();
-    QFile qfSqliteDb(qsSqliteFilePath);
     QFileInfo fiSqliteDb(qsSqliteFilePath);
 	QPoiModel::POI_DB_ENGINES dbeEngineSelected = propDlg.getSelectedDBEngine();
 	QString qsPgConnStr=propDlg.m_pleDbConn->text();
 	// check if connection state changed
 	if (m_dbeEngineSelected!=dbeEngineSelected 
 	     || (dbeEngineSelected==QPoiModel::DB_Engine_Postgres && m_qsPgConnStr!=qsPgConnStr)
-		 || (dbeEngineSelected==QPoiModel::DB_Engine_Sqlite && m_qsSqliteFilePath!=fiSqliteDb.absoluteFilePath())) {
+         || (dbeEngineSelected==QPoiModel::DB_Engine_Sqlite && m_qsSqliteFilePath!=qsSqliteFilePath)) {
 		m_pPoiModel->releaseDataSource(); // make sure old db is not locked
 		displayConnStatus(QPoiModel::DB_Engine_Undefined);
 	}
@@ -172,8 +170,14 @@ void QTraceFilter::onSetup() {
 	if (bUseGen) { // no data source used
 		m_dbeEngineSelected=dbeEngineSelected; // just blindly save entered values, do not connect
 		m_qsPgConnStr=qsPgConnStr;
-		if (fiSqliteDb.exists() && fiSqliteDb.isFile()) {
-			m_qsSqliteFilePath=fiSqliteDb.absoluteFilePath();
+        if (fiSqliteDb.isFile() && fiSqliteDb.isReadable()) {
+            QDir qdSqliteDb=fiSqliteDb.absoluteDir();
+            QDir qdCur=QDir::current();
+            if (qdSqliteDb.rootPath()==qdCur.rootPath()) {
+                m_qsSqliteFilePath=qdCur.relativeFilePath(fiSqliteDb.absoluteFilePath());
+            } else {
+                m_qsSqliteFilePath=fiSqliteDb.absoluteFilePath();
+            }
 		}
 	}
 	bool bDataSourceChanged=false; // flag for SUCCESSFUL change of ACTIVE data source
@@ -189,44 +193,82 @@ void QTraceFilter::onSetup() {
 			}
 		}
 		else if (dbeEngineSelected == QPoiModel::DB_Engine_Sqlite) {
-			if (fiSqliteDb.exists() && fiSqliteDb.isFile()) {
-				if (m_pPoiModel->initSqliteDB(qfSqliteDb)) {
+            if (fiSqliteDb.isFile() && fiSqliteDb.isReadable()) {
+                QFile qfSqliteDb(fiSqliteDb.absoluteFilePath());
+                if (m_pPoiModel->initSqliteDB(qfSqliteDb)) {
 					if (m_dbeEngineSelected!=dbeEngineSelected || m_qsSqliteFilePath!=fiSqliteDb.absoluteFilePath()) {
 						bDataSourceChanged=true;
 					}
 					m_dbeEngineSelected=QPoiModel::DB_Engine_Sqlite;
-					m_qsSqliteFilePath=fiSqliteDb.absoluteFilePath();
+                    QDir qdSqliteDb=fiSqliteDb.absoluteDir();
+                    QDir qdCur=QDir::current();
+                    if (qdSqliteDb.rootPath()==qdCur.rootPath()) { // same Windows drives
+                        m_qsSqliteFilePath=qdCur.relativeFilePath(fiSqliteDb.absoluteFilePath());
+                    }
+                    else { // Different Windows drive
+                        m_qsSqliteFilePath=fiSqliteDb.absoluteFilePath();
+                    }
 					displayConnStatus(QPoiModel::DB_Engine_Sqlite);
 				}
 			}
 		}
 	}
+    // Mainctrl file
+    QString qsMainCtrl=propDlg.m_pleMainCtrl->text();
+    QFileInfo fiMainCtrl(qsMainCtrl);
+    if (fiMainCtrl.isFile() && fiMainCtrl.isReadable()) {
+        QDir qdMainCtrl=fiMainCtrl.absoluteDir();
+        QDir qdCur=QDir::current();
+        if (qdMainCtrl.rootPath() == qdCur.rootPath()) { // same Windows drive
+            m_qsMainctrlCfg = qdCur.relativeFilePath(fiMainCtrl.absoluteFilePath());
+        }
+        else { // differenr Windows drives
+            m_qsMainctrlCfg = fiMainCtrl.absoluteFilePath();
+        }
+    }
+    else { // write as is ...
+        m_qsMainctrlCfg = qsMainCtrl;
+    }
 	// Kalman filter parameters
 	QString qs;
 	qs=propDlg.m_pleKalmanSigmaS->text();
-	QVoiProcessor::m_dFltSigmaS2 = qs.toDouble(&bOk);
+    QKalmanFilter::m_dFltSigmaS2 = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QVoiProcessor::m_dFltSigmaS2 malformed " << qs;
 	qs=propDlg.m_pleKalmanSigmaM->text();
-	QVoiProcessor::m_dFltSigmaM = qs.toDouble(&bOk);
+    QKalmanFilter::m_dFltSigmaM = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QVoiProcessor::m_dFltSigmaM malformed " << qs;
 	qs=propDlg.m_pleKalmanHeight->text();
-	QVoiProcessor::m_dFltHeight = qs.toDouble(&bOk);
+    QKalmanFilter::m_dFltHeight = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QVoiProcessor::m_dFltHeight malformed " << qs;
 	qs=propDlg.m_pleKalmanTolerance->text();
 	QPsVoi::m_Tolerance = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QPsVoi::m_Tolerance malformed " << qs;
 	QPsVoi::m_UseTolerance = (int)propDlg.m_pcbKalmanUseTol->isChecked();;
 	qs=propDlg.m_pleKalmanMinStrob->text();
-	QVoiProcessor::m_dStrobSpreadMin = qs.toDouble(&bOk);
+    QKalmanFilter::m_dStrobSpreadMin = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QVoiProcessor::m_dStrobSpreadMin malformed " << qs;
 	qs=propDlg.m_pleKalmanStrobSpread->text();
-	QVoiProcessor::m_dStrobSpreadSpeed = qs.toDouble(&bOk);
+    QKalmanFilter::m_dStrobSpreadSpeed = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QVoiProcessor::m_dStrobSpreadSpeed malformed " << qs;
-	QVoiProcessor::m_iChi2Prob=propDlg.m_pcbKalmanChi2Prob->currentIndex();
+    QKalmanFilter::m_iChi2Prob = propDlg.m_pcbKalmanChi2Prob->currentIndex();
 	qs=propDlg.m_pleKalmanMatRelaxTime->text();
-	QVoiProcessor::m_dMatRelaxTime = qs.toDouble(&bOk);
+    QKalmanFilter::m_dMatRelaxTime = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QVoiProcessor::m_dMatRelaxTime malformed " << qs;
-    QVoiProcessor::m_bUseMatRelax=propDlg.m_pcbKalmanUseRelax->isChecked();
+    QKalmanFilter::m_bUseMatRelax = propDlg.m_pcbKalmanUseRelax->isChecked();
+    QKalmanFilter::m_bStickTrajToModeS = propDlg.m_pcbKalmanStickToModeS->isChecked();
+    qs=propDlg.m_pleKalmanClusterCutoff->text();
+    QKalmanFilter::m_dClusterCutoff = qs.toDouble(&bOk);
+    if (!bOk) qDebug() << "QKalmanFilter::m_dClusterCutoff malformed " << qs;
+    qs=propDlg.m_pleKalmanClusterMinSz->text();
+    QKalmanFilter::m_iClusterMinSize = qs.toInt(&bOk);
+    if (!bOk) qDebug() << "QKalmanFilter::m_iClusterMinSize malformed " << qs;
+    qs=propDlg.m_pleKalmanTrajVMax->text();
+    QKalmanFilter::m_dTrajMaxVelocity = qs.toDouble(&bOk);
+    if (!bOk) qDebug() << "QKalmanFilter::m_dTrajMaxVelocity malformed " << qs;
+    qs=propDlg.m_pleKalmanTrajTimeout->text();
+    QKalmanFilter::m_dTrajTimeout = qs.toDouble(&bOk);
+    if (!bOk) qDebug() << "QKalmanFilter::m_dTrajTimeout malformed " << qs;
+    QKalmanFilter::m_bEstIniVelocity = propDlg.m_pcbKalmanEstIniVelo->isChecked();
 
 	// generator parameters
 	qs=propDlg.m_pleGenSigmaM->text();
@@ -260,10 +302,13 @@ void QTraceFilter::onSetup() {
 	qs=propDlg.m_pleGenKinkAngle->text();
 	QGenerator::m_dGenKinkAngle = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QGenerator::m_dGenKinkAngle malformed " << qs;
-	qs=propDlg.m_pleTrajDuration->text();
+    qs=propDlg.m_pleGenClusterMinSz->text();
+    QGenerator::m_iClusterMinSize = qs.toInt(&bOk);
+    if (!bOk) qDebug() << "QGenerator::m_iClusterMinSize malformed " << qs;
+    qs=propDlg.m_pleTrajDuration->text();
 	QVoiProcessor::m_dTrajDuration = qs.toDouble(&bOk);
 	if (!bOk) qDebug() << "QTraceFilter: QGenerator::m_dTrajDuration malformed " << qs;
-	QStringList qslNames=QIndicator::m_lsLegend.m_qlSettingNames;
+    QStringList qslNames=QIndicator::m_lsLegend.m_qlSettingNames;
 	int iNumColors=QIndicator::m_lsLegend.m_iNumColors;
 	for (int i=0; i<iNumColors; i++) {
 		QString qsKey=qslNames.at(i);
@@ -303,69 +348,47 @@ void QTraceFilter::closeView() {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTraceFilter::onUpdate() {
-	quint64 uMsecs = horizontalSlider->value() * m_uMsecsTot / (m_uMaxTick+1);
 
-	m_tSliceFrom=m_tFrom+uMsecs;
-	m_tSliceTo=m_tSliceFrom+m_uMsecsTot/(m_uMaxTick+1);
-
+    // note user choice like traj type and so on
     onControlToggled();
+
+    // init QVoiProcessor
 	buttonUpdate->setEnabled(false);
-
 	closeView();
-	m_pIndicator=new QIndicator(QIcon(QPixmap(":/Resources/binocle.ico")),0);
-
+    m_pIndicator=new QIndicator(QIcon(QPixmap(":/Resources/binocle.ico")),m_pPoiModel);
 	QVoiProcessor vp(this,m_pPoiModel);
-	if (!vp.init(m_qsMainctrlCfg)) throw RmoException(QString("File: ")+m_qsMainctrlCfg+" is not a valid configuration!");
-
-	QObject::connect(&vp,SIGNAL(indicatorPoint(double,double,int,TPoiT*)),m_pIndicator,SLOT(addPoint(double,double,int,TPoiT*)));
+    if (!vp.init(m_qsMainctrlCfg)) {
+        buttonUpdate->setEnabled(true);
+        throw RmoException(QString("File: ")+m_qsMainctrlCfg+" is not a valid configuration!");
+    }
+    QObject::connect(&vp,SIGNAL(indicatorPoint(double,double,int,TPoiT*,int)),m_pIndicator,SLOT(addPoint(double,double,int,TPoiT*,int)));
 	QObject::connect(&vp,SIGNAL(indicatorUpdate()),m_pIndicator,SLOT(indicatorUpdate()));
 
     // posts coordinates
 	QObject::connect(&vp,SIGNAL(addPost(double,double,int)),m_pIndicator,SLOT(addPost(double,double,int)));
 	vp.listPosts();
 
+    // start simulation/imitator
 	if (vp.m_bUseGen) {
 		quint64 uTimeTo=vp.m_dTrajDuration*60.0e3; // Imitator duration msec
-	    vp.startImitator(0,uTimeTo);
-		if (qlChi2.count()) {
-			for (int i=0; i<qlChi2.count()-1; i++) {
-			    for (int j=i+1; j<qlChi2.count(); j++) {
-					if (qlChi2.at(i) > qlChi2.at(j)) {
-						qlChi2.swap(i,j);
-					}
-				}
-			}
-	        QFile qfChi2("chi2.txt");
-			qfChi2.open(QIODevice::ReadWrite);
-			qfChi2.seek(qfChi2.size());
-			for (int i=0; i<qlChi2.count()-1; i++) {
-				double dChi2=qlChi2.at(i);
-				int nDim=2;
-				double dGamma[]={0,sqrt(3.14159265),1,sqrt(3.14159265)/2.0};
-                double P_num=1.0*i/qlChi2.count();
-				double P_exact=0.0e0;
-				double dQuant=0.001;
-				int nQuant=dChi2/dQuant;
-				for (int j=0; j<nQuant; j++) {
-					double dXi=(j+1)*dQuant;
-					double dDens=exp(-0.5*dXi+(0.5*nDim-1.0)*log(dXi)-0.5*nDim*log(2.0))/(dGamma[nDim]);
-					P_exact+=dQuant*dDens;
-				}
-				QString qs("%1\t%2\t%3\n");
-                qfChi2.write(qs.arg(dChi2).arg(P_num).arg(P_exact).toLocal8Bit().data());
-			}
-			qfChi2.close();
-		}
+        vp.start(0,uTimeTo,true);
 	}
 	else {
-		m_pPoiModel->clearTPoiTList();
-		m_pPoiModel->readPoite(m_tSliceFrom,m_tSliceTo,QVoiProcessor::m_dFltHeight*1.0e3);
-	    vp.startSimulation(m_tSliceFrom,m_tSliceTo);
+        // calculate start time and end time
+        quint64 uMsecs = horizontalSlider->value() * m_uMsecsTot / (m_uMaxTick+1);
+        m_tSliceFrom=m_tFrom+uMsecs;
+        m_tSliceTo=m_tSliceFrom+m_uMsecsTot/(m_uMaxTick+1);
+
+        m_pPoiModel->clearRawLists();
+        if (!m_pPoiModel->readPoite(m_tSliceFrom,m_tSliceTo,QKalmanFilter::m_dFltHeight*1.0e3)) {
+            throw RmoException("m_pPoiModel->readPoite failed");
+            return;
+        }
+        vp.start(m_tSliceFrom,m_tSliceTo,false);
 	}
-	// vp.startSimulation(m_tSliceFrom,m_tSliceFrom+m_qlTimeSlices.at(ui.comboTimeSlice->currentIndex())*60*1000);
 
+    // show indicator window and re-enable update button
 	m_pIndicator->show();
-
 	buttonUpdate->setEnabled(true);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -407,25 +430,47 @@ void QTraceFilter::readSettings() {
 		                m_qmParamDefaults[SETTINGS_SQLITE_FILE]).toString();
 	QFile qfSqliteDb(qsFilePath);
 	QFileInfo fiSqliteDb(qfSqliteDb);
-	m_qsSqliteFilePath=fiSqliteDb.absoluteFilePath();
+    if (fiSqliteDb.isFile() && fiSqliteDb.isReadable()) {
+        QDir qdSqliteDb=fiSqliteDb.absoluteDir();
+        QDir qdCur=QDir::current();
+        if (qdCur.rootPath()==qdSqliteDb.rootPath()) { // same Windows drive
+            m_qsSqliteFilePath=qdCur.relativeFilePath(fiSqliteDb.absoluteFilePath());
+        }
+        else { // different Windows drives
+            m_qsSqliteFilePath=fiSqliteDb.absoluteFilePath();
+        }
+    }
+
 	m_qsMainctrlCfg=m_pSettings->value(SETTINGS_KEY_MAINCTRL,
 		             m_qmParamDefaults[SETTINGS_KEY_MAINCTRL]).toString();
-	QVoiProcessor::m_dFltSigmaS2=m_pSettings->value(SETTINGS_KEY_FLT_SIGMAS,
+    QKalmanFilter::m_dFltSigmaS2=m_pSettings->value(SETTINGS_KEY_FLT_SIGMAS,
 		                         m_qmParamDefaults[SETTINGS_KEY_FLT_SIGMAS]).toDouble(); // flt system speed sigma2 m2/s3
-	QVoiProcessor::m_dFltSigmaM=m_pSettings->value(SETTINGS_KEY_FLT_SIGMAM,
+    QKalmanFilter::m_dFltSigmaM=m_pSettings->value(SETTINGS_KEY_FLT_SIGMAM,
 		                         m_qmParamDefaults[SETTINGS_KEY_FLT_SIGMAM]).toDouble(); // flt measurement sigma m
-	QVoiProcessor::m_dFltHeight=m_pSettings->value(SETTINGS_KEY_FLT_HEIGHT,
+    QKalmanFilter::m_dFltHeight=m_pSettings->value(SETTINGS_KEY_FLT_HEIGHT,
 		                         m_qmParamDefaults[SETTINGS_KEY_FLT_HEIGHT]).toDouble(); // flt measurement sigma m
-	QVoiProcessor::m_dStrobSpreadMin=m_pSettings->value(SETTINGS_KEY_FLT_MINSTROB,
+    QKalmanFilter::m_dStrobSpreadMin=m_pSettings->value(SETTINGS_KEY_FLT_MINSTROB,
 		                              m_qmParamDefaults[SETTINGS_KEY_FLT_MINSTROB]).toDouble(); // flt strob size km
-	QVoiProcessor::m_dStrobSpreadSpeed=m_pSettings->value(SETTINGS_KEY_FLT_STROBSPREAD,
+    QKalmanFilter::m_dStrobSpreadSpeed=m_pSettings->value(SETTINGS_KEY_FLT_STROBSPREAD,
 		                                m_qmParamDefaults[SETTINGS_KEY_FLT_STROBSPREAD]).toDouble(); // flt strob spread m/s
-	QVoiProcessor::m_iChi2Prob=m_pSettings->value(SETTINGS_KEY_FLT_CHI2PROB,
+    QKalmanFilter::m_iChi2Prob=m_pSettings->value(SETTINGS_KEY_FLT_CHI2PROB,
 		                        m_qmParamDefaults[SETTINGS_KEY_FLT_CHI2PROB]).toInt(); // chi2 probability threshold
-	QVoiProcessor::m_bUseMatRelax=m_pSettings->value(SETTINGS_KEY_FLT_USERELAX,
+    QKalmanFilter::m_bUseMatRelax=m_pSettings->value(SETTINGS_KEY_FLT_USERELAX,
 		                           m_qmParamDefaults[SETTINGS_KEY_FLT_USERELAX]).toBool(); // use cov relaxation
-	QVoiProcessor::m_dMatRelaxTime=m_pSettings->value(SETTINGS_KEY_FLT_MATRELAX,
-		                            m_qmParamDefaults[SETTINGS_KEY_FLT_MATRELAX]).toDouble(); // cov relaxation time
+    QKalmanFilter::m_dMatRelaxTime=m_pSettings->value(SETTINGS_KEY_FLT_MATRELAX,
+                                    m_qmParamDefaults[SETTINGS_KEY_FLT_MATRELAX]).toDouble(); // cov relaxation time
+    QKalmanFilter::m_bStickTrajToModeS=m_pSettings->value(SETTINGS_KEY_FLT_STICKMODES,
+                                        m_qmParamDefaults[SETTINGS_KEY_FLT_STICKMODES]).toBool(); // stick trajectory to ModeS
+    QKalmanFilter::m_dClusterCutoff=m_pSettings->value(SETTINGS_KEY_FLT_RCLUSTER,
+                                     m_qmParamDefaults[SETTINGS_KEY_FLT_RCLUSTER]).toDouble(); // cluster cutoff km
+    QKalmanFilter::m_iClusterMinSize=m_pSettings->value(SETTINGS_KEY_FLT_CLUSTERSZ,
+                                      m_qmParamDefaults[SETTINGS_KEY_FLT_CLUSTERSZ]).toInt(); // min cluster size to start traj
+    QKalmanFilter::m_dTrajMaxVelocity=m_pSettings->value(SETTINGS_KEY_FLT_TRAJVMAX,
+                                       m_qmParamDefaults[SETTINGS_KEY_FLT_TRAJVMAX]).toDouble(); // velocity (m/s) to kill traj
+    QKalmanFilter::m_dTrajTimeout=m_pSettings->value(SETTINGS_KEY_FLT_TRAJTIMEOUT,
+                                   m_qmParamDefaults[SETTINGS_KEY_FLT_TRAJTIMEOUT]).toDouble(); // timout (min) to kill traj
+    QKalmanFilter::m_bEstIniVelocity=m_pSettings->value(SETTINGS_KEY_FLT_ESTINIVELO,
+                                      m_qmParamDefaults[SETTINGS_KEY_FLT_ESTINIVELO]).toBool(); // estimate ini velocity from pri cluster
 	QVoiProcessor::m_bUseGen=m_pSettings->value(SETTINGS_KEY_USE_GEN,
 		                      m_qmParamDefaults[SETTINGS_KEY_USE_GEN]).toBool(); // use imitator instead of POITE db
 	QVoiProcessor::m_dTrajDuration=m_pSettings->value(SETTINGS_KEY_TRAJDUR,
@@ -456,7 +501,9 @@ void QTraceFilter::readSettings() {
 		                      m_qmParamDefaults[SETTINGS_KEY_GEN_KINKTIME]).toDouble(); // gen kink time min
 	QGenerator::m_dGenKinkAngle=m_pSettings->value(SETTINGS_KEY_GEN_KINKANGLE,
 		                      m_qmParamDefaults[SETTINGS_KEY_GEN_KINKANGLE]).toDouble(); // gen kink angle deg
-	QGenerator::m_ttGenTrajectory=(QGenerator::TrajectoryTypes)
+    QGenerator::m_iClusterMinSize=m_pSettings->value(SETTINGS_KEY_GEN_CLUSTERSZ,
+                                   m_qmParamDefaults[SETTINGS_KEY_GEN_CLUSTERSZ]).toInt(); // min cluster size to start traj
+    QGenerator::m_ttGenTrajectory=(QGenerator::TrajectoryTypes)
 		                     m_pSettings->value(SETTINGS_KEY_GEN_TRAJTYPE,
 		                      m_qmParamDefaults[SETTINGS_KEY_GEN_TRAJTYPE]).toInt(); // gen kink angle deg
 
@@ -518,18 +565,24 @@ void QTraceFilter::writeSettings() {
 	m_pSettings->setValue(SETTINGS_SQLITE_FILE, m_qsSqliteFilePath);
 	m_pSettings->setValue(SETTINGS_KEY_MAINCTRL, m_qsMainctrlCfg);
 
-	m_pSettings->setValue(SETTINGS_KEY_FLT_SIGMAS,QVoiProcessor::m_dFltSigmaS2); // flt s system
-	m_pSettings->setValue(SETTINGS_KEY_FLT_SIGMAM,QVoiProcessor::m_dFltSigmaM); // flt s meas 
-	m_pSettings->setValue(SETTINGS_KEY_FLT_HEIGHT,QVoiProcessor::m_dFltHeight); // flt tg height
+    m_pSettings->setValue(SETTINGS_KEY_FLT_SIGMAS,QKalmanFilter::m_dFltSigmaS2); // flt s system
+    m_pSettings->setValue(SETTINGS_KEY_FLT_SIGMAM,QKalmanFilter::m_dFltSigmaM); // flt s meas
+    m_pSettings->setValue(SETTINGS_KEY_FLT_HEIGHT,QKalmanFilter::m_dFltHeight); // flt tg height
 	m_pSettings->setValue(SETTINGS_KEY_USE_GEN,QVoiProcessor::m_bUseGen); // use imitator
 	m_pSettings->setValue(SETTINGS_KEY_TRAJDUR,QVoiProcessor::m_dTrajDuration); // traj duration min
 	m_pSettings->setValue(SETTINGS_KEY_FLT_TOLERANCE,QPsVoi::m_Tolerance); // tolerance thresh
 	m_pSettings->setValue(SETTINGS_KEY_FLT_USE_TOL,QPsVoi::m_UseTolerance); // use tolerance
-	m_pSettings->setValue(SETTINGS_KEY_FLT_MINSTROB,QVoiProcessor::m_dStrobSpreadMin); // flt strob size km
-	m_pSettings->setValue(SETTINGS_KEY_FLT_STROBSPREAD,QVoiProcessor::m_dStrobSpreadSpeed); // flt strob spread m/s
-	m_pSettings->setValue(SETTINGS_KEY_FLT_CHI2PROB,QVoiProcessor::m_iChi2Prob); // chi2 probability threshold
-	m_pSettings->setValue(SETTINGS_KEY_FLT_USERELAX,QVoiProcessor::m_bUseMatRelax); // use cov relaxation
-	m_pSettings->setValue(SETTINGS_KEY_FLT_MATRELAX,QVoiProcessor::m_dMatRelaxTime); // cov relaxation time (sec)
+    m_pSettings->setValue(SETTINGS_KEY_FLT_MINSTROB,QKalmanFilter::m_dStrobSpreadMin); // flt strob size km
+    m_pSettings->setValue(SETTINGS_KEY_FLT_STROBSPREAD,QKalmanFilter::m_dStrobSpreadSpeed); // flt strob spread m/s
+    m_pSettings->setValue(SETTINGS_KEY_FLT_CHI2PROB,QKalmanFilter::m_iChi2Prob); // chi2 probability threshold
+    m_pSettings->setValue(SETTINGS_KEY_FLT_USERELAX,QKalmanFilter::m_bUseMatRelax); // use cov relaxation
+    m_pSettings->setValue(SETTINGS_KEY_FLT_MATRELAX,QKalmanFilter::m_dMatRelaxTime); // cov relaxation time (sec)
+    m_pSettings->setValue(SETTINGS_KEY_FLT_STICKMODES,QKalmanFilter::m_bStickTrajToModeS); // stick trajectory to ModeS
+    m_pSettings->setValue(SETTINGS_KEY_FLT_RCLUSTER,QKalmanFilter::m_dClusterCutoff); // cluster cutoff radius km
+    m_pSettings->setValue(SETTINGS_KEY_FLT_TRAJTIMEOUT,QKalmanFilter::m_dTrajTimeout); // traj timeout (min)
+    m_pSettings->setValue(SETTINGS_KEY_FLT_TRAJVMAX,QKalmanFilter::m_dTrajMaxVelocity); // traj Vmax (m/s)
+    m_pSettings->setValue(SETTINGS_KEY_FLT_CLUSTERSZ,QKalmanFilter::m_iClusterMinSize); // min cluster size to start traj
+    m_pSettings->setValue(SETTINGS_KEY_FLT_ESTINIVELO,QKalmanFilter::m_bEstIniVelocity); // estimate ini velocity from pri cluster
 
 	m_pSettings->setValue(SETTINGS_KEY_GEN_SIGMAM,QGenerator::m_dGenSigmaM); // gen s meas
 	m_pSettings->setValue(SETTINGS_KEY_GEN_DELAY,QGenerator::m_dGenDelay); // gen meas delay
@@ -542,7 +595,8 @@ void QTraceFilter::writeSettings() {
 	m_pSettings->setValue(SETTINGS_KEY_GEN_HEIGHT,QGenerator::m_dGenHeight); // gen target height
 	m_pSettings->setValue(SETTINGS_KEY_GEN_KINKTIME,QGenerator::m_dGenKinkTime); // gen kink time
 	m_pSettings->setValue(SETTINGS_KEY_GEN_KINKANGLE,QGenerator::m_dGenKinkAngle); // gen kink angle
-	m_pSettings->setValue(SETTINGS_KEY_GEN_TRAJTYPE,QGenerator::m_ttGenTrajectory); // gen traj type
+    m_pSettings->setValue(SETTINGS_KEY_GEN_CLUSTERSZ,QGenerator::m_iClusterMinSize); // min cluster size to start traj
+    m_pSettings->setValue(SETTINGS_KEY_GEN_TRAJTYPE,QGenerator::m_ttGenTrajectory); // gen traj type
 
 	QRect qrIndGeometry = QIndicator::m_qrIndGeometry;
 	m_pSettings->setValue(SETTINGS_KEY_IND_GEOMETRY, QSerial(qrIndGeometry).toBase64());

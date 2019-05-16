@@ -31,6 +31,12 @@
 #define SETTINGS_KEY_FLT_CHI2PROB               "KalmanChi2Prob"
 #define SETTINGS_KEY_FLT_MATRELAX               "KalmanMatRelax"
 #define	SETTINGS_KEY_FLT_USERELAX               "KalmanUseRelax"
+#define	SETTINGS_KEY_FLT_STICKMODES             "KalmanStickModeS"
+#define	SETTINGS_KEY_FLT_RCLUSTER               "ClusterCutoff"
+#define	SETTINGS_KEY_FLT_CLUSTERSZ              "ClusterMinSize"
+#define	SETTINGS_KEY_FLT_TRAJTIMEOUT            "TrajTimeout"
+#define	SETTINGS_KEY_FLT_TRAJVMAX               "TrajMaxVelocity"
+#define	SETTINGS_KEY_FLT_ESTINIVELO             "EstIniVelocity"
 #define SETTINGS_KEY_USE_GEN                    "UseImitator"
 #define SETTINGS_KEY_TRAJDUR                    "TrajectoryDuration"
 #define SETTINGS_KEY_FLT_TOLERANCE              "KalmanTolerance"
@@ -45,6 +51,7 @@
 #define SETTINGS_KEY_GEN_HEIGHT                 "GeneratorHeight"
 #define SETTINGS_KEY_GEN_KINKTIME               "GeneratorKinkTime"
 #define SETTINGS_KEY_GEN_KINKANGLE              "GeneratorKinkAngle"
+#define	SETTINGS_KEY_GEN_CLUSTERSZ              "GeneratorMinClSize"
 #define SETTINGS_KEY_GEN_TRAJTYPE               "GeneratorTrajType"
 #define SETTINGS_KEY_PROP_TAB                   "PropTab"
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
@@ -110,6 +117,12 @@ public:
 	QComboBox *m_pcbKalmanChi2Prob;
 	QCheckBox *m_pcbKalmanUseRelax;
 	QLineEdit *m_pleKalmanMatRelaxTime;
+    QCheckBox *m_pcbKalmanStickToModeS;
+    QLineEdit *m_pleKalmanClusterCutoff;
+    QLineEdit *m_pleKalmanClusterMinSz;
+    QLineEdit *m_pleKalmanTrajVMax;
+    QLineEdit *m_pleKalmanTrajTimeout;
+    QCheckBox *m_pcbKalmanEstIniVelo;
 
 	QLineEdit *m_pleGenX0;
 	QLineEdit *m_pleGenY0;
@@ -122,6 +135,7 @@ public:
 	QLineEdit *m_pleGenKinkTime;
 	QLineEdit *m_pleGenKinkAngle;
 	QLineEdit *m_pleTrajDuration;
+    QLineEdit *m_pleGenClusterMinSz;
 	QMap<QString,QColorSelectionButton*> m_qmIndLegendColors;
 	QMap<QString,QSpinBox*> m_qmIndSymbSizes;
 

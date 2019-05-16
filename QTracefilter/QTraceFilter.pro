@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = QTraceFilter
 QT += core gui sql opengl widgets
 CONFIG += release
+CONFIG += static
 
 INCLUDEPATH +=  \
     ../PostgreSQL_9.4_32bit \
@@ -60,10 +61,12 @@ SOURCES += \
     qtracefilter.cpp \
     qtracefilter01.cpp \
     qvoiprocessor.cpp \
-    qvoiprocessor01.cpp \
     ran1.cpp \
     rmoexception.cpp \
     tpoit.cpp \
     tqli.cpp \
     tred2.cpp
 
+win32 {
+   RC_FILE = qtracefilter.rc
+}

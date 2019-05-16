@@ -12,6 +12,7 @@
 #define QINDICATOR_LEGEND_SOURCE           "Imitator source"
 #define QINDICATOR_LEGEND_FILTER           "Filter output"
 #define QINDICATOR_LEGEND_SOURCE_ALARM     "Source alarm"
+#define QINDICATOR_LEGEND_CLUSTER          "Primary cluster"
 
 struct LegendSettings {
 	int m_iNumColors;
@@ -20,11 +21,14 @@ struct LegendSettings {
 	QList<int> m_qlSizes;
 };
 
+class QFormular;
+class QPoiModel;
+
 class QIndicator : public QGLWidget {
 	Q_OBJECT
 
 public:
-	QIndicator(QIcon &icon,QWidget *parent = 0);
+    QIndicator(QIcon &icon, QPoiModel *pPoiModel, QWidget *parent = 0);
 	~QIndicator();
 
     static LegendSettings m_lsLegend;
@@ -50,8 +54,11 @@ public:
 
 public slots:
 	void addPost(double x, double y, int iId);
-	void addPoint(double x, double y, int iType, TPoiT *pTPoit);
+    void addPoint(double x, double y, int iType, TPoiT *pTPoit, int iIdxPoite);
     void indicatorUpdate();
+    void onCustomContextMenu(const QPoint &);
+    void onFormularAccepted();
+    void onFormularRejected();
 
 protected:
     void initializeGL();
@@ -63,6 +70,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
+    virtual void closeEvent(QCloseEvent* pe);
 
 private:
 	void indicatorDrag(const QPoint &qpEndPoit);
@@ -71,7 +79,8 @@ private:
     void showPosts(QPainter &painter);
 
 	QList<TPoiT*> m_qlPTPoiT;
-	QList<QPointF> m_qlPoints;
+    QList<int> m_qlIdxPoite;
+    QList<QPointF> m_qlPoints;
 	QList<QPointF> m_qlPostsCoord;
 	QList<int> m_qlPostsId;
 	QList<int> m_qlPntTypes;
@@ -80,7 +89,27 @@ private:
     QPoint m_qpLastPoint;
 	bool m_bIndDragging;
 	int m_iHighlighted;
-	QString m_qsHighlightedModes;
+    QString m_qsHighlightedModes;
+    QFormular *m_pFormular;
+    QPoiModel *m_pPoiModel;
+    friend class QFormular;
+};
+
+class QFormular : public QDialog {
+    Q_OBJECT
+
+public:
+    QFormular(qint64 iTime, QPointF pfLoc, TPoiT *pTPoiT, QByteArray baPoite, QIndicator *pOwner,QWidget *parent = 0);
+    ~QFormular();
+    void showEvent(QShowEvent *event);
+    QString m_qsSmodeCall;
+    QString m_qsSmodeAdr;
+    QString m_qsModeSData;
+
+private:
+    QIndicator *m_pOwner;
+    QTableWidget *m_pTable;
+    QByteArray m_baPoite;
 };
 
 #endif // QINDICATOR_H

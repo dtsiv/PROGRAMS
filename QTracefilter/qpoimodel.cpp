@@ -168,7 +168,7 @@ bool QPoiModel::getMinMaxTime(quint64 &tFrom,quint64 &tTo) {
 			0, /* 0 param */
 			NULL, /* let the backend deduce param type */
 			NULL, // no input params
-			NULL, /* don’t need param lengths since text */
+			NULL, /* donâ€™t need param lengths since text */
 			NULL, /* default to all text params */
 			0); /* ask for binary results */
 		if (PQresultStatus(m_res) != PGRES_TUPLES_OK || PQntuples(m_res) != 1) {
@@ -262,14 +262,15 @@ bool QPoiModel::readPoite(quint64 tFrom, quint64 tTo, double dHeight) {
 			" p.count::character varying(255) AS \"count\""
 			" FROM poite p WHERE p.time_from >= $1"
 			" AND p.time_from <= $2"
-			" AND (p.count>1 OR p.count IS NULL)");
+            " AND (p.count>1 OR p.count IS NULL)"
+            " ORDER BY time_from");
 
 		m_res = PQexecParams(m_conn,
 			qsQuery.toLocal8Bit().data(),
 			2, /* 2 param */
 			NULL, /* let the backend deduce param type */
 			paramValues,
-			NULL, /* don’t need param lengths since text */
+			NULL, /* donâ€™t need param lengths since text */
 			NULL, /* default to all text params */
 			1); /* ask for binary results */
 		if (PQresultStatus(m_res) != PGRES_TUPLES_OK) {
@@ -304,7 +305,7 @@ bool QPoiModel::readPoite(quint64 tFrom, quint64 tTo, double dHeight) {
 			TPoiT *pTPoiT = new TPoiT(pPoite);
 			pTPoiT->m_dHeight=dHeight;
 			m_qlPTPoiT.append(pTPoiT);
-
+            m_qlPPoite.append(QByteArray(cptr,clen));
 			m_qlPoiteTime.append(tCodogram);
 		}
 		PQclear(m_res);
@@ -327,7 +328,8 @@ bool QPoiModel::readPoite(quint64 tFrom, quint64 tTo, double dHeight) {
 			" p.codogram,"
 			" p.count AS \"count\""
 			" FROM poite p WHERE p.time_from >= :tFrom"
-			" AND p.time_from <= :tTo");
+            " AND p.time_from <= :tTo"
+            " ORDER BY time_from");
 		QSqlQuery query(m_db);
 		query.prepare(qsQuery);
 		query.bindValue(":tFrom",tFrom);
@@ -361,30 +363,32 @@ bool QPoiModel::readPoite(quint64 tFrom, quint64 tTo, double dHeight) {
 			TPoiT *pTPoiT = new TPoiT(pPoite);
 			pTPoiT->m_dHeight=dHeight;
 			m_qlPTPoiT.append(pTPoiT);
-
+            m_qlPPoite.append(baUncomp);
 			m_qlPoiteTime.append(tCodogram);
 		}
 		query.clear(); // release db file handle
-	}
+        return true;
+    }
 	return false;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    clear lists m_qlPTPoiT and m_qlPoiteTime
+//    clear lists m_qlPTPoiT, m_qlPPoite and m_qlPoiteTime
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QPoiModel::clearTPoiTList() {
+void QPoiModel::clearRawLists() {
 	while(m_qlPTPoiT.count()) delete m_qlPTPoiT.takeFirst();
+    m_qlPPoite.clear();
 	m_qlPoiteTime.clear();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //    build list for sliding window and solve 2D equation according to bBasic2DSolver
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-QList<int> QPoiModel::buildSlidingWindow(quint64 tFrom, quint64 tTo) {
+QList<int> QPoiModel::buildPrunedList(quint64 tFrom, quint64 tTo) {
     QList<int> qlRetVal;
 
-	for (int i=0; i<m_qlPoiteTime.count(); i++) {
-		quint64 uPoiteTime = m_qlPoiteTime.at(i);
+    for (int iRawIdx=0; iRawIdx<m_qlPoiteTime.count(); iRawIdx++) {
+        quint64 uPoiteTime = m_qlPoiteTime.at(iRawIdx);
 		if (uPoiteTime <=tTo && uPoiteTime >= tFrom) {
-            TPoiT* pTPoiT = getTPoiT(i);
+            TPoiT* pTPoiT = getTPoiT(iRawIdx);
 			if (pTPoiT == NULL) continue;
 			if (QPsVoi::m_UseTolerance) {
 			    if (!pTPoiT->CalculateXY()) continue;
@@ -394,7 +398,7 @@ QList<int> QPoiModel::buildSlidingWindow(quint64 tFrom, quint64 tTo) {
 				pTPoiT->m_pt.dX = pTPoiT->m_x[0];
 				pTPoiT->m_pt.dY = pTPoiT->m_y[0];
 			}
-			qlRetVal.append(i);
+            qlRetVal.append(iRawIdx);
 		}
 	}
 	return qlRetVal;
@@ -402,9 +406,9 @@ QList<int> QPoiModel::buildSlidingWindow(quint64 tFrom, quint64 tTo) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // extract from private m_qlPoiteTime
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-quint64 QPoiModel::getPoiteTime(int iSlWindowIdx) {
-	if (iSlWindowIdx >= 0 && iSlWindowIdx < m_qlPoiteTime.count()) {
-        return m_qlPoiteTime.at(iSlWindowIdx);
+quint64 QPoiModel::getPoiteTime(int iRawIdx) {
+    if (iRawIdx >= 0 && iRawIdx < m_qlPoiteTime.count()) {
+        return m_qlPoiteTime.at(iRawIdx);
 	}
 	// on error return 0
 	return 0;
@@ -412,11 +416,20 @@ quint64 QPoiModel::getPoiteTime(int iSlWindowIdx) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // extract from private m_qlPTPoiT
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-TPoiT* QPoiModel::getTPoiT(int iSlWindowIdx) {
-	if (iSlWindowIdx >= 0 && iSlWindowIdx < m_qlPTPoiT.count()) {
-		return m_qlPTPoiT.at(iSlWindowIdx);
+TPoiT* QPoiModel::getTPoiT(int iRawIdx) {
+    if (iRawIdx >= 0 && iRawIdx < m_qlPTPoiT.count()) {
+        return m_qlPTPoiT.at(iRawIdx);
 	}
 	// on error return NULL
 	return NULL;
 }
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// extract from private m_qlPPoite
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QByteArray QPoiModel::getPPoite(int iRawIdx) {
+    if (iRawIdx >= 0 && iRawIdx < m_qlPPoite.count()) {
+        return m_qlPPoite.at(iRawIdx);
+    }
+    // on error return NULL
+    return QByteArray();
+}

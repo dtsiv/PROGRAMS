@@ -1,6 +1,9 @@
 #ifndef QGEOUTILS_H
 #define QGEOUTILS_H
 
+#define QGEOUTILS_VER_MAJOR 1
+#define QGEOUTILS_VER_MINOR 1
+
 #include <QObject>
 #include <QFile>
 
@@ -10,11 +13,11 @@
 #include "qavtctrl.h"
 #include "codograms.h"
 
-class QGeoUtils : public QObject
+class QGeoUtils
 {
 public:
-	QGeoUtils(QObject *parent=0);
-    QGeoUtils(const QGeoUtils &guTemplate, QObject *parent=0);
+    QGeoUtils();
+    QGeoUtils(const QGeoUtils &guTemplate);
 	~QGeoUtils();
 
 	bool readCfgFile(QString qsMainctrlCfg);

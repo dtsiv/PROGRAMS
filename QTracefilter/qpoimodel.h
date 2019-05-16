@@ -16,6 +16,7 @@
 
 #define SQLITE_CONN_NAME "sqlite_db_connection"
 
+class QIndicator;
 class QPoiModel {
 
 public:
@@ -32,7 +33,7 @@ public:
 	bool initSqliteDB(QFile &qfSqlite);
     bool readPoite(quint64 tFrom, quint64 tTo, double dHeight);
 
-	void clearTPoiTList();
+    void clearRawLists();
     bool getMinMaxTime(quint64 &tFrom,quint64 &tTo);
 	static PPOSTCORD m_pPostCord;
 
@@ -43,9 +44,18 @@ public:
 
 	double m_dRmax;
 
-    QList<int> buildSlidingWindow(quint64 tFrom, quint64 tTo);
-    quint64 getPoiteTime(int iSlWindowIdx);
-    TPoiT* getTPoiT(int iSlWindowIdx);
+    QList<int> buildPrunedList(quint64 tFrom, quint64 tTo);
+    quint64 getPoiteTime(int iRawIdx);
+    TPoiT* getTPoiT(int iRawIdx);
+    QByteArray getPPoite(int iRawIdx);
+    int getRawListSize() {
+        int nPoite=m_qlPPoite.size();
+        int nTPoiT=m_qlPTPoiT.size();
+        int nPoiteTime=m_qlPoiteTime.size();
+        if (nPoiteTime==nPoite && nPoiteTime==nTPoiT) return nPoiteTime;
+        return -1;
+    }
+
 	void releaseDataSource();
 
 private:
@@ -56,9 +66,11 @@ private:
 	PGconn *m_conn;
 	PGresult *m_res;
 	QList<TPoiT*> m_qlPTPoiT;
-	QList<quint64> m_qlPoiteTime;
+    QList<QByteArray> m_qlPPoite;
+    QList<quint64> m_qlPoiteTime;
 	POI_DB_ENGINES m_iDbEngine;
     QString m_qsPgConnStr;
+    friend class QIndicator;
 };
 
 #endif // QPOIMODEL_H

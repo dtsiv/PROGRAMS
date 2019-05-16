@@ -1,8 +1,8 @@
 #include "tpoit.h"
 
-double Vmax = 600.;        // максимально допустимая скорость цели, м/с
-double Amax = 5. * GEARTH;  // максимально допустимое ускорени цели, м/(c*c)
-double VAmax = 5.;			// максимально допустимая скорость ускорения цели, км/с
+double Vmax = 600.;        // РјР°РєСЃРёРјР°Р»СЊРЅРѕ РґРѕРїСѓСЃС‚РёРјР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ С†РµР»Рё, Рј/СЃ
+double Amax = 5. * GEARTH;  // РјР°РєСЃРёРјР°Р»СЊРЅРѕ РґРѕРїСѓСЃС‚РёРјРѕРµ СѓСЃРєРѕСЂРµРЅРё С†РµР»Рё, Рј/(c*c)
+double VAmax = 5.;			// РјР°РєСЃРёРјР°Р»СЊРЅРѕ РґРѕРїСѓСЃС‚РёРјР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ СѓСЃРєРѕСЂРµРЅРёСЏ С†РµР»Рё, РєРј/СЃ
 
 // initialize static variables
 const double TdCord::DEFMAJOR = 6378245.0;
@@ -92,11 +92,11 @@ void __fastcall TdCord::Dirct2(double dLon, double dLat,
     if(pAz) *pAz = (atan2(SA , BAZ) + M_PI);
 }
 //******************************************************************************
-//                Прямой расчёт  геоцентрических координат X, Y, Z    [м]
-//                по известным   геодезическим координатам B, L, h
-//					B, L [градусы], h [м]				
-// m_dMajor м, большая полуось Земли
-// m_dESq квадрат эксцентриситета Земли
+//                РџСЂСЏРјРѕР№ СЂР°СЃС‡С‘С‚  РіРµРѕС†РµРЅС‚СЂРёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚ X, Y, Z    [Рј]
+//                РїРѕ РёР·РІРµСЃС‚РЅС‹Рј   РіРµРѕРґРµР·РёС‡РµСЃРєРёРј РєРѕРѕСЂРґРёРЅР°С‚Р°Рј B, L, h
+//					B, L [РіСЂР°РґСѓСЃС‹], h [Рј]				
+// m_dMajor Рј, Р±РѕР»СЊС€Р°СЏ РїРѕР»СѓРѕСЃСЊ Р—РµРјР»Рё
+// m_dESq РєРІР°РґСЂР°С‚ СЌРєСЃС†РµРЅС‚СЂРёСЃРёС‚РµС‚Р° Р—РµРјР»Рё
 //******************************************************************************
 void TdCord::BlhToXyz(double dLat, double dLon, double dHei,
 									double * pdX, double * pdY, double * pdZ)
@@ -643,17 +643,17 @@ bool TPoiT::CalculateXY_baseSelection(void) {
 		// prx -> D = 1.e-9 * (double)((int)pi0 -> uT - (int)pi1 -> uT) * m_pPoi -> m_LightVelo; 
 
 		if (!bP[uMinuIndx] && !bP[uSubtIndx]) {
-			dPaths[uMinuIndx]=m_pRxInfoe[i].D;     // опт путь (м)
+			dPaths[uMinuIndx]=m_pRxInfoe[i].D;     // РѕРїС‚ РїСѓС‚СЊ (Рј)
 			dPaths[uSubtIndx]=0.0e0;
 		    bP[uMinuIndx]=true; 
 			bP[uSubtIndx]=true;
 		};
 		if (!bP[uMinuIndx] && bP[uSubtIndx]) {
-			dPaths[uMinuIndx]=dPaths[uSubtIndx] + m_pRxInfoe[i].D;     // опт путь (м)
+			dPaths[uMinuIndx]=dPaths[uSubtIndx] + m_pRxInfoe[i].D;     // РѕРїС‚ РїСѓС‚СЊ (Рј)
 		    bP[uMinuIndx]=true;
 		};
 		if (bP[uMinuIndx] && !bP[uSubtIndx]) {
-			dPaths[uSubtIndx]=dPaths[uMinuIndx] - m_pRxInfoe[i].D;    // опт путь (м)
+			dPaths[uSubtIndx]=dPaths[uMinuIndx] - m_pRxInfoe[i].D;    // РѕРїС‚ РїСѓС‚СЊ (Рј)
 		    bP[uSubtIndx]=true;
 		};
 	}
@@ -1155,13 +1155,13 @@ bool __fastcall TPoiT::CalcEquation(PBLH p0, PBLH p1, PBLH p2, double D0, double
     dd_ = 1. - a1 * a1 - a2 * a2;
 
 	dd  = a1 * b1 + a2 * b2;
-									// Расчёт дискриминанта квадратного уравнения
-									// относительно расстояния между Целью и
-									// Центральной ("нулевой") приёмной
-									// позицией (дальности до цели):
+									// Р Р°СЃС‡С‘С‚ РґРёСЃРєСЂРёРјРёРЅР°РЅС‚Р° РєРІР°РґСЂР°С‚РЅРѕРіРѕ СѓСЂР°РІРЅРµРЅРёСЏ
+									// РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РјРµР¶РґСѓ Р¦РµР»СЊСЋ Рё
+									// Р¦РµРЅС‚СЂР°Р»СЊРЅРѕР№ ("РЅСѓР»РµРІРѕР№") РїСЂРёС‘РјРЅРѕР№
+									// РїРѕР·РёС†РёРµР№ (РґР°Р»СЊРЅРѕСЃС‚Рё РґРѕ С†РµР»Рё):
     double _dd = dd * dd + dd_ * (b1 * b1 + b2 * b2);
     if(_dd < 0.) return(false);
-    _dd = sqrt(_dd);				// дискриминант квадратного уравнения
+    _dd = sqrt(_dd);				// РґРёСЃРєСЂРёРјРёРЅР°РЅС‚ РєРІР°РґСЂР°С‚РЅРѕРіРѕ СѓСЂР°РІРЅРµРЅРёСЏ
 
     double rPlus  = (dd + _dd) / dd_;
     double rMinus = (dd - _dd) / dd_;
@@ -1179,4 +1179,53 @@ bool __fastcall TPoiT::CalcEquation(PBLH p0, PBLH p1, PBLH p2, double D0, double
         return(true);
     }
     return(false);
+}
+//******************************************************************************
+//
+//******************************************************************************
+QString TPoiT::calculatedPathDiffs(double dX, double dY) {
+    // posts topocentric coordinates must be initialized
+    if (!tc) initPostsTopocentricCoords();
+    if (!tc) return QString();
+    // m_pRxInfoe must be initialized
+    if (!m_pRxInfoe) return QString();
+    // enumerate matches
+    QString qsRetVal("[");
+    for (int i=0; i<this->m_iMatchCount; i++) {
+        double dTargetHeight = 5000.0e0;
+        quint32 uMinuIndx=m_pRxInfoe[i].uMinuIndx-1;
+        quint32 uSubtIndx=m_pRxInfoe[i].uSubtIndx-1;
+        // tc[3*i+0], tc[3*i+1], tc[3*i+2] - topocentric x,y,z for post i=1,2,3,4
+        double xx,yy,zz;
+        double D;
+        xx=tc[3*uMinuIndx+0]-dX; xx=xx*xx;
+        yy=tc[3*uMinuIndx+1]-dY; yy=yy*yy;
+        zz=tc[3*uMinuIndx+2]-dTargetHeight; zz=zz*zz;
+        D=sqrt(xx+yy+zz);
+        xx=tc[3*uSubtIndx+0]-dX; xx=xx*xx;
+        yy=tc[3*uSubtIndx+1]-dY; yy=yy*yy;
+        zz=tc[3*uSubtIndx+2]-dTargetHeight; zz=zz*zz;
+        D-=sqrt(xx+yy+zz);
+        qsRetVal.append(QString(" %1,").arg(D,0,'f',0));
+    }
+    qsRetVal.chop(1);
+    qsRetVal.append("]");
+    return qsRetVal;
+}
+//******************************************************************************
+//
+//******************************************************************************
+QString TPoiT::getBasesString() {
+    // m_pRxInfoe must be initialized
+    if (!m_pRxInfoe) return QString();
+    // enumerate matches
+    QString qsRetVal("[");
+    for (int i=0; i<this->m_iMatchCount; i++) {
+        quint32 uMinuIndx=m_pRxInfoe[i].uMinuIndx-1;
+        quint32 uSubtIndx=m_pRxInfoe[i].uSubtIndx-1;
+        qsRetVal.append(QString(" %1-%2,").arg(uMinuIndx).arg(uSubtIndx));
+    }
+    qsRetVal.chop(1);
+    qsRetVal.append("]");
+    return qsRetVal;
 }

@@ -13,6 +13,7 @@ double QGenerator::m_dGenDelay=QGENERATOR_DUMMY_DEFAULT;   // Poite generator: m
 double QGenerator::m_dGenHeight=QGENERATOR_DUMMY_DEFAULT;   // Poite generator: height km
 double QGenerator::m_dGenKinkTime=QGENERATOR_DUMMY_DEFAULT;   // Poite generator: kink time min
 double QGenerator::m_dGenKinkAngle=QGENERATOR_DUMMY_DEFAULT;   // Poite generator: kink angle deg
+int QGenerator::m_iClusterMinSize=0;                            // minimum cluster size to start traj
 QGenerator::TrajectoryTypes QGenerator::m_ttGenTrajectory=(QGenerator::TrajectoryTypes)0; // traj type
 
 // Gaussian random number seed

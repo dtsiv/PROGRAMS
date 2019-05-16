@@ -9,5 +9,6 @@
       <file>Resources/binocle.ico</file>
       <file>Resources/plane_small.png</file>
       <file>Resources/hdd_exch.png</file>
+      <file>Resources/formular.ico</file>
     </qresource>
 </RCC>

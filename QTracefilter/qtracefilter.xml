@@ -1,46 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
-    <DBEngine>2</DBEngine>
+    <ClusterCutoff>50</ClusterCutoff>
+    <ClusterMinSize>20</ClusterMinSize>
+    <DBEngine>1</DBEngine>
+    <EstIniVelocity>true</EstIniVelocity>
     <Filter_output>AAAAGAAAAAAAAADPAAAA/w==</Filter_output>
     <GeneratorAz0>-60</GeneratorAz0>
-    <GeneratorDelay>30</GeneratorDelay>
+    <GeneratorDelay>0.29999999999999999</GeneratorDelay>
     <GeneratorHeight>5</GeneratorHeight>
     <GeneratorKinkAngle>30</GeneratorKinkAngle>
-    <GeneratorKinkTime>10</GeneratorKinkTime>
+    <GeneratorKinkTime>1</GeneratorKinkTime>
+    <GeneratorMinClSize>7</GeneratorMinClSize>
     <GeneratorSigmaM>20</GeneratorSigmaM>
     <GeneratorTrajCW>1</GeneratorTrajCW>
     <GeneratorTrajR>200</GeneratorTrajR>
     <GeneratorTrajType>1</GeneratorTrajType>
-    <GeneratorV0>100</GeneratorV0>
+    <GeneratorV0>500</GeneratorV0>
     <GeneratorX0>-50</GeneratorX0>
     <GeneratorY0>-150</GeneratorY0>
     <Imitator_source>AAAAFgAAABgAAAAXAAAAgA==</Imitator_source>
-    <IndGeometry>///7kgAAABz///82AAACvg==</IndGeometry>
+    <IndGeometry>AAABMgAAACgAAAUZAAADIQ==</IndGeometry>
     <IndGridStep>50</IndGridStep>
-    <IndViewScale>0.0012999999999999999</IndViewScale>
-    <IndViewX0>8.5999999999999996</IndViewX0>
-    <IndViewY0>8.5999999999999996</IndViewY0>
+    <IndViewScale>0.00084557193664583125</IndViewScale>
+    <IndViewX0>-131.20176852649669</IndViewX0>
+    <IndViewY0>-150.12387237902993</IndViewY0>
     <KalmanChi2Prob>3</KalmanChi2Prob>
     <KalmanHeight>5</KalmanHeight>
-    <KalmanMatRelax>2000</KalmanMatRelax>
-    <KalmanMinStrob>100</KalmanMinStrob>
+    <KalmanMatRelax>20</KalmanMatRelax>
+    <KalmanMinStrob>5</KalmanMinStrob>
     <KalmanSigmaM>20</KalmanSigmaM>
-    <KalmanSigmaS>0.10000000000000001</KalmanSigmaS>
+    <KalmanSigmaS>0.5</KalmanSigmaS>
     <KalmanSpaceStrob>200</KalmanSpaceStrob>
-    <KalmanStrobSpread>200</KalmanStrobSpread>
+    <KalmanStickModeS>true</KalmanStickModeS>
+    <KalmanStrobSpread>600</KalmanStrobSpread>
     <KalmanTolerance>1e-08</KalmanTolerance>
     <KalmanUseRelax>true</KalmanUseRelax>
     <KalmanUseTolerance>1</KalmanUseTolerance>
-    <MainCtrl>C:/PROGRAMS/QTracefilter/02.06.2017-09.00.22.639-mainctrl.cfg</MainCtrl>
+    <MainCtrl>02.06.2017-09.00.22.639-mainctrl.cfg</MainCtrl>
     <PostgresConnectionString>host=127.0.0.1 dbname=rmo user=rmo password=123 client_encoding=WIN1251</PostgresConnectionString>
+    <Primary_cluster>AAAA7AAAAOwAAAAAAAAAKA==</Primary_cluster>
     <Primary_points>AAAAAAAAAKoAAAAAAAAA/w==</Primary_points>
-    <PropTab>0</PropTab>
-    <SQLiteFile>C:/PROGRAMS/QTracefilter/poite20170602.db</SQLiteFile>
+    <PropTab>2</PropTab>
+    <SQLiteFile>poite20170602.db</SQLiteFile>
     <Source_alarm>AAAA/wAAAAAAAAAAAAAAgA==</Source_alarm>
-    <SymbolSizes>AAAABgAAAAUAAAAKAAAABg==</SymbolSizes>
-    <TickIndex>1</TickIndex>
-    <TimeSlice>10</TimeSlice>
-    <TrajectoryDuration>60</TrajectoryDuration>
+    <SymbolSizes>AAAABgAAAAUAAAAKAAAABgAAAB4=</SymbolSizes>
+    <TickIndex>0</TickIndex>
+    <TimeSlice>3</TimeSlice>
+    <TrajMaxVelocity>1500</TrajMaxVelocity>
+    <TrajTimeout>0.20000000000000001</TrajTimeout>
+    <TrajectoryDuration>10</TrajectoryDuration>
     <UseImitator>false</UseImitator>
-    <geometry>AAABJwAAAKUAAAM4AAAB2w==</geometry>
+    <geometry>AAAB9gAAAMgAAAQbAAAB/Q==</geometry>
 </PARAMETERS>

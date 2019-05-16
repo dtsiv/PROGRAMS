@@ -1,8 +1,8 @@
 //******************************************************************************
 //
-//  файл codograms.h - компонент приложения psadurs.exe - модуля
-//     управления изделием A, модуля ВОИ и ПОИ Copyright by Tristan 2009-2014
-//     описывает кодограммы обмена с РМО, ПОИ и ВОИ
+//  С„Р°Р№Р» codograms.h - РєРѕРјРїРѕРЅРµРЅС‚ РїСЂРёР»РѕР¶РµРЅРёСЏ psadurs.exe - РјРѕРґСѓР»СЏ
+//     СѓРїСЂР°РІР»РµРЅРёСЏ РёР·РґРµР»РёРµРј A, РјРѕРґСѓР»СЏ Р’РћР Рё РџРћР Copyright by Tristan 2009-2014
+//     РѕРїРёСЃС‹РІР°РµС‚ РєРѕРґРѕРіСЂР°РјРјС‹ РѕР±РјРµРЅР° СЃ Р РњРћ, РџРћР Рё Р’РћР
 //
 //******************************************************************************
 #ifndef CodogramsH
@@ -16,61 +16,61 @@
 #endif
 
 //******************************************************************************
-// При обмене по Ps4 каналу каждый буфер идентифицируется типом dwType в
-// соответствии с тем что передается. Далее приводятся используемые типы
+// РџСЂРё РѕР±РјРµРЅРµ РїРѕ Ps4 РєР°РЅР°Р»Сѓ РєР°Р¶РґС‹Р№ Р±СѓС„РµСЂ РёРґРµРЅС‚РёС„РёС†РёСЂСѓРµС‚СЃСЏ С‚РёРїРѕРј dwType РІ
+// СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ С‚РµРј С‡С‚Рѕ РїРµСЂРµРґР°РµС‚СЃСЏ. Р”Р°Р»РµРµ РїСЂРёРІРѕРґСЏС‚СЃСЏ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ С‚РёРїС‹
 //
 //******************************************************************************
-#define  WTYP_ADUINFO			1       // Старая зона(сейчас не используется)
-#define  WTYP_ADUINFOEX			2       // Новая зона (массив ZONEINFO), -1 - новая зона
-#define  WTYP_VOIINFO			3       // Новый сектор запрета автозахвата посылаю в виде (массив ZONEINFO)
-#define  WTYP_POSTINFO			4       // Координаты постов (устаревшая)
-#define  WTYP_GROUNDINFO		5       // Координаты наземных средств (устаревшая)
-#define  WTYP_CTLINFO			6       // Информация для управления (структура LOCALCTRLSTRUCT)
-#define  WTYP_FREQUCHANGE		7       // Информация для управления частотами (структура FREQUTBL)
-#define  WTYP_FDSTATUS			8		// фдк статус (структура FD_STATUS)
-#define  WTYP_JUSTIFYRX			9       // Информация юстировки (массив double[8])
+#define  WTYP_ADUINFO			1       // РЎС‚Р°СЂР°СЏ Р·РѕРЅР°(СЃРµР№С‡Р°СЃ РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ)
+#define  WTYP_ADUINFOEX			2       // РќРѕРІР°СЏ Р·РѕРЅР° (РјР°СЃСЃРёРІ ZONEINFO), -1 - РЅРѕРІР°СЏ Р·РѕРЅР°
+#define  WTYP_VOIINFO			3       // РќРѕРІС‹Р№ СЃРµРєС‚РѕСЂ Р·Р°РїСЂРµС‚Р° Р°РІС‚РѕР·Р°С…РІР°С‚Р° РїРѕСЃС‹Р»Р°СЋ РІ РІРёРґРµ (РјР°СЃСЃРёРІ ZONEINFO)
+#define  WTYP_POSTINFO			4       // РљРѕРѕСЂРґРёРЅР°С‚С‹ РїРѕСЃС‚РѕРІ (СѓСЃС‚Р°СЂРµРІС€Р°СЏ)
+#define  WTYP_GROUNDINFO		5       // РљРѕРѕСЂРґРёРЅР°С‚С‹ РЅР°Р·РµРјРЅС‹С… СЃСЂРµРґСЃС‚РІ (СѓСЃС‚Р°СЂРµРІС€Р°СЏ)
+#define  WTYP_CTLINFO			6       // РРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ (СЃС‚СЂСѓРєС‚СѓСЂР° LOCALCTRLSTRUCT)
+#define  WTYP_FREQUCHANGE		7       // РРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ С‡Р°СЃС‚РѕС‚Р°РјРё (СЃС‚СЂСѓРєС‚СѓСЂР° FREQUTBL)
+#define  WTYP_FDSTATUS			8		// С„РґРє СЃС‚Р°С‚СѓСЃ (СЃС‚СЂСѓРєС‚СѓСЂР° FD_STATUS)
+#define  WTYP_JUSTIFYRX			9       // РРЅС„РѕСЂРјР°С†РёСЏ СЋСЃС‚РёСЂРѕРІРєРё (РјР°СЃСЃРёРІ double[8])
 
-#define  WTYP_NEWCONNECTION		0xe     // К серверу произошло новое подключение
-#define  WTYP_POSTADDR			0x10    // Адреса постов (структура POSTADDRESSES)
-#define  WTYP_CONNECTTOSERVER	0x11	// Команда сменить сервер
-#define  WTYP_POSTINFOE			0x12    // Координаты постов (структура POSTCORD)
-#define  WTYP_GROUNDINFOE		0x13    // Координаты наземных средств (массив GROUNDINFO)
-#define  WTYP_CHANGEMODE		0x14    // Команда сменить режим обзора (структура APPLAYLOCALCTRL)
+#define  WTYP_NEWCONNECTION		0xe     // Рљ СЃРµСЂРІРµСЂСѓ РїСЂРѕРёР·РѕС€Р»Рѕ РЅРѕРІРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ
+#define  WTYP_POSTADDR			0x10    // РђРґСЂРµСЃР° РїРѕСЃС‚РѕРІ (СЃС‚СЂСѓРєС‚СѓСЂР° POSTADDRESSES)
+#define  WTYP_CONNECTTOSERVER	0x11	// РљРѕРјР°РЅРґР° СЃРјРµРЅРёС‚СЊ СЃРµСЂРІРµСЂ
+#define  WTYP_POSTINFOE			0x12    // РљРѕРѕСЂРґРёРЅР°С‚С‹ РїРѕСЃС‚РѕРІ (СЃС‚СЂСѓРєС‚СѓСЂР° POSTCORD)
+#define  WTYP_GROUNDINFOE		0x13    // РљРѕРѕСЂРґРёРЅР°С‚С‹ РЅР°Р·РµРјРЅС‹С… СЃСЂРµРґСЃС‚РІ (РјР°СЃСЃРёРІ GROUNDINFO)
+#define  WTYP_CHANGEMODE		0x14    // РљРѕРјР°РЅРґР° СЃРјРµРЅРёС‚СЊ СЂРµР¶РёРј РѕР±Р·РѕСЂР° (СЃС‚СЂСѓРєС‚СѓСЂР° APPLAYLOCALCTRL)
 #define  WTYP_LNASTAT			0x15
-#define  WTYP_CHANGEMODEEX		0x16    // Команда сменить режим обзора (структура APPLAYLOCALCTRLEX)
+#define  WTYP_CHANGEMODEEX		0x16    // РљРѕРјР°РЅРґР° СЃРјРµРЅРёС‚СЊ СЂРµР¶РёРј РѕР±Р·РѕСЂР° (СЃС‚СЂСѓРєС‚СѓСЂР° APPLAYLOCALCTRLEX)
 #define  WTYP_BALANCETBL		0x17    // BALANCETBLENTRY array
 
-#define  WTYP_REGINFO       500         // Обмен с АДУ (FTABENT) здесь не используется
-#define  WTYP_ET            1000        // Кодограмма (массив ETVOI) - трасса
-                                        // uFlags - буковка к номеру трассы, высота в км на другой строке,
-                                        // на следующей строке скорости в км/c
-#define  WTYP_POIT          2000        // Кодограмма (массив POIT),
-#define  WTYP_POITE         2001        // Кодограмма (массив POITE),
-                                        // крестиком цвет от типа
-#define  WTYP_KT            2500        // нет
-#define  WTYP_POSTT			2501		// Кодограмма (массив POSTT)	
-#define  WTYP_POSTTE		2502		// Кодограмма (массив POSTTE)	
-#define  WTYP_CONSOLE       2005        // текст
-#define  WTYP_CONSOLEEX     2006        // стилизованнй текст (структура CONSOLEMSG)
-#define  WTYP_TRACELIST     2009        // массив структур TRACELISTENTRY 
-#define  WTYP_ADUCOM        3000        // команда для модуля управления
-#define  WTYP_ADURSTATUS    3005        // статус модуля управления
-#define	 WTYP_AVTSTATUS		0xb00		// статус модуля управления (Avtobaza)
-#define	 WTYP_UVSSTATUS		0xb01		// статус модуля управления (Avtobaza)
+#define  WTYP_REGINFO       500         // РћР±РјРµРЅ СЃ РђР”РЈ (FTABENT) Р·РґРµСЃСЊ РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+#define  WTYP_ET            1000        // РљРѕРґРѕРіСЂР°РјРјР° (РјР°СЃСЃРёРІ ETVOI) - С‚СЂР°СЃСЃР°
+                                        // uFlags - Р±СѓРєРѕРІРєР° Рє РЅРѕРјРµСЂСѓ С‚СЂР°СЃСЃС‹, РІС‹СЃРѕС‚Р° РІ РєРј РЅР° РґСЂСѓРіРѕР№ СЃС‚СЂРѕРєРµ,
+                                        // РЅР° СЃР»РµРґСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ СЃРєРѕСЂРѕСЃС‚Рё РІ РєРј/c
+#define  WTYP_POIT          2000        // РљРѕРґРѕРіСЂР°РјРјР° (РјР°СЃСЃРёРІ POIT),
+#define  WTYP_POITE         2001        // РљРѕРґРѕРіСЂР°РјРјР° (РјР°СЃСЃРёРІ POITE),
+                                        // РєСЂРµСЃС‚РёРєРѕРј С†РІРµС‚ РѕС‚ С‚РёРїР°
+#define  WTYP_KT            2500        // РЅРµС‚
+#define  WTYP_POSTT			2501		// РљРѕРґРѕРіСЂР°РјРјР° (РјР°СЃСЃРёРІ POSTT)	
+#define  WTYP_POSTTE		2502		// РљРѕРґРѕРіСЂР°РјРјР° (РјР°СЃСЃРёРІ POSTTE)	
+#define  WTYP_CONSOLE       2005        // С‚РµРєСЃС‚
+#define  WTYP_CONSOLEEX     2006        // СЃС‚РёР»РёР·РѕРІР°РЅРЅР№ С‚РµРєСЃС‚ (СЃС‚СЂСѓРєС‚СѓСЂР° CONSOLEMSG)
+#define  WTYP_TRACELIST     2009        // РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ TRACELISTENTRY 
+#define  WTYP_ADUCOM        3000        // РєРѕРјР°РЅРґР° РґР»СЏ РјРѕРґСѓР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ
+#define  WTYP_ADURSTATUS    3005        // СЃС‚Р°С‚СѓСЃ РјРѕРґСѓР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ
+#define	 WTYP_AVTSTATUS		0xb00		// СЃС‚Р°С‚СѓСЃ РјРѕРґСѓР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ (Avtobaza)
+#define	 WTYP_UVSSTATUS		0xb01		// СЃС‚Р°С‚СѓСЃ РјРѕРґСѓР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ (Avtobaza)
 #define  WTYP_VOICOM        4000        // RMOCOMMAND
 #define  WTYP_VOIREP        4001        // RMOCOMMAND
 #define  WTYP_FRSELECTION	4002        // FRSELECTION
-#define  WTYP_TRACEINFO		4009		// TRACEINFOHEADER с TRACEINFOENTRY 
-#define  WTYP_TRACEINFOE	4010		// TRACEINFOHEADER с TRACEINFOENTRYE (new style)
-#define  WTYP_SCOPEDATA		6000        // осциллограмма
-#define  WTYP_SCOPE16C		6001        // осциллограмма (структура SCOPE16C)
-#define  WTYP_BASECORR		6010        // корфункция (BASECORRELATION)
-#define  WTYP_TBOLTINFO     7100        // информация от Trimble ThuderBolt
+#define  WTYP_TRACEINFO		4009		// TRACEINFOHEADER СЃ TRACEINFOENTRY 
+#define  WTYP_TRACEINFOE	4010		// TRACEINFOHEADER СЃ TRACEINFOENTRYE (new style)
+#define  WTYP_SCOPEDATA		6000        // РѕСЃС†РёР»Р»РѕРіСЂР°РјРјР°
+#define  WTYP_SCOPE16C		6001        // РѕСЃС†РёР»Р»РѕРіСЂР°РјРјР° (СЃС‚СЂСѓРєС‚СѓСЂР° SCOPE16C)
+#define  WTYP_BASECORR		6010        // РєРѕСЂС„СѓРЅРєС†РёСЏ (BASECORRELATION)
+#define  WTYP_TBOLTINFO     7100        // РёРЅС„РѕСЂРјР°С†РёСЏ РѕС‚ Trimble ThuderBolt
 #define  WTYP_SOIMESSAGE	30006
-#define  WTYPE_RAW1			0x8005		// осциллограмма 1 бит(структура ACMHEADER)
+#define  WTYPE_RAW1			0x8005		// РѕСЃС†РёР»Р»РѕРіСЂР°РјРјР° 1 Р±РёС‚(СЃС‚СЂСѓРєС‚СѓСЂР° ACMHEADER)
 
 //******************************************************************************
-// некоторые полезные структуруи связанные с координатами чего нибудь
+// РЅРµРєРѕС‚РѕСЂС‹Рµ РїРѕР»РµР·РЅС‹Рµ СЃС‚СЂСѓРєС‚СѓСЂСѓРё СЃРІСЏР·Р°РЅРЅС‹Рµ СЃ РєРѕРѕСЂРґРёРЅР°С‚Р°РјРё С‡РµРіРѕ РЅРёР±СѓРґСЊ
 //
 //******************************************************************************
 #ifndef QTRANSFORMER_H
@@ -96,22 +96,22 @@ typedef struct LBH_
 {   double dLon, dLat, dHei;
 } LBH, * PLBH;
 //******************************************************************************
-// структура ZONEINFO
-// в форме этой структуры хранятся и передаются между модулями различные
-// двумерные области (зоны ответственности, сектора запрета и пр.)
-// каждая струкрура это многоугольник (максимум 32-вух угольник) в
-// геодезических координатах (вершины определены широтой и долготой)
+// СЃС‚СЂСѓРєС‚СѓСЂР° ZONEINFO
+// РІ С„РѕСЂРјРµ СЌС‚РѕР№ СЃС‚СЂСѓРєС‚СѓСЂС‹ С…СЂР°РЅСЏС‚СЃСЏ Рё РїРµСЂРµРґР°СЋС‚СЃСЏ РјРµР¶РґСѓ РјРѕРґСѓР»СЏРјРё СЂР°Р·Р»РёС‡РЅС‹Рµ
+// РґРІСѓРјРµСЂРЅС‹Рµ РѕР±Р»Р°СЃС‚Рё (Р·РѕРЅС‹ РѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕСЃС‚Рё, СЃРµРєС‚РѕСЂР° Р·Р°РїСЂРµС‚Р° Рё РїСЂ.)
+// РєР°Р¶РґР°СЏ СЃС‚СЂСѓРєСЂСѓСЂР° СЌС‚Рѕ РјРЅРѕРіРѕСѓРіРѕР»СЊРЅРёРє (РјР°РєСЃРёРјСѓРј 32-РІСѓС… СѓРіРѕР»СЊРЅРёРє) РІ
+// РіРµРѕРґРµР·РёС‡РµСЃРєРёС… РєРѕРѕСЂРґРёРЅР°С‚Р°С… (РІРµСЂС€РёРЅС‹ РѕРїСЂРµРґРµР»РµРЅС‹ С€РёСЂРѕС‚РѕР№ Рё РґРѕР»РіРѕС‚РѕР№)
 //
 //******************************************************************************
 #ifndef ZONEINFO
 typedef struct ZONEINFO_
-{   int iID;                  // номер зоны/сектора
-    int iCount;               // число вершин
-    BLPOINT pt[32];            // координаты в градусах (широта, долгота)
+{   int iID;                  // РЅРѕРјРµСЂ Р·РѕРЅС‹/СЃРµРєС‚РѕСЂР°
+    int iCount;               // С‡РёСЃР»Рѕ РІРµСЂС€РёРЅ
+    BLPOINT pt[32];            // РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РіСЂР°РґСѓСЃР°С… (С€РёСЂРѕС‚Р°, РґРѕР»РіРѕС‚Р°)
 } ZONEINFO, * PZONEINFO;
 #endif
 //******************************************************************************
-// структура GROUNDINFO
+// СЃС‚СЂСѓРєС‚СѓСЂР° GROUNDINFO
 //******************************************************************************
 #ifndef RCTRLH
 typedef struct GROUNDINFO_
@@ -124,7 +124,7 @@ typedef struct GROUNDINFO_
 #endif
 #define GRINF_FLAG_JUSTIFY 0x100
 //******************************************************************************
-// структура POSTCORD (WTYP_POSTINFOE)
+// СЃС‚СЂСѓРєС‚СѓСЂР° POSTCORD (WTYP_POSTINFOE)
 //******************************************************************************
 typedef struct POSTCORD_
 {	GROUNDINFO positions[8];	  
@@ -195,18 +195,18 @@ typedef struct FREQUTBL_
 	int iStartIndx;
 	union {
 		struct {
-		short sFrequHb;				// частота настройки WBR (2 - 18 ГГц) в 10 МГц-вых квантах 
-		short sFrequLb;				// частота настройки LBR (0.2 - 2 ГГц) в МГц
+		short sFrequHb;				// С‡Р°СЃС‚РѕС‚Р° РЅР°СЃС‚СЂРѕР№РєРё WBR (2 - 18 Р“Р“С†) РІ 10 РњР“С†-РІС‹С… РєРІР°РЅС‚Р°С… 
+		short sFrequLb;				// С‡Р°СЃС‚РѕС‚Р° РЅР°СЃС‚СЂРѕР№РєРё LBR (0.2 - 2 Р“Р“С†) РІ РњР“С†
 		};
 		DWORD dwFrequ;
 	} freq[];
 } FREQUTBL, * PFREQUTBL;
 //******************************************************************************
-// структура CONSOLEMSG
+// СЃС‚СЂСѓРєС‚СѓСЂР° CONSOLEMSG
 //******************************************************************************
 typedef struct CONSOLEMSG_
 {   union {
-	FILETIME ftTime;				// Время (100ns ticks)
+	FILETIME ftTime;				// Р’СЂРµРјСЏ (100ns ticks)
     unsigned __int64 uqTime;
 	};
 	int iId;
@@ -214,11 +214,11 @@ typedef struct CONSOLEMSG_
 } CONSOLEMSG, * PCONSOLEMSG;
 
 //******************************************************************************
-// структура NEWCONNECTION (К серверу произошло новое подключение)
+// СЃС‚СЂСѓРєС‚СѓСЂР° NEWCONNECTION (Рљ СЃРµСЂРІРµСЂСѓ РїСЂРѕРёР·РѕС€Р»Рѕ РЅРѕРІРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ)
 //******************************************************************************
 typedef struct NEWCONNECTION_		// wtype WTYP_NEWCONNECTION
 {   union {
-	FILETIME ftTime;				// Время UTC (100ns ticks)
+	FILETIME ftTime;				// Р’СЂРµРјСЏ UTC (100ns ticks)
     unsigned __int64 uqTime;
 	};
 	int iSocket;
@@ -262,22 +262,22 @@ typedef struct BALANCETBLENTRY_
 
 
 //******************************************************************************
-// структура RMOCOMMAND
-// Кодограмма команды от РМО
+// СЃС‚СЂСѓРєС‚СѓСЂР° RMOCOMMAND
+// РљРѕРґРѕРіСЂР°РјРјР° РєРѕРјР°РЅРґС‹ РѕС‚ Р РњРћ
 //******************************************************************************
 typedef struct RMOCOMMAND_  // dwType=4000
-{   unsigned long Id;       // код команды VVOD1, SBROSOPR, KORR
-	unsigned long rm;       // номер рабочего места
+{   unsigned long Id;       // РєРѕРґ РєРѕРјР°РЅРґС‹ VVOD1, SBROSOPR, KORR
+	unsigned long rm;       // РЅРѕРјРµСЂ СЂР°Р±РѕС‡РµРіРѕ РјРµСЃС‚Р°
 	unsigned long uNum;     // Trace Num
 	unsigned long uFlags;   // Err code
 	union {
 		struct {
-			double dLat;            // Lat маркера гр. или высота км
-			double dLon;     	    // Lon маркера
+			double dLat;            // Lat РјР°СЂРєРµСЂР° РіСЂ. РёР»Рё РІС‹СЃРѕС‚Р° РєРј
+			double dLon;     	    // Lon РјР°СЂРєРµСЂР°
 		};
 		struct {
-			double dTStart;         // Начальное время сек, 0. - начало 
-			double dTEnd;     	    // Конечное время сек, -1. - до конца
+			double dTStart;         // РќР°С‡Р°Р»СЊРЅРѕРµ РІСЂРµРјСЏ СЃРµРє, 0. - РЅР°С‡Р°Р»Рѕ 
+			double dTEnd;     	    // РљРѕРЅРµС‡РЅРѕРµ РІСЂРµРјСЏ СЃРµРє, -1. - РґРѕ РєРѕРЅС†Р°
 		};
 	};
 } RMOCOMMAND, * PRMOCOMMAND;
@@ -301,152 +301,152 @@ typedef struct RMOCOMMAND_  // dwType=4000
 #define    REGCHAGE		80
 #define    EMIENAB		81
 //******************************************************************************
-// структура FRSELECTION
-// Кодограмма команды от РМО
+// СЃС‚СЂСѓРєС‚СѓСЂР° FRSELECTION
+// РљРѕРґРѕРіСЂР°РјРјР° РєРѕРјР°РЅРґС‹ РѕС‚ Р РњРћ
 //******************************************************************************
 typedef struct FRSELECTION_		// dwType=WTYP_FRSELECTION (4002)
-{	unsigned long rm;			// номер рабочего места
-	unsigned long id;			// номер линейки частотной панорамы 
-	double dFSel;				// центральная частота МГц
-	double dBandSel;			// полуширина МГц	
-	double dAzFrom;				// азимут от, гр. 
-	double dAzTo;				// азимут до, гр.
-	int iCPCount;				// число точек в осциллографической части
-	int iFlags;					//флаги FRSEL_FLAG_XXX
+{	unsigned long rm;			// РЅРѕРјРµСЂ СЂР°Р±РѕС‡РµРіРѕ РјРµСЃС‚Р°
+	unsigned long id;			// РЅРѕРјРµСЂ Р»РёРЅРµР№РєРё С‡Р°СЃС‚РѕС‚РЅРѕР№ РїР°РЅРѕСЂР°РјС‹ 
+	double dFSel;				// С†РµРЅС‚СЂР°Р»СЊРЅР°СЏ С‡Р°СЃС‚РѕС‚Р° РњР“С†
+	double dBandSel;			// РїРѕР»СѓС€РёСЂРёРЅР° РњР“С†	
+	double dAzFrom;				// Р°Р·РёРјСѓС‚ РѕС‚, РіСЂ. 
+	double dAzTo;				// Р°Р·РёРјСѓС‚ РґРѕ, РіСЂ.
+	int iCPCount;				// С‡РёСЃР»Рѕ С‚РѕС‡РµРє РІ РѕСЃС†РёР»Р»РѕРіСЂР°С„РёС‡РµСЃРєРѕР№ С‡Р°СЃС‚Рё
+	int iFlags;					//С„Р»Р°РіРё FRSEL_FLAG_XXX
 	int iReserved[4];
 } FRSELECTION, * PFRSELECTION;
 
 #define    FRSEL_FLAG_TA		0x1
 #define    FRSEL_FLAG_CLEARALL	0x2
 //******************************************************************************
-// структура ETVOI
-// Кодограмма экстраполяционной точки (ЭТ) - выход ВОИ
+// СЃС‚СЂСѓРєС‚СѓСЂР° ETVOI
+// РљРѕРґРѕРіСЂР°РјРјР° СЌРєСЃС‚СЂР°РїРѕР»СЏС†РёРѕРЅРЅРѕР№ С‚РѕС‡РєРё (Р­Рў) - РІС‹С…РѕРґ Р’РћР
 //******************************************************************************
 typedef struct ETVOI_               // dwType = WTYP_ET (1000)
 {   union {
-	FILETIME ftTime;				// Время экстраполяции (100ns ticks)
+	FILETIME ftTime;				// Р’СЂРµРјСЏ СЌРєСЃС‚СЂР°РїРѕР»СЏС†РёРё (100ns ticks)
     unsigned __int64 uqTime;
 	};
-	unsigned long uTrNum;	        // Номер трассы
-    unsigned short usFlags;         // флаги ET_FLAGS_ХХХХ
-    unsigned short usStyle;         // дополнительный параметр (стиль отображения)
+	unsigned long uTrNum;	        // РќРѕРјРµСЂ С‚СЂР°СЃСЃС‹
+    unsigned short usFlags;         // С„Р»Р°РіРё ET_FLAGS_РҐРҐРҐРҐ
+    unsigned short usStyle;         // РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ (СЃС‚РёР»СЊ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ)
 	union {
 	double dAzimuth;	
-	LBH lbh;						// радианы и км	
+	LBH lbh;						// СЂР°РґРёР°РЅС‹ Рё РєРј	
 	};
-    XYH velo;                       // скорости в км/c
+    XYH velo;                       // СЃРєРѕСЂРѕСЃС‚Рё РІ РєРј/c
 	int iSmodeAdr;					// S-mode bort adress
 	int iReserved;
 	char bSmodeCall[8];				// S-mode call sign
 	DWORD dwReserved[8];
 } ETVOI, * PETVOI;
 
-#define  ET_FLAGS_NEW           0x001     // новая трасса
-#define  ET_FLAGS_AUTO          0x002     // сопровождкние
-#define  ET_FLAGS_CANCELED      0x004     // сброшенная
-#define  ET_FLAGS_GROUND        0x008     // наземный обект
-#define  ET_FLAGS_STATIC        0x010     // неподвижная трасса
-#define  ET_FLAGS_IMIT	        0x020     // имитированный обект
-#define  ET_FLAGS_AZIMUTH	    0x040     // азимут валидный
-#define  ET_FLAGS_2D			0x100     // 2D фильтер
-#define  ET_FLAGS_3D			0x200     // 3D фильтер
+#define  ET_FLAGS_NEW           0x001     // РЅРѕРІР°СЏ С‚СЂР°СЃСЃР°
+#define  ET_FLAGS_AUTO          0x002     // СЃРѕРїСЂРѕРІРѕР¶РґРєРЅРёРµ
+#define  ET_FLAGS_CANCELED      0x004     // СЃР±СЂРѕС€РµРЅРЅР°СЏ
+#define  ET_FLAGS_GROUND        0x008     // РЅР°Р·РµРјРЅС‹Р№ РѕР±РµРєС‚
+#define  ET_FLAGS_STATIC        0x010     // РЅРµРїРѕРґРІРёР¶РЅР°СЏ С‚СЂР°СЃСЃР°
+#define  ET_FLAGS_IMIT	        0x020     // РёРјРёС‚РёСЂРѕРІР°РЅРЅС‹Р№ РѕР±РµРєС‚
+#define  ET_FLAGS_AZIMUTH	    0x040     // Р°Р·РёРјСѓС‚ РІР°Р»РёРґРЅС‹Р№
+#define  ET_FLAGS_2D			0x100     // 2D С„РёР»СЊС‚РµСЂ
+#define  ET_FLAGS_3D			0x200     // 3D С„РёР»СЊС‚РµСЂ
 #define  ET_FLAGS_SMODADR		0x1000    // S-mode bort adress valid
 #define  ET_FLAGS_SMODCS		0x2000    // S-mode call sign valid
 
 
 //******************************************************************************
-// структура POIT_EXINFO
+// СЃС‚СЂСѓРєС‚СѓСЂР° POIT_EXINFO
 //
 //******************************************************************************
 typedef union POIT_EXINFO_
-{   struct {                    // RL,TACAN (данные пассивной разностно дальномерной системы)
-	    unsigned Dummy0    :3;  // пусто
-	    unsigned Mod       :3;  // код модуляции (1-ФКМ,2-ЧМ-,4-ЧМ+)
-	    unsigned Pol       :2;  // код поляризации
-	    unsigned Pim       :1;  // признак имитации
-	    unsigned PmodT     :1;  // признак модуляции Т
-	    unsigned PmodTau   :1;  // признак модуляции Тау
-        unsigned B		   :1;  /*Вид сигнала (при tau > 400 мкс B = 1, иначе B = 0)*/
-        unsigned H		   :1;  /*Признак наложения импульсов*/
-        unsigned ModF      :1;  /*Признак модуляции по девиации (введен мною)*/
+{   struct {                    // RL,TACAN (РґР°РЅРЅС‹Рµ РїР°СЃСЃРёРІРЅРѕР№ СЂР°Р·РЅРѕСЃС‚РЅРѕ РґР°Р»СЊРЅРѕРјРµСЂРЅРѕР№ СЃРёСЃС‚РµРјС‹)
+	    unsigned Dummy0    :3;  // РїСѓСЃС‚Рѕ
+	    unsigned Mod       :3;  // РєРѕРґ РјРѕРґСѓР»СЏС†РёРё (1-Р¤РљРњ,2-Р§Рњ-,4-Р§Рњ+)
+	    unsigned Pol       :2;  // РєРѕРґ РїРѕР»СЏСЂРёР·Р°С†РёРё
+	    unsigned Pim       :1;  // РїСЂРёР·РЅР°Рє РёРјРёС‚Р°С†РёРё
+	    unsigned PmodT     :1;  // РїСЂРёР·РЅР°Рє РјРѕРґСѓР»СЏС†РёРё Рў
+	    unsigned PmodTau   :1;  // РїСЂРёР·РЅР°Рє РјРѕРґСѓР»СЏС†РёРё РўР°Сѓ
+        unsigned B		   :1;  /*Р’РёРґ СЃРёРіРЅР°Р»Р° (РїСЂРё tau > 400 РјРєСЃ B = 1, РёРЅР°С‡Рµ B = 0)*/
+        unsigned H		   :1;  /*РџСЂРёР·РЅР°Рє РЅР°Р»РѕР¶РµРЅРёСЏ РёРјРїСѓР»СЊСЃРѕРІ*/
+        unsigned ModF      :1;  /*РџСЂРёР·РЅР°Рє РјРѕРґСѓР»СЏС†РёРё РїРѕ РґРµРІРёР°С†РёРё (РІРІРµРґРµРЅ РјРЅРѕСЋ)*/
 	    unsigned NTacan    :18; //
 		union {
 		int Sector;
 		int PostID;
 		};
-		float Aimp;             // Амплитуда импульса Дб
-	    float sigmataui;        // СКО длительности импульса мкс
-	    float sigmaT;           // СКО периода повторения импульсов мкс
-	    float sigmafc;          // СКО несущей частоты
+		float Aimp;             // РђРјРїР»РёС‚СѓРґР° РёРјРїСѓР»СЊСЃР° Р”Р±
+	    float sigmataui;        // РЎРљРћ РґР»РёС‚РµР»СЊРЅРѕСЃС‚Рё РёРјРїСѓР»СЊСЃР° РјРєСЃ
+	    float sigmaT;           // РЎРљРћ РїРµСЂРёРѕРґР° РїРѕРІС‚РѕСЂРµРЅРёСЏ РёРјРїСѓР»СЊСЃРѕРІ РјРєСЃ
+	    float sigmafc;          // РЎРљРћ РЅРµСЃСѓС‰РµР№ С‡Р°СЃС‚РѕС‚С‹
     };
 
-    struct {                    // SIF (данные пассивной разностно дальномерной системы)
-	    unsigned long uDummyS;		// пусто
+    struct {                    // SIF (РґР°РЅРЅС‹Рµ РїР°СЃСЃРёРІРЅРѕР№ СЂР°Р·РЅРѕСЃС‚РЅРѕ РґР°Р»СЊРЅРѕРјРµСЂРЅРѕР№ СЃРёСЃС‚РµРјС‹)
+	    unsigned long uDummyS;		// РїСѓСЃС‚Рѕ
 	    int Sector;
-	    float Aimp;             // Амплитуда импульса Дб
-        unsigned D4_C1	   :12; /*Позиционный код посылки*/
-        unsigned UBD	   :17; /*Позиционный код режима УВД-М*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (3)*/
-   /*Слово 1*/
-        unsigned DP1	   :29; /*Позиционный код режима УВД-S*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (4)*/
-   /*Слово 2*/
-        unsigned DP2	   :29; /*Позиционный код режима УВД-S*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (5)*/
-   /*Слово 3*/
-        unsigned DP3	   :29; /*Позиционный код режима УВД-S*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (6)*/
-   /*Слово 4*/
-	    unsigned long Rezhim;   // режима SIF
+	    float Aimp;             // РђРјРїР»РёС‚СѓРґР° РёРјРїСѓР»СЊСЃР° Р”Р±
+        unsigned D4_C1	   :12; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ РїРѕСЃС‹Р»РєРё*/
+        unsigned UBD	   :17; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-Рњ*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (3)*/
+   /*РЎР»РѕРІРѕ 1*/
+        unsigned DP1	   :29; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-S*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (4)*/
+   /*РЎР»РѕРІРѕ 2*/
+        unsigned DP2	   :29; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-S*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (5)*/
+   /*РЎР»РѕРІРѕ 3*/
+        unsigned DP3	   :29; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-S*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (6)*/
+   /*РЎР»РѕРІРѕ 4*/
+	    unsigned long Rezhim;   // СЂРµР¶РёРјР° SIF
     };
 
-    struct {						// данные активной системы
-	    unsigned short uDummyA;		// пусто
-	    unsigned short uFlags;		// пусто
-	    float fR, fBeta, fEps, fVdop;       // дальность, азимут, угол места, радиальная скорость
-	    float fDR, fDBeta, fDEps, fDVdop;   // соответствующие сигмы ошибок этих велечин
+    struct {						// РґР°РЅРЅС‹Рµ Р°РєС‚РёРІРЅРѕР№ СЃРёСЃС‚РµРјС‹
+	    unsigned short uDummyA;		// РїСѓСЃС‚Рѕ
+	    unsigned short uFlags;		// РїСѓСЃС‚Рѕ
+	    float fR, fBeta, fEps, fVdop;       // РґР°Р»СЊРЅРѕСЃС‚СЊ, Р°Р·РёРјСѓС‚, СѓРіРѕР» РјРµСЃС‚Р°, СЂР°РґРёР°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ
+	    float fDR, fDBeta, fDEps, fDVdop;   // СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ СЃРёРіРјС‹ РѕС€РёР±РѕРє СЌС‚РёС… РІРµР»РµС‡РёРЅ
         float fAmp;
         BYTE bBeem;
         BYTE bSId;
         BYTE bPId;
         BYTE bCId;
         DWORD dwDopMask;
-	    float DummyA[5];        // период повторения импульсов мкс (для имитатора)
+	    float DummyA[5];        // РїРµСЂРёРѕРґ РїРѕРІС‚РѕСЂРµРЅРёСЏ РёРјРїСѓР»СЊСЃРѕРІ РјРєСЃ (РґР»СЏ РёРјРёС‚Р°С‚РѕСЂР°)
     };
 } POIT_EXINFO, * PPOIT_EXINFO;
 //******************************************************************************
-// структура RXINFO
+// СЃС‚СЂСѓРєС‚СѓСЂР° RXINFO
 //
 //******************************************************************************
 typedef struct RXINFO_
-{   unsigned short uMinuIndx, uSubtIndx;  // Гео координаты постов (ссылки к blh)
-    int iIndex;             // номер имп. в пачке от 0
-    unsigned long uT;       // uT - Временное смещение от начала СЛ в нс
+{   unsigned short uMinuIndx, uSubtIndx;  // Р“РµРѕ РєРѕРѕСЂРґРёРЅР°С‚С‹ РїРѕСЃС‚РѕРІ (СЃСЃС‹Р»РєРё Рє blh)
+    int iIndex;             // РЅРѕРјРµСЂ РёРјРї. РІ РїР°С‡РєРµ РѕС‚ 0
+    unsigned long uT;       // uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
 	union {
-	double Az;				// Азимут а радианах
-	double D;				// рх в м
+	double Az;				// РђР·РёРјСѓС‚ Р° СЂР°РґРёР°РЅР°С…
+	double D;				// СЂС… РІ Рј
 	};
 	union {
-	double sAz;				// СКО фзимута в рад
-	double sD;				// СКО рх в м
+	double sAz;				// РЎРљРћ С„Р·РёРјСѓС‚Р° РІ СЂР°Рґ
+	double sD;				// РЎРљРћ СЂС… РІ Рј
 	};
-    double dTau, dF;        // Длит имп мкс; частота Мгц
+    double dTau, dF;        // Р”Р»РёС‚ РёРјРї РјРєСЃ; С‡Р°СЃС‚РѕС‚Р° РњРіС†
 } RXINFO, * PRXINFO;
 //******************************************************************************
-// структура POIT
+// СЃС‚СЂСѓРєС‚СѓСЂР° POIT
 //******************************************************************************
 typedef struct POIT_
 {   union {
-	FILETIME ftTlock;				//Время локации(100ns ticks)
+	FILETIME ftTlock;				//Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё(100ns ticks)
     unsigned __int64 uqTlock;
 	};
     POIT_EXINFO exi;
 	union {
 	LBH lbh;
-	BLH blh[8];                     // 0 - ViewPoint , радианы радианы км
-	};                              // 0 for KT - Main Point , радианы радианы км
-    unsigned long uFlags;           // POIT_FLAGS_CHNL_ХХХ | POIT_FLAGS_ХХХХ
-	int Count;                      // для активной станции 0
+	BLH blh[8];                     // 0 - ViewPoint , СЂР°РґРёР°РЅС‹ СЂР°РґРёР°РЅС‹ РєРј
+	};                              // 0 for KT - Main Point , СЂР°РґРёР°РЅС‹ СЂР°РґРёР°РЅС‹ РєРј
+    unsigned long uFlags;           // POIT_FLAGS_CHNL_РҐРҐРҐ | POIT_FLAGS_РҐРҐРҐРҐ
+	int Count;                      // РґР»СЏ Р°РєС‚РёРІРЅРѕР№ СЃС‚Р°РЅС†РёРё 0
     RXINFO rx[];
 } POIT, * PPOIT;
 
@@ -467,29 +467,29 @@ typedef struct POIT_
 #define  POIT_FLAGS_SMODADR_VALID	0x100000
 #define  POIT_FLAGS_SMODCS_VALID	0x200000
 //******************************************************************************
-// структура RXINFOE
+// СЃС‚СЂСѓРєС‚СѓСЂР° RXINFOE
 //
 //******************************************************************************
 typedef struct RXINFOE_
-{   unsigned short uMinuIndx, uSubtIndx;  // Гео координаты постов (ссылки к blh)
-    int iIndex;             // номер имп. в пачке от 0
-    unsigned long uT;       // uT - Временное смещение от начала СЛ в нс
+{   unsigned short uMinuIndx, uSubtIndx;  // Р“РµРѕ РєРѕРѕСЂРґРёРЅР°С‚С‹ РїРѕСЃС‚РѕРІ (СЃСЃС‹Р»РєРё Рє blh)
+    int iIndex;             // РЅРѕРјРµСЂ РёРјРї. РІ РїР°С‡РєРµ РѕС‚ 0
+    unsigned long uT;       // uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
 	union {
-	double Az;				// Азимут а радианах
-	double D;				// рх в м
+	double Az;				// РђР·РёРјСѓС‚ Р° СЂР°РґРёР°РЅР°С…
+	double D;				// СЂС… РІ Рј
 	};
 	union {
-	double sAz;				// СКО азимута в рад
-	double sD;				// СКО рх в м
+	double sAz;				// РЎРљРћ Р°Р·РёРјСѓС‚Р° РІ СЂР°Рґ
+	double sD;				// РЎРљРћ СЂС… РІ Рј
 	};
-	double dAmp;			// Амплитуда дБ 
-	double dTau;			// Длит имп мкс
-	double dF;				// Цент. частота Мгц
+	double dAmp;			// РђРјРїР»РёС‚СѓРґР° РґР‘ 
+	double dTau;			// Р”Р»РёС‚ РёРјРї РјРєСЃ
+	double dF;				// Р¦РµРЅС‚. С‡Р°СЃС‚РѕС‚Р° РњРіС†
 	DWORD dwFrSigma2;
 	DWORD dwStrobEQuad;
-	DWORD dwPeriod;			// период в пачке в нс
-	USHORT usImpCount;		// число имп. в пачке
-	short sFreq0, sFreq1;	// KHz от центральной
+	DWORD dwPeriod;			// РїРµСЂРёРѕРґ РІ РїР°С‡РєРµ РІ РЅСЃ
+	USHORT usImpCount;		// С‡РёСЃР»Рѕ РёРјРї. РІ РїР°С‡РєРµ
+	short sFreq0, sFreq1;	// KHz РѕС‚ С†РµРЅС‚СЂР°Р»СЊРЅРѕР№
 	USHORT usStrobE;
 	union {
 	struct {
@@ -503,11 +503,11 @@ typedef struct RXINFOE_
 	int iNTacan;
 } RXINFOE, * PRXINFOE;
 //******************************************************************************
-// структура POITE
+// СЃС‚СЂСѓРєС‚СѓСЂР° POITE
 //******************************************************************************
 typedef struct POITE_
 {   union {
-	FILETIME ftTlock;				//Время локации(100ns ticks)
+	FILETIME ftTlock;				//Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё(100ns ticks)
     unsigned __int64 uqTlock;
 	};
 	int iSector;
@@ -518,19 +518,19 @@ typedef struct POITE_
 	DWORD dwReserved[5];
 	union {
 	LBH lbh;
-	BLH blh[9];                     // 0 - ViewPoint , радианы радианы км
-	};                              // 0 for KT - Main Point , радианы радианы км
-    unsigned long uFlags;           // POIT_FLAGS_CHNL_ХХХ | POIT_FLAGS_ХХХХ
-	int Count;                      // для активной станции 0
+	BLH blh[9];                     // 0 - ViewPoint , СЂР°РґРёР°РЅС‹ СЂР°РґРёР°РЅС‹ РєРј
+	};                              // 0 for KT - Main Point , СЂР°РґРёР°РЅС‹ СЂР°РґРёР°РЅС‹ РєРј
+    unsigned long uFlags;           // POIT_FLAGS_CHNL_РҐРҐРҐ | POIT_FLAGS_РҐРҐРҐРҐ
+	int Count;                      // РґР»СЏ Р°РєС‚РёРІРЅРѕР№ СЃС‚Р°РЅС†РёРё 0
     RXINFOE rx[];
 } POITE, * PPOITE;
 //******************************************************************************
-// структура IMPINFO
+// СЃС‚СЂСѓРєС‚СѓСЂР° IMPINFO
 //
 //******************************************************************************
 #ifndef RCTRLH
 typedef struct COMBOPOINTS_
-{   unsigned int uT;       // uT - Временное смещение от начала СЛ в нс
+{   unsigned int uT;       // uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
 	struct {
 		short sRe;
 		short sIm;
@@ -539,15 +539,15 @@ typedef struct COMBOPOINTS_
 #endif
 
 typedef struct IMPINFO_
-{   long uT;				// uT - Временное смещение от начала СЛ в нс
+{   long uT;				// uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
 	DWORD dwFlags;			// FLAG_IMPULS_XXXX
 	int iAmp;				// 0 - 32000
-	int iDur;				// 10ns кванты
+	int iDur;				// 10ns РєРІР°РЅС‚С‹
 	int iFreq;				// KHz
-	short sFreq0, sFreq1;	// KHz от центральной
+	short sFreq0, sFreq1;	// KHz РѕС‚ С†РµРЅС‚СЂР°Р»СЊРЅРѕР№
 	DWORD dwFrSigma2;
-	DWORD dwPeriod;			// период в нс
-	int icount;				// число импульсов в пачке
+	DWORD dwPeriod;			// РїРµСЂРёРѕРґ РІ РЅСЃ
+	int icount;				// С‡РёСЃР»Рѕ РёРјРїСѓР»СЊСЃРѕРІ РІ РїР°С‡РєРµ
 	union {
 		struct {
 		DWORD dwD4_C1;
@@ -561,7 +561,7 @@ typedef struct IMPINFO_
 	USHORT usBandCode;
 	USHORT usNCOCode;
 	USHORT usFrequCode;
-	USHORT usFlags;					// флаги CHAN_FLAG_XXXXX
+	USHORT usFlags;					// С„Р»Р°РіРё CHAN_FLAG_XXXXX
 	USHORT usTrashHold;
 	USHORT usPar0;
 	USHORT usPar1;
@@ -588,8 +588,8 @@ typedef struct IMPINFO_
 #define	FLAG_IMPULS_PELENG		0x100
 
 typedef struct IMPINFOE_
-{   long uT;				// uT - Временное смещение от начала СЛ в нс
-	int iDur;				// 10ns кванты
+{   long uT;				// uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
+	int iDur;				// 10ns РєРІР°РЅС‚С‹
 	union {
 		char data[20];
 		DWORD dwD4_C1;
@@ -600,10 +600,10 @@ typedef struct IMPINFOE_
 		};
 		struct {
 		int iFreq;				// KHz
-		short sFreq0, sFreq1;	// KHz от центральной
+		short sFreq0, sFreq1;	// KHz РѕС‚ С†РµРЅС‚СЂР°Р»СЊРЅРѕР№
 		DWORD dwFrSigma2;
-		DWORD dwPeriod;			// период в нс
-		USHORT usPackCount;		// число импульсов в пачке
+		DWORD dwPeriod;			// РїРµСЂРёРѕРґ РІ РЅСЃ
+		USHORT usPackCount;		// С‡РёСЃР»Рѕ РёРјРїСѓР»СЊСЃРѕРІ РІ РїР°С‡РєРµ
 		USHORT usAtt;
 		};
 	};
@@ -612,29 +612,29 @@ typedef struct IMPINFOE_
 	int iPeleng;				// peleng estimation in 1 / 0x10000 parts of 2*PI
 	BYTE bImpFlags;				// FLAG_IMPULS_XXXX
 	BYTE bChannelNum;	
-	BYTE bChannelFlags;			// флаги CHAN_FLAG_XXXXX
+	BYTE bChannelFlags;			// С„Р»Р°РіРё CHAN_FLAG_XXXXX
 	BYTE bReserved;	
 } IMPINFOE, * PIMPINFOE;
 
 //******************************************************************************
-// структура POSTT
+// СЃС‚СЂСѓРєС‚СѓСЂР° POSTT
 //******************************************************************************
 typedef struct POSTT_
 {	union {
-	FILETIME ftTlock;				//Время локации(100ns ticks)
+	FILETIME ftTlock;				//Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё(100ns ticks)
 	unsigned __int64 uqTlock;
 	};
-	DWORD dwDuration;               // длительность (100ns ticks)
+	DWORD dwDuration;               // РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (100ns ticks)
 	int iPosId;
-	DWORD dwFlags;                  // флаги FLAG_XXX_XXXX
-	DWORD dwKuCode;					// флаги FLAG_KUCODE_XXXX
+	DWORD dwFlags;                  // С„Р»Р°РіРё FLAG_XXX_XXXX
+	DWORD dwKuCode;					// С„Р»Р°РіРё FLAG_KUCODE_XXXX
 	DWORD dwKuAttCode;				
 	DWORD dwAzCode0;
 	DWORD dwAzCode1;
 	DWORD dwFreq0;
 	DWORD dwFreq1;
 	DWORD dwChannelMask;
-	USHORT usPostMask;				// вставляется в АДУ инфа о падсоединенных постах 
+	USHORT usPostMask;				// РІСЃС‚Р°РІР»СЏРµС‚СЃСЏ РІ РђР”РЈ РёРЅС„Р° Рѕ РїР°РґСЃРѕРµРґРёРЅРµРЅРЅС‹С… РїРѕСЃС‚Р°С… 
 	BYTE bIndx;
 	BYTE bIndxWba;
 	int iImpCount;
@@ -644,7 +644,7 @@ typedef struct POSTT_
 
 typedef struct POSTTE_
 {	union {
-	FILETIME ftTlock;				//Время локации(100ns ticks)
+	FILETIME ftTlock;				//Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё(100ns ticks)
 	unsigned __int64 uqTlock;
 	};
 	DWORD dwChannelMask;
@@ -656,18 +656,18 @@ typedef struct POSTTE_
 
 #define	FLAG_KUCODE_REGENAB	0x10000000
 //******************************************************************************
-// структура TRACELISTENTRY
+// СЃС‚СЂСѓРєС‚СѓСЂР° TRACELISTENTRY
 //******************************************************************************
 typedef struct TRACELISTENTRY_
 {   union {
-	FILETIME ftStartTime;				//Время создания(100ns ticks)
+	FILETIME ftStartTime;				//Р’СЂРµРјСЏ СЃРѕР·РґР°РЅРёСЏ(100ns ticks)
     unsigned __int64 uqStartTime;
 	};
 	double dLifeTime;					// in seconds from uqStartTime
-    double dEpsylon;					// Здоровье
+    double dEpsylon;					// Р—РґРѕСЂРѕРІСЊРµ
     int iId;
 	int iType;
-    int iIll;							// состояние
+    int iIll;							// СЃРѕСЃС‚РѕСЏРЅРёРµ
     int iCount, iPackCount, iRlCount;
 	int iBaseCount[5];
 	int iSmodeAdr;
@@ -678,72 +678,72 @@ typedef struct TRACELISTENTRY_
 //
 //******************************************************************************
 typedef struct RXENTRY_
-{   unsigned long uT;       // uT - Временное смещение от начала СЛ в нс
+{   unsigned long uT;       // uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
     unsigned long uBasesCode;
-	float fTau, fF;         // Длит имп мкс; частота Мгц
+	float fTau, fF;         // Р”Р»РёС‚ РёРјРї РјРєСЃ; С‡Р°СЃС‚РѕС‚Р° РњРіС†
 } RXENTRY, * PRXENTRY;
 //******************************************************************************
 //
 //******************************************************************************
 typedef struct TRACEINFOENTRY_
 {   union {
-	FILETIME ftLocTime;				//Время локации (100ns ticks)(UTC)
+	FILETIME ftLocTime;				//Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё (100ns ticks)(UTC)
     unsigned __int64 uqLocTime;
 	};
 	union {
-	struct {                    // RL,TACAN (данные пассивной разностно дальномерной системы)
-	    unsigned Dummy0    :3;  // пусто
-	    unsigned Mod       :3;  // код модуляции (1-ФКМ,2-ЧМ-,4-ЧМ+)
-	    unsigned Pol       :2;  // код поляризации
-	    unsigned Pim       :1;  // признак имитации
-	    unsigned PmodT     :1;  // признак модуляции Т
-	    unsigned PmodTau   :1;  // признак модуляции Тау
-        unsigned B		   :1;  /*Вид сигнала (при tau > 400 мкс B = 1, иначе B = 0)*/
-        unsigned H		   :1;  /*Признак наложения импульсов*/
-        unsigned ModF      :1;  /*Признак модуляции по девиации (введен мною)*/
+	struct {                    // RL,TACAN (РґР°РЅРЅС‹Рµ РїР°СЃСЃРёРІРЅРѕР№ СЂР°Р·РЅРѕСЃС‚РЅРѕ РґР°Р»СЊРЅРѕРјРµСЂРЅРѕР№ СЃРёСЃС‚РµРјС‹)
+	    unsigned Dummy0    :3;  // РїСѓСЃС‚Рѕ
+	    unsigned Mod       :3;  // РєРѕРґ РјРѕРґСѓР»СЏС†РёРё (1-Р¤РљРњ,2-Р§Рњ-,4-Р§Рњ+)
+	    unsigned Pol       :2;  // РєРѕРґ РїРѕР»СЏСЂРёР·Р°С†РёРё
+	    unsigned Pim       :1;  // РїСЂРёР·РЅР°Рє РёРјРёС‚Р°С†РёРё
+	    unsigned PmodT     :1;  // РїСЂРёР·РЅР°Рє РјРѕРґСѓР»СЏС†РёРё Рў
+	    unsigned PmodTau   :1;  // РїСЂРёР·РЅР°Рє РјРѕРґСѓР»СЏС†РёРё РўР°Сѓ
+        unsigned B		   :1;  /*Р’РёРґ СЃРёРіРЅР°Р»Р° (РїСЂРё tau > 400 РјРєСЃ B = 1, РёРЅР°С‡Рµ B = 0)*/
+        unsigned H		   :1;  /*РџСЂРёР·РЅР°Рє РЅР°Р»РѕР¶РµРЅРёСЏ РёРјРїСѓР»СЊСЃРѕРІ*/
+        unsigned ModF      :1;  /*РџСЂРёР·РЅР°Рє РјРѕРґСѓР»СЏС†РёРё РїРѕ РґРµРІРёР°С†РёРё (РІРІРµРґРµРЅ РјРЅРѕСЋ)*/
 	    unsigned NTacan    :18; //
 	    int Sector;
-		float Aimp;             // Амплитуда импульса Дб
-	    float sigmataui;        // СКО длительности импульса мкс
-	    float sigmaT;           // СКО периода повторения импульсов мкс
-	    float sigmafc;          // СКО несущей частоты
+		float Aimp;             // РђРјРїР»РёС‚СѓРґР° РёРјРїСѓР»СЊСЃР° Р”Р±
+	    float sigmataui;        // РЎРљРћ РґР»РёС‚РµР»СЊРЅРѕСЃС‚Рё РёРјРїСѓР»СЊСЃР° РјРєСЃ
+	    float sigmaT;           // РЎРљРћ РїРµСЂРёРѕРґР° РїРѕРІС‚РѕСЂРµРЅРёСЏ РёРјРїСѓР»СЊСЃРѕРІ РјРєСЃ
+	    float sigmafc;          // РЎРљРћ РЅРµСЃСѓС‰РµР№ С‡Р°СЃС‚РѕС‚С‹
 		};
-    struct {                    // SIF (данные пассивной разностно дальномерной системы)
-	    unsigned long uSifFlags;   // режима SIF
+    struct {                    // SIF (РґР°РЅРЅС‹Рµ РїР°СЃСЃРёРІРЅРѕР№ СЂР°Р·РЅРѕСЃС‚РЅРѕ РґР°Р»СЊРЅРѕРјРµСЂРЅРѕР№ СЃРёСЃС‚РµРјС‹)
+	    unsigned long uSifFlags;   // СЂРµР¶РёРјР° SIF
 	    int Sector;
-	    float Aimp;             // Амплитуда импульса Дб
-        unsigned D4_C1	   :12; /*Позиционный код посылки*/
-        unsigned UBD	   :17; /*Позиционный код режима УВД-М*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (3)*/
-   /*Слово 1*/
-        unsigned DP1	   :29; /*Позиционный код режима УВД-S*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (4)*/
-   /*Слово 2*/
-        unsigned DP2	   :29; /*Позиционный код режима УВД-S*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (5)*/
-   /*Слово 3*/
-        unsigned DP3	   :29; /*Позиционный код режима УВД-S*/
-        unsigned		   :3;  /*Номер слова в кодограмме посылки (6)*/
-   /*Слово 4*/
+	    float Aimp;             // РђРјРїР»РёС‚СѓРґР° РёРјРїСѓР»СЊСЃР° Р”Р±
+        unsigned D4_C1	   :12; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ РїРѕСЃС‹Р»РєРё*/
+        unsigned UBD	   :17; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-Рњ*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (3)*/
+   /*РЎР»РѕРІРѕ 1*/
+        unsigned DP1	   :29; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-S*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (4)*/
+   /*РЎР»РѕРІРѕ 2*/
+        unsigned DP2	   :29; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-S*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (5)*/
+   /*РЎР»РѕРІРѕ 3*/
+        unsigned DP3	   :29; /*РџРѕР·РёС†РёРѕРЅРЅС‹Р№ РєРѕРґ СЂРµР¶РёРјР° РЈР’Р”-S*/
+        unsigned		   :3;  /*РќРѕРјРµСЂ СЃР»РѕРІР° РІ РєРѕРґРѕРіСЂР°РјРјРµ РїРѕСЃС‹Р»РєРё (6)*/
+   /*РЎР»РѕРІРѕ 4*/
 		};
 	};
-    unsigned long uFlags;           // POIT_FLAGS_CHNL_ХХХ | POIT_FLAGS_ХХХХ
-    int RxCount;                    // для активной станции 0
+    unsigned long uFlags;           // POIT_FLAGS_CHNL_РҐРҐРҐ | POIT_FLAGS_РҐРҐРҐРҐ
+    int RxCount;                    // РґР»СЏ Р°РєС‚РёРІРЅРѕР№ СЃС‚Р°РЅС†РёРё 0
     RXENTRY rx[];
 } TRACEINFOENTRY, * PTRACEINFOENTRY;
 //******************************************************************************
 //
 //******************************************************************************
 typedef struct RXENTRYE_
-{   unsigned long uT;       // uT - Временное смещение от начала СЛ в нс
+{   unsigned long uT;       // uT - Р’СЂРµРјРµРЅРЅРѕРµ СЃРјРµС‰РµРЅРёРµ РѕС‚ РЅР°С‡Р°Р»Р° РЎР› РІ РЅСЃ
     unsigned long uBasesCode;
-	float fTau, fF;         // Длит имп мкс; частота Мгц
+	float fTau, fF;         // Р”Р»РёС‚ РёРјРї РјРєСЃ; С‡Р°СЃС‚РѕС‚Р° РњРіС†
 	float fAmp;
 	DWORD dwFrSigma2;
 	DWORD dwStrobEQuad;
-	DWORD dwPeriod;			// период в пачке в нс
-	USHORT usImpCount;		// число имп. в пачке
-	short sFreq0, sFreq1;	// KHz от центральной
+	DWORD dwPeriod;			// РїРµСЂРёРѕРґ РІ РїР°С‡РєРµ РІ РЅСЃ
+	USHORT usImpCount;		// С‡РёСЃР»Рѕ РёРјРї. РІ РїР°С‡РєРµ
+	short sFreq0, sFreq1;	// KHz РѕС‚ С†РµРЅС‚СЂР°Р»СЊРЅРѕР№
 	USHORT usStrobE;
 } RXENTRYE, * PRXENTRYE;
 //******************************************************************************
@@ -751,7 +751,7 @@ typedef struct RXENTRYE_
 //******************************************************************************
 typedef struct TRACEINFOENTRYE_
 {   union {
-	FILETIME ftLocTime;				//Время локации (100ns ticks)(UTC)
+	FILETIME ftLocTime;				//Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё (100ns ticks)(UTC)
     unsigned __int64 uqLocTime;
 	};
 	int iSector;
@@ -768,8 +768,8 @@ typedef struct TRACEINFOENTRYE_
 	int iSmodeAdr;
 	DWORD dwReserved;
 	char bSmodeCall[8];
-	unsigned long uFlags;           // POIT_FLAGS_CHNL_ХХХ | POIT_FLAGS_ХХХХ
-    int RxCount;                    // для активной станции 0
+	unsigned long uFlags;           // POIT_FLAGS_CHNL_РҐРҐРҐ | POIT_FLAGS_РҐРҐРҐРҐ
+    int RxCount;                    // РґР»СЏ Р°РєС‚РёРІРЅРѕР№ СЃС‚Р°РЅС†РёРё 0
     RXENTRYE rx[];
 } TRACEINFOENTRYE, * PTRACEINFOENTRYE;
 //******************************************************************************
@@ -781,40 +781,40 @@ typedef struct TRACEINFOHEADER_
 	unsigned char bErrCode;			// TRINF_ERR_XXX					
 	unsigned char bType;			// 					
 	double dTimeFrom, dTimeTo;			//
-	/*TRACEINFOENTRY te[]; или TRACEINFOENTRYE te[];*/
+	/*TRACEINFOENTRY te[]; РёР»Рё TRACEINFOENTRYE te[];*/
 } TRACEINFOHEADER, * PTRACEINFOHEADER;
 
 #define TRINF_ERR_OK			0x0
 #define TRINF_ERR_TRNOTFOUND	0x1
 #define TRINF_ERR_NOINFO		0x2
 //******************************************************************************
-// структура SCOPE16C
+// СЃС‚СЂСѓРєС‚СѓСЂР° SCOPE16C
 //******************************************************************************
 typedef struct SCOPE16C_
 {   union {
-	FILETIME ftTlock;				// Время локации(100ns ticks)
+	FILETIME ftTlock;				// Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё(100ns ticks)
     unsigned __int64 uqTlock;
 	};
 	int iPosId;
 	int iChanId;
-	int iCount;						// число комплексных отсчетов ( sizeof(sData) / 4)
-	int iTimeInc;					// Период дискретизации ns
-	int iFrequency;					// в КГц
+	int iCount;						// С‡РёСЃР»Рѕ РєРѕРјРїР»РµРєСЃРЅС‹С… РѕС‚СЃС‡РµС‚РѕРІ ( sizeof(sData) / 4)
+	int iTimeInc;					// РџРµСЂРёРѕРґ РґРёСЃРєСЂРµС‚РёР·Р°С†РёРё ns
+	int iFrequency;					// РІ РљР“С†
 	int iReserved[6];
 	short sData[];
 } SCOPE16C, * PSCOPE16C;
 //******************************************************************************
-// структура BASECORRELATION (w-type WTYP_BASECORR)
+// СЃС‚СЂСѓРєС‚СѓСЂР° BASECORRELATION (w-type WTYP_BASECORR)
 //******************************************************************************
 typedef struct BASECORRELATION_
 {   union {
-	FILETIME ftTlock;				// Время локации(100ns ticks)
+	FILETIME ftTlock;				// Р’СЂРµРјСЏ Р»РѕРєР°С†РёРё(100ns ticks)
     unsigned __int64 uqTlock;
 	};
 	int iMinuId;
 	int iSubtId;
 	int iChanId;
-	int iCount;						// число отсчетов
+	int iCount;						// С‡РёСЃР»Рѕ РѕС‚СЃС‡РµС‚РѕРІ
 	int iReserved[8];
 	struct DATA
 	{	float fRx;
@@ -826,18 +826,18 @@ typedef struct BASECORRELATION_
 //******************************************************************************
 #ifndef RCTRLH
 typedef struct ADUCLI_STATUS_
-{	unsigned __int64 uqTime;		// Время UTC (100ns ticks)
-	double dSncBufStat;				// Запас стробов в сек
-	double dCliBufStat;				// Запас стробов в сек
-	double dUvsBufStat;				// Запас стробов в сек
-	double dAduBufStat;				// Запас стробов в сек
-	double dOut0BufStat;			// Запас в сек
-	double dOut1BufStat;			// Запас в сек
-	double dSpeedIn;				// Поток на прием мбит в сек
-	double dSpeedOut;				// Поток на передачу мбит в сек
-	double dOutLoad;				// Процент заполтуния выходного буфера
+{	unsigned __int64 uqTime;		// Р’СЂРµРјСЏ UTC (100ns ticks)
+	double dSncBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dCliBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dUvsBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dAduBufStat;				// Р—Р°РїР°СЃ СЃС‚СЂРѕР±РѕРІ РІ СЃРµРє
+	double dOut0BufStat;			// Р—Р°РїР°СЃ РІ СЃРµРє
+	double dOut1BufStat;			// Р—Р°РїР°СЃ РІ СЃРµРє
+	double dSpeedIn;				// РџРѕС‚РѕРє РЅР° РїСЂРёРµРј РјР±РёС‚ РІ СЃРµРє
+	double dSpeedOut;				// РџРѕС‚РѕРє РЅР° РїРµСЂРµРґР°С‡Сѓ РјР±РёС‚ РІ СЃРµРє
+	double dOutLoad;				// РџСЂРѕС†РµРЅС‚ Р·Р°РїРѕР»С‚СѓРЅРёСЏ РІС‹С…РѕРґРЅРѕРіРѕ Р±СѓС„РµСЂР°
 	double dReserved;				//
-	DWORD dwFlags;                  // флаги UVS_STAT_FLAG_XXXXX
+	DWORD dwFlags;                  // С„Р»Р°РіРё UVS_STAT_FLAG_XXXXX
 	DWORD dwErrCount;
 	DWORD dwDoneCount;
 	DWORD dwSatellCou;
@@ -849,7 +849,7 @@ typedef struct ADUCLI_STATUS_
 	BLH blh;
 	DWORD dwClientId;
 	double dLastTCorr;
-	unsigned __int64 uqLastUpdateTime;		// Время UTC (100ns ticks)
+	unsigned __int64 uqLastUpdateTime;		// Р’СЂРµРјСЏ UTC (100ns ticks)
 	BYTE bAcmStatus[24];
 	DWORD dwChannelMask;
 	BYTE bWbr0MagicNumber;
@@ -896,12 +896,12 @@ typedef struct MAINSTATUS_
 #define		UVS_STAT_FLAG_SNC_TECCLOCK		0x1000000
 
 typedef struct ACMHEADER_ {
-	unsigned __int64 uqExecTime;	// Время исполнения UTC (100ns ticks)
-	DWORD dwDuration;               // длительность (100ns ticks)
+	unsigned __int64 uqExecTime;	// Р’СЂРµРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ UTC (100ns ticks)
+	DWORD dwDuration;               // РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (100ns ticks)
 	USHORT usPostId;
 	BYTE bIndx;
 	BYTE bIndxWba;
-	DWORD dwFlags;                  // флаги FLAG_ACMSTROB_XXXX
+	DWORD dwFlags;                  // С„Р»Р°РіРё FLAG_ACMSTROB_XXXX
 	DWORD dwKuCode;					// KU_CODE_FLAG_XXX
 	DWORD dwKuAttCode;
 	DWORD dwAzCode0;
@@ -912,13 +912,13 @@ typedef struct ACMHEADER_ {
 	USHORT usBandCode;
 	USHORT usNCOCode;
 	USHORT usFrequCode;
-	USHORT usFlags;					// флаги CHAN_FLAG_XXXXX
+	USHORT usFlags;					// С„Р»Р°РіРё CHAN_FLAG_XXXXX
 	USHORT usTrashHold;
 	USHORT usPar0;
 	USHORT usPar1;
 	USHORT usPar2;
 	USHORT usAtt;
-	USHORT usPostMask;				// вставляется в АДУ инфа о падсоединенных постах 
+	USHORT usPostMask;				// РІСЃС‚Р°РІР»СЏРµС‚СЃСЏ РІ РђР”РЈ РёРЅС„Р° Рѕ РїР°РґСЃРѕРµРґРёРЅРµРЅРЅС‹С… РїРѕСЃС‚Р°С… 
 	BYTE bChannelId;	
 	BYTE bProcId;	
 	BYTE bBoardId;	
@@ -932,7 +932,7 @@ typedef struct ACMHEADER_ {
 
 #endif
 //******************************************************************************
-//					ФДК STATUS
+//					Р¤Р”Рљ STATUS
 //******************************************************************************
 typedef struct FDSENTRY_
 {
@@ -948,7 +948,7 @@ typedef struct FDSENTRY_
 #define		FD_SUSBSYSTEM_WBA		5
 
 typedef struct FD_STATUS_
-{	unsigned __int64 uqTime;		// Время UTC (100ns ticks)
+{	unsigned __int64 uqTime;		// Р’СЂРµРјСЏ UTC (100ns ticks)
 	BYTE	bType;
 	BYTE	bProgress;
 	USHORT	usStatus;
@@ -979,98 +979,98 @@ typedef struct SOIMESSAGE_
 } SOIMESSAGE, * PSOIMESSAGE;
 
 /**************************************************************************//**
-*	Константы ФДК
+*	РљРѕРЅСЃС‚Р°РЅС‚С‹ Р¤Р”Рљ
 ******************************************************************************/
-/*! Определения типов контроля */
-#define FDC_TYPE_READY		200		//!< контроль готовности
-#define FDC_TYPE_FUNC		201		//!< текущий функциональный контроль
-#define FDC_TYPE_DIAG		202		//!< функционально-диагностический контроль
-#define FDC_TYPE_COMM		203		//!< контроль линии связи
-#define FDC_TYPE_NAV		204		//!< контроль навигационной системы
+/*! РћРїСЂРµРґРµР»РµРЅРёСЏ С‚РёРїРѕРІ РєРѕРЅС‚СЂРѕР»СЏ */
+#define FDC_TYPE_READY		200		//!< РєРѕРЅС‚СЂРѕР»СЊ РіРѕС‚РѕРІРЅРѕСЃС‚Рё
+#define FDC_TYPE_FUNC		201		//!< С‚РµРєСѓС‰РёР№ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅС‹Р№ РєРѕРЅС‚СЂРѕР»СЊ
+#define FDC_TYPE_DIAG		202		//!< С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕ-РґРёР°РіРЅРѕСЃС‚РёС‡РµСЃРєРёР№ РєРѕРЅС‚СЂРѕР»СЊ
+#define FDC_TYPE_COMM		203		//!< РєРѕРЅС‚СЂРѕР»СЊ Р»РёРЅРёРё СЃРІСЏР·Рё
+#define FDC_TYPE_NAV		204		//!< РєРѕРЅС‚СЂРѕР»СЊ РЅР°РІРёРіР°С†РёРѕРЅРЅРѕР№ СЃРёСЃС‚РµРјС‹
 
-/*! Определения подсистем */
-#define FDC_SS_APM			1		//!< АПМ
-#define FDC_SS_BUS			2		//!< БУС
-#define	FDC_SS_RDMT1		3		//!< РДМТ 1
-#define	FDC_SS_RDMT2		4		//!< РДМТ 2
-#define	FDC_SS_WBA			5		//!< ШАС
+/*! РћРїСЂРµРґРµР»РµРЅРёСЏ РїРѕРґСЃРёСЃС‚РµРј */
+#define FDC_SS_APM			1		//!< РђРџРњ
+#define FDC_SS_BUS			2		//!< Р‘РЈРЎ
+#define	FDC_SS_RDMT1		3		//!< Р Р”РњРў 1
+#define	FDC_SS_RDMT2		4		//!< Р Р”РњРў 2
+#define	FDC_SS_WBA			5		//!< РЁРђРЎ
 
-/*! Определения устройств */
-#define FDC_DEV_UNKNOWN			0					//<! Устройство не определено
+/*! РћРїСЂРµРґРµР»РµРЅРёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІ */
+#define FDC_DEV_UNKNOWN			0					//<! РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ
 
-/*! Устройства АПМ */
-#define FDC_APM_HB_LNA(r, d)	(1 + r * 8 + d)		/*!< МШУ диапазона 2 — 18 ГГц
-													* r - диапазон:
-													* 0 - 2...4 ГГц
-													* 1 - 4...8 ГГц
-													* 2 - 8...12 ГГц
-													* 3 - 12...18 ГГц
-													* d - грань от 0 до 7
+/*! РЈСЃС‚СЂРѕР№СЃС‚РІР° РђРџРњ */
+#define FDC_APM_HB_LNA(r, d)	(1 + r * 8 + d)		/*!< РњРЁРЈ РґРёР°РїР°Р·РѕРЅР° 2 вЂ” 18 Р“Р“С†
+													* r - РґРёР°РїР°Р·РѕРЅ:
+													* 0 - 2...4 Р“Р“С†
+													* 1 - 4...8 Р“Р“С†
+													* 2 - 8...12 Р“Р“С†
+													* 3 - 12...18 Р“Р“С†
+													* d - РіСЂР°РЅСЊ РѕС‚ 0 РґРѕ 7
 													*/												
-#define FDC_APM_HB_IN_SWITCH(r)	(33 + r)			/*!< Входной коммутатор
-													* r - диапазон:
-													* 0 - 2...4 ГГц
-													* 1 - 4...8 ГГц
-													* 2 - 8...12 ГГц
-													* 3 - 12...18 ГГц
+#define FDC_APM_HB_IN_SWITCH(r)	(33 + r)			/*!< Р’С…РѕРґРЅРѕР№ РєРѕРјРјСѓС‚Р°С‚РѕСЂ
+													* r - РґРёР°РїР°Р·РѕРЅ:
+													* 0 - 2...4 Р“Р“С†
+													* 1 - 4...8 Р“Р“С†
+													* 2 - 8...12 Р“Р“С†
+													* 3 - 12...18 Р“Р“С†
 													*/
-#define FDC_APM_HB_WBR(n)		(37 + n)			//!< БПУ 0, 1
-#define FDC_APM_HB_WBR0			37					//!< БПУ 0
-#define FDC_APM_HB_WBR1			38					//!< БПУ 1
-#define FDC_APM_HB_OUT_SWITCH	39					//!< Выходной коммутатор верхнего поддиапазона
-#define FDC_APM_HB_KU			40					//!< КУ002 верхнего поддиапазона
-#define FDC_APM_LB_KU			41					//!< КУ002 нижнего поддиапазона
-#define FDC_APM_LB_LNA(r, d)	(43 + r * 8 + d)	/*!< МШУ диапазона 0,2...2 ГГц
-													* r - диапазон:
-													* 0 - 1...2 ГГц
-													* 1 - 0,5...1 ГГц
-													* 2 - 0,2...0,5 ГГц
-													* d - направление:
-													* для нижнего диапазона 0...3
-													* для верхних диапазонов 0...7
+#define FDC_APM_HB_WBR(n)		(37 + n)			//!< Р‘РџРЈ 0, 1
+#define FDC_APM_HB_WBR0			37					//!< Р‘РџРЈ 0
+#define FDC_APM_HB_WBR1			38					//!< Р‘РџРЈ 1
+#define FDC_APM_HB_OUT_SWITCH	39					//!< Р’С‹С…РѕРґРЅРѕР№ РєРѕРјРјСѓС‚Р°С‚РѕСЂ РІРµСЂС…РЅРµРіРѕ РїРѕРґРґРёР°РїР°Р·РѕРЅР°
+#define FDC_APM_HB_KU			40					//!< РљРЈ002 РІРµСЂС…РЅРµРіРѕ РїРѕРґРґРёР°РїР°Р·РѕРЅР°
+#define FDC_APM_LB_KU			41					//!< РљРЈ002 РЅРёР¶РЅРµРіРѕ РїРѕРґРґРёР°РїР°Р·РѕРЅР°
+#define FDC_APM_LB_LNA(r, d)	(43 + r * 8 + d)	/*!< РњРЁРЈ РґРёР°РїР°Р·РѕРЅР° 0,2...2 Р“Р“С†
+													* r - РґРёР°РїР°Р·РѕРЅ:
+													* 0 - 1...2 Р“Р“С†
+													* 1 - 0,5...1 Р“Р“С†
+													* 2 - 0,2...0,5 Р“Р“С†
+													* d - РЅР°РїСЂР°РІР»РµРЅРёРµ:
+													* РґР»СЏ РЅРёР¶РЅРµРіРѕ РґРёР°РїР°Р·РѕРЅР° 0...3
+													* РґР»СЏ РІРµСЂС…РЅРёС… РґРёР°РїР°Р·РѕРЅРѕРІ 0...7
 													*/
-#define FDC_APM_LB_SWITCH(n)	(64 + n)			/*!< Коммутаторы нижнего поддиапазона
-													* 0 - коммутатор диапазона 0,5...1 ГГц
-													* 1 - коммутатор диапазона 1...2 ГГц
-													* 2 - выходной коммутатор
-													* 3 - коммутатор диапазона 0,8...2 ГГц
+#define FDC_APM_LB_SWITCH(n)	(64 + n)			/*!< РљРѕРјРјСѓС‚Р°С‚РѕСЂС‹ РЅРёР¶РЅРµРіРѕ РїРѕРґРґРёР°РїР°Р·РѕРЅР°
+													* 0 - РєРѕРјРјСѓС‚Р°С‚РѕСЂ РґРёР°РїР°Р·РѕРЅР° 0,5...1 Р“Р“С†
+													* 1 - РєРѕРјРјСѓС‚Р°С‚РѕСЂ РґРёР°РїР°Р·РѕРЅР° 1...2 Р“Р“С†
+													* 2 - РІС‹С…РѕРґРЅРѕР№ РєРѕРјРјСѓС‚Р°С‚РѕСЂ
+													* 3 - РєРѕРјРјСѓС‚Р°С‚РѕСЂ РґРёР°РїР°Р·РѕРЅР° 0,8...2 Р“Р“С†
 													*/
 
-/*! Устройства БУС */
-#define FDC_BUS_MODEM(n)		(1 + n)				/*!< Модемы:
-													* 0 - левый
-													* 1 - центральный
-													* 2 - правый
+/*! РЈСЃС‚СЂРѕР№СЃС‚РІР° Р‘РЈРЎ */
+#define FDC_BUS_MODEM(n)		(1 + n)				/*!< РњРѕРґРµРјС‹:
+													* 0 - Р»РµРІС‹Р№
+													* 1 - С†РµРЅС‚СЂР°Р»СЊРЅС‹Р№
+													* 2 - РїСЂР°РІС‹Р№
 													*/
-#define FDC_BUS_RUBIDIUM		4					//!< Стандарт частоты
-#define FDC_BUS_UVS				5					//!< УВС
-#define FDC_BUS_POWER(n)		(6 + n)				//!< Источник питания 12В 0...1
+#define FDC_BUS_RUBIDIUM		4					//!< РЎС‚Р°РЅРґР°СЂС‚ С‡Р°СЃС‚РѕС‚С‹
+#define FDC_BUS_UVS				5					//!< РЈР’РЎ
+#define FDC_BUS_POWER(n)		(6 + n)				//!< РСЃС‚РѕС‡РЅРёРє РїРёС‚Р°РЅРёСЏ 12Р’ 0...1
 
-/*! Устройства РДМТ */
+/*! РЈСЃС‚СЂРѕР№СЃС‚РІР° Р Р”РњРў */
 #define FDC_RDMT_CPC			1					//!< CPC600
-#define FDC_RDMT_ESW			2					//!< Коммутатор ESW
-#define FDC_RDMT_SNC			3					//!< СНЦ003
-#define FDC_RDMT_UAP1			4					//!< УАП001 - 1
-#define FDC_RDMT_PRU1			5					//!< ПРУ001
-#define FDC_RDMT_UDS			6					//!< УДС001
-#define FDC_RDMT_PRU2			7					//!< ПРУ001А
-#define FDC_RDMT_UAP2			8					//!< УАП001 - 2
-#define FDC_RDMT_KSO			9					//!< КСО001
-#define FDC_RDMT_RPM			10					//!< РПМ002
-#define FDC_RDMT_UAP3			11					//!< УАП001 - 3
-#define FDC_RDMT_URP			12					//!< УРП001
+#define FDC_RDMT_ESW			2					//!< РљРѕРјРјСѓС‚Р°С‚РѕСЂ ESW
+#define FDC_RDMT_SNC			3					//!< РЎРќР¦003
+#define FDC_RDMT_UAP1			4					//!< РЈРђРџ001 - 1
+#define FDC_RDMT_PRU1			5					//!< РџР РЈ001
+#define FDC_RDMT_UDS			6					//!< РЈР”РЎ001
+#define FDC_RDMT_PRU2			7					//!< РџР РЈ001Рђ
+#define FDC_RDMT_UAP2			8					//!< РЈРђРџ001 - 2
+#define FDC_RDMT_KSO			9					//!< РљРЎРћ001
+#define FDC_RDMT_RPM			10					//!< Р РџРњ002
+#define FDC_RDMT_UAP3			11					//!< РЈРђРџ001 - 3
+#define FDC_RDMT_URP			12					//!< РЈР Рџ001
 
-/*! Устройства ШАС */
-#define FDC_WBA_LL				1					//!< 2ЛЛ01
-#define FDC_WBA_CP1				2					//!< 2ЦП01 - 1
-#define FDC_WBA_CP2				3					//!< 2ЦП01 - 2
-#define FDC_WBA_CP(n)			(2 + n)				//!< 2ЦП01 - 0...1
-#define FDC_WBA_UU				4					//!< 2УУ01
+/*! РЈСЃС‚СЂРѕР№СЃС‚РІР° РЁРђРЎ */
+#define FDC_WBA_LL				1					//!< 2Р›Р›01
+#define FDC_WBA_CP1				2					//!< 2Р¦Рџ01 - 1
+#define FDC_WBA_CP2				3					//!< 2Р¦Рџ01 - 2
+#define FDC_WBA_CP(n)			(2 + n)				//!< 2Р¦Рџ01 - 0...1
+#define FDC_WBA_UU				4					//!< 2РЈРЈ01
 #define FDC_WBA_HOST			5					//!< host
 
 
 //-----------------------------------------------------------------------------
-//   Конец файла *.h
+//   РљРѕРЅРµС† С„Р°Р№Р»Р° *.h
 //-----------------------------------------------------------------------------
 
 #ifdef _MSC_VER

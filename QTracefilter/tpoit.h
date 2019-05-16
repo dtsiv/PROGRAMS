@@ -33,8 +33,8 @@ inline void DbgPrint(const wchar_t * fmt, ...)
 }
 #endif
 
-#define GEARTH          9.87  // ускорение свободного падения, м/(c*c);
-#define VERYLARGEAMOUNT 1.e10    // Чтобы больше не было
+#define GEARTH          9.87  // СѓСЃРєРѕСЂРµРЅРёРµ СЃРІРѕР±РѕРґРЅРѕРіРѕ РїР°РґРµРЅРёСЏ, Рј/(c*c);
+#define VERYLARGEAMOUNT 1.e10    // Р§С‚РѕР±С‹ Р±РѕР»СЊС€Рµ РЅРµ Р±С‹Р»Рѕ
 #define FREEPTREEDEPTH  5
 #define RAD_TO_DEG	    57.29577951308232
 #define DEG_TO_RAD	    0.0174532925199432958
@@ -157,6 +157,8 @@ public:
 		return(dRet);
 	}
 	bool IsHasBase(int iMinue, int iSubtra, int iIndx);
+    QString calculatedPathDiffs(double dX, double dY);
+    QString getBasesString();
 	unsigned __int64 m_uqTime;
 	DWORD m_dwTu;
 	unsigned long m_uFlags;
