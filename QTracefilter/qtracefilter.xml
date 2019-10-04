@@ -2,7 +2,7 @@
 <PARAMETERS>
     <ClusterCutoff>50</ClusterCutoff>
     <ClusterMinSize>20</ClusterMinSize>
-    <DBEngine>1</DBEngine>
+    <DBEngine>2</DBEngine>
     <EstIniVelocity>true</EstIniVelocity>
     <Filter_output>AAAAGAAAAAAAAADPAAAA/w==</Filter_output>
     <GeneratorAz0>-60</GeneratorAz0>
@@ -21,9 +21,9 @@
     <Imitator_source>AAAAFgAAABgAAAAXAAAAgA==</Imitator_source>
     <IndGeometry>AAABMgAAACgAAAUZAAADIQ==</IndGeometry>
     <IndGridStep>50</IndGridStep>
-    <IndViewScale>0.00084557193664583125</IndViewScale>
-    <IndViewX0>-131.20176852649669</IndViewX0>
-    <IndViewY0>-150.12387237902993</IndViewY0>
+    <IndViewScale>0.00052609204588455573</IndViewScale>
+    <IndViewX0>2.2774587477169956</IndViewX0>
+    <IndViewY0>2.2774587477169956</IndViewY0>
     <KalmanChi2Prob>3</KalmanChi2Prob>
     <KalmanHeight>5</KalmanHeight>
     <KalmanMatRelax>20</KalmanMatRelax>
@@ -40,7 +40,7 @@
     <PostgresConnectionString>host=127.0.0.1 dbname=rmo user=rmo password=123 client_encoding=WIN1251</PostgresConnectionString>
     <Primary_cluster>AAAA7AAAAOwAAAAAAAAAKA==</Primary_cluster>
     <Primary_points>AAAAAAAAAKoAAAAAAAAA/w==</Primary_points>
-    <PropTab>2</PropTab>
+    <PropTab>0</PropTab>
     <SQLiteFile>poite20170602.db</SQLiteFile>
     <Source_alarm>AAAA/wAAAAAAAAAAAAAAgA==</Source_alarm>
     <SymbolSizes>AAAABgAAAAUAAAAKAAAABgAAAB4=</SymbolSizes>
