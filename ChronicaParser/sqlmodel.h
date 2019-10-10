@@ -32,6 +32,7 @@
 #define SETTINGS_KEY_RAWFROM        "rawStrobFrom"
 #define SETTINGS_KEY_RAWTO          "rawStrobTo"
 #define SETTINGS_KEY_MAXVELO        "maxVelocity"
+#define SETTINGS_KEY_PFALARM        "falseAlarmProb"
 
 #define DATA_FILE_NAME              "00000000"
 

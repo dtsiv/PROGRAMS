@@ -75,6 +75,7 @@ int readSettings() {
     iRawStrobFrom=qSettings.value(SETTINGS_KEY_RAWFROM,0).toInt(&bOk);
     iRawStrobTo=qSettings.value(SETTINGS_KEY_RAWTO,0).toInt(&bOk);
     dMaxVelocity=qSettings.value(SETTINGS_KEY_MAXVELO,0).toDouble(&bOk);
+    dFalseAlarmProb=qSettings.value(SETTINGS_KEY_PFALARM,1.0e-5).toDouble(&bOk);
 
     if (qsOperation=="dataImport") omSelectedMode=mDataImport;
     else if (qsOperation=="poi") omSelectedMode=mPrimaryProc;

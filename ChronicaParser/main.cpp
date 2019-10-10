@@ -17,6 +17,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // initialize random number generator. idum is ReadWrite
+    idum=-1;
+    NR::gasdev(idum);
+
     switch (omSelectedMode) {
         case mDataImport:
             if ((iErr=openDataFile())) {

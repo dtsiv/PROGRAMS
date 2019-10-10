@@ -23,6 +23,7 @@ double dCarrierF, dTs;
 int NT,NT_,Np,Ntau;
 int iPlotSlicePeriod,iPlotSliceBeam;
 double dMaxVelocity;
+double dFalseAlarmProb;
 
 //======================================================================================================
 //
@@ -221,39 +222,6 @@ QByteArray dopplerRepresentation(qint16 *pData, unsigned int iArrElemCount, unsi
         }
     }
 
-#if 0
-    QFile qfTimeTest("timetest.txt");
-    qfTimeTest.open(QIODevice::ReadWrite);
-    qfTimeTest.resize(0);
-    QTextStream tsTimeTest(&qfTimeTest);
-    for (i=0; i<iFilteredN; i++) {
-        tsTimeTest << QString("%1").arg(i,2);
-        double dFourier274Re=0.0e0;
-        double dFourier274Im=0.0e0;
-        for (k=0; k<Np; k++) {
-            double dHamA0=25.0/46;
-            double dHamA1=21.0/46;
-            double dHamW=2.0*3.14159265/(Np-1);
-                // loop over one period (recorded fragment) 0...NT_-1
-                // tsTimeTest << QString("%1").arg(k,4);
-            int idx=2*(k*iFilteredN+i); // last i is (NT_-Ntau+1)-1=NT_-Ntau
-            qint64 iRe=pDataFiltered[idx]*(dHamA0-dHamA1*cos(dHamW*k));
-            qint64 iIm=pDataFiltered[idx+1]*(dHamA0-dHamA1*cos(dHamW*k));
-            double dW=2*3.14159265*k/2048*274;
-            dFourier274Re+=iRe*cos(dW);
-            dFourier274Re-=iIm*sin(dW);
-            dFourier274Im+=iIm*cos(dW);
-            dFourier274Im+=iRe*sin(dW);
-        }
-        dFourier274Re/=2048;
-        dFourier274Im/=2048;
-        tsTimeTest << QString("\t%1").arg(dFourier274Re*dFourier274Re+dFourier274Im*dFourier274Im,20);
-        tsTimeTest << endl;
-    }
-    qfTimeTest.close();
-#endif
-
-
     NFFT=0;
     for (i=0; i<31; i++) {
         NFFT = 1<<i;
@@ -290,19 +258,6 @@ QByteArray dopplerRepresentation(qint16 *pData, unsigned int iArrElemCount, unsi
             inData[2*j]=pHammingWin[j]*pDataFiltered[idx];
             inData[2*j+1]=pHammingWin[j]*pDataFiltered[idx+1];
         }
-#if 0
-        if (i==23) {
-            QFile qfTimeTest("timetest.txt");
-            qfTimeTest.open(QIODevice::ReadWrite);
-            qfTimeTest.resize(0);
-            QTextStream tsTimeTest(&qfTimeTest);
-            for (j=0; j<2048; j++) {
-                tsTimeTest << QString("\t%1\t%2\t%3").arg(j)
-                              .arg(inData[2*j]).arg(inData[2*j+1]) << endl;
-            }
-            qfTimeTest.close();
-        }
-#endif
         isign=1;
         NR::four1(inData,isign);
         for (k=0; k<NFFT; k++) {
@@ -311,21 +266,6 @@ QByteArray dopplerRepresentation(qint16 *pData, unsigned int iArrElemCount, unsi
             pRetData[idxW+1]=inData[2*k+1]/NFFT;
         }
     }
-#if 0
-    QFile qfTimeTest("timetest.txt");
-    qfTimeTest.open(QIODevice::ReadWrite);
-    qfTimeTest.resize(0);
-    QTextStream tsTimeTest(&qfTimeTest);
-    for (i=0; i<iFilteredN; i++) {
-        tsTimeTest << QString("%1").arg(i,2);
-        k=274;
-        int idxW=2*(k*iFilteredN+i);
-        tsTimeTest << QString("\t%1")
-                      .arg(pRetData[idxW]*pRetData[idxW]+pRetData[idxW+1]*pRetData[idxW+1])
-                   << endl;
-    }
-    qfTimeTest.close();
-#endif
     return retVal;
 }
 

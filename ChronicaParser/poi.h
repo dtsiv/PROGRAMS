@@ -4,6 +4,7 @@
 #include <QtCore>
 #include <QtSql>
 #include <QByteArray>
+#include "nr.h"
 
 int poi();
 int poi20190409();
@@ -24,5 +25,8 @@ extern int iPlotSlicePeriod,iPlotSliceBeam;
 
 extern int iRawStrobFrom, iRawStrobTo;
 extern double dMaxVelocity;
+extern double dFalseAlarmProb;
+
+extern int idum;
 
 #endif // POI_H
