@@ -4,7 +4,7 @@
 #include "qchrprotoacm.h"
 #include "sqlmodel.h"
 
-int parseDataFile(quint64 uTimeStamp,QString qsFilePath, char *pFileData, quint64 uSize);
+int parseDataFile(quint64 uTimeStamp,QString qsFilePath, QFile *pFile, quint64 uSize);
 
 struct sFileHdr {
     char sMagic[4];
@@ -14,5 +14,8 @@ struct sFileHdr {
 };
 
 extern struct sFileHdr fileHdr;
+
+unsigned int getFileVersion();
+unsigned int getProtoVersion();
 
 #endif // PARSER_H

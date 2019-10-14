@@ -2,6 +2,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QRegExp>
 #include "sqlmodel.h"
 #include "parser.h"
 #include "poi.h"
@@ -35,11 +36,11 @@ int readSettings() {
     qmParamDefaults[SETTINGS_KEY_DATAFILE]  = QString("C:/PROGRAMS/DATA/RegFixed/2019-03-01T14-12-02/00000000");
     qmParamDefaults[SETTINGS_KEY_OPERATION] = QString("Undefined");
     qmParamDefaults[SETTINGS_KEY_TSAMPL]    = 0.120e0; // usec
-    qmParamDefaults[SETTINGS_KEY_FCARRIER]  = 1.0e4;   // MHz
+    qmParamDefaults[SETTINGS_KEY_FCARRIER]  = 9.5e3;   // MHz
     qmParamDefaults[SETTINGS_KEY_NTAU]      = 8;       // samples per pulse
-    qmParamDefaults[SETTINGS_KEY_NT]        = 80;      // "samplesPerPeriod"
-    qmParamDefaults[SETTINGS_KEY_NT_]       = 48;      // "recordedSamplesPerPeriod"
-    qmParamDefaults[SETTINGS_KEY_NP]        = 1100;    // "periodsPerBatch"
+    qmParamDefaults[SETTINGS_KEY_NT]        = 200;      // "samplesPerPeriod"
+    qmParamDefaults[SETTINGS_KEY_NT_]       = 80;      // "recordedSamplesPerPeriod"
+    qmParamDefaults[SETTINGS_KEY_NP]        = 1024;    // "periodsPerBatch"
     qmParamDefaults[SETTINGS_KEY_DBNAME]    = QString("/home/tsivlin/PROGRAMS/DATA/chronicaparser.sqlite3");
 
     // read settings
@@ -107,20 +108,16 @@ int openDataFile() {
     QFileInfo fiDataFile(qsDataFile);
     if (!fiDataFile.exists() || !fiDataFile.isFile()) return 1;
     QDir qdRoot=fiDataFile.absoluteDir();
-    if (!qdRoot.cdUp()) return 2;
-    tsStdOut << "browsing: " << qdRoot.absolutePath() << endl;
+    // tsStdOut << "browsing: " << qdRoot.absolutePath() << endl;
 
-    QStringList qslEntries=qdRoot.entryList(QDir::Dirs,QDir::NoSort);
-    if (!qslEntries.count()) return 3;
-    for (int i=0; i<qslEntries.count(); i++) {
-        QString qsCurDir = qslEntries.at(i);
-        if (qsCurDir == "." || qsCurDir == ".." || qsCurDir.contains("2019-02-28")) continue;
-        QDir qdCurDir = QDir(qdRoot.absoluteFilePath(qsCurDir));
-        tsStdOut << "browsing: " << qdRoot.absoluteFilePath(qsCurDir) << endl;
-
-        if (!qdCurDir.exists(DATA_FILE_NAME)) return 4;
+    QStringList qslFiles = qdRoot.entryList(QDir::Files);
+    for (int j=0; j<qslFiles.count(); j++) {
+        QRegExp rx("^\\d\\d\\d\\d\\d\\d\\d\\d$");
+        if (!rx.exactMatch(qslFiles.at(j))) continue;
+        QString qsCurFile=qdRoot.absoluteFilePath(qslFiles.at(j));
+        if (!qdRoot.exists(qsCurFile)) return 4;
+        // tsStdOut << "opening: " << qsCurFile << endl;
         // open
-        QString qsCurFile=qdCurDir.absoluteFilePath(DATA_FILE_NAME);
         QFile qfCurFile(qsCurFile);
         if (!qfCurFile.exists() || !qfCurFile.open(QIODevice::ReadOnly)) {
             tsStdOut << "\nCannot open file: " << QFileInfo(qfCurFile).absoluteFilePath()  << "\n\n";
@@ -128,10 +125,12 @@ int openDataFile() {
         }
 
         // parse file name
+        // tsStdOut << "Parsing" << endl;
         QStringList qslDirs=qsCurFile.split("/");
         if (qslDirs.count()<2) continue;
         QString qsTimeStamp=qslDirs.at(qslDirs.count()-2);
         QStringList qslDateTime=qsTimeStamp.split("T");
+        // tsStdOut << "qslDateTime" << endl;
         if (qslDateTime.count()!=2) continue;
         dtTimeStamp=QDateTime(
             QDate::fromString(qslDateTime.at(0),"yyyy-MM-dd"),
@@ -140,11 +139,13 @@ int openDataFile() {
         if (!dtTimeStamp.isValid()) continue;
 
         // map & parse contents
-        char *pFileData=(char *)qfCurFile.map(0,qfCurFile.size());
-        if (!pFileData) continue;
+        if (iRetval=parseDataFile(dtTimeStamp.toMSecsSinceEpoch(),qsCurFile, &qfCurFile, qfCurFile.size())) return 100+iRetval;
+        // tsStdOut << "parsed: " << qsTimeStamp << endl;
+
         qfCurFile.close();
-        if ((iRetval=parseDataFile(dtTimeStamp.toMSecsSinceEpoch(),qsCurFile, pFileData, qfCurFile.size()))) return 100+iRetval;
-        tsStdOut << "parsed: " << qsTimeStamp << endl;
+        // !!! For debug:
+        // !!! just parse first file in target dir
+        // break;
     }
     return 0;
 }
@@ -165,21 +166,73 @@ int openDatabase() {
     }
     QSqlQuery query("SELECT COUNT(*) AS cnt FROM sqlite_master"
                     " WHERE type='table' AND name"
-                    " IN ('files','strobs','samples')",db);
+                    " IN ('files','strobs','samples','dbver')",db);
     QSqlRecord rec = query.record();
     int iFld=rec.indexOf("cnt");
     if (!query.next() || iFld==-1) return 3;
     int iCnt=query.value(iFld).toInt(&bOk);
     if (!bOk) return 4;
-    if (iCnt!=3) return createTables();
+    // tsStdOut << "'files','strobs','samples','dbver' returned " << iCnt << endl;
+
+    // DB scheme version
+    QString qsVersion;
+    bOk= query.exec("SELECT version FROM dbver LIMIT 1");
+    rec = query.record();
+    int iVer=rec.indexOf("version");
+    if (query.next() && iVer!=-1) {
+        qsVersion=query.value(iVer).toString();
+    }
+
+    // If DB format is ill (wrong tables, version etc) then drop all and create anew
+    if (iCnt!=4 || qsVersion!=DATA_BASE_VERSION) {
+        bOk = dropTables();
+        // tsStdOut << "dropTables() returned " << bOk << endl;
+        if (bOk) return 6;
+        bOk = createTables();
+        // tsStdOut << "createTables() returned " << bOk << endl;
+        if (bOk) return 7;
+    }
     return 0;
 }
 //======================================================================================================
 //
 //======================================================================================================
 int closeDatabase() {
+    bool bOk;
+    QTextStream                  tsStdOut(stdout);
     QSqlDatabase db = QSqlDatabase::database();
-    if (db.isOpen()) db.close();
+    db.setDatabaseName(qsSqliteDbName);
+    if (!db.open()) {
+        tsStdOut << "Cannot open database" << endl;
+        return 1;
+    }
+    db.close();
+    return 0;
+}
+//======================================================================================================
+//
+//======================================================================================================
+int dropTables() {
+    bool bOk;
+    QTextStream                  tsStdOut(stdout);
+    QSqlDatabase db = QSqlDatabase::database();
+    db.setDatabaseName(qsSqliteDbName);
+    if (!db.open()) {
+        tsStdOut << "Cannot open database" << endl;
+        return 1;
+    }
+
+    if (!db.isOpen()) return 1;
+    QSqlQuery query(db);
+    bOk= query.exec("DROP TABLE IF EXISTS samples;");
+    if (!bOk) return 11;
+    bOk= query.exec("DROP TABLE IF EXISTS strobs;");
+    if (!bOk) return 12;
+    bOk= query.exec("DROP TABLE IF EXISTS files;");
+    if (!bOk) return 13;
+    bOk= query.exec("DROP TABLE IF EXISTS dbver;");
+    if (!bOk) return 14;
+    tsStdOut << "drop tables ok" << endl;
     return 0;
 }
 //======================================================================================================
@@ -189,18 +242,33 @@ int createTables() {
     bool bOk;
     QTextStream                  tsStdOut(stdout);
     QSqlDatabase db = QSqlDatabase::database();
+    db.setDatabaseName(qsSqliteDbName);
+    if (!db.open()) {
+        tsStdOut << "Cannot open database" << endl;
+        return 1;
+    }
 
     if (!db.isOpen()) return 1;
     QSqlQuery query(db);
+    bOk= query.exec("CREATE TABLE dbver (id INTEGER PRIMARY KEY ASC,"
+                    " version TEXT);");
+    if (!bOk) return 11;
+    bOk = query.prepare("INSERT INTO dbver (version) VALUES (:version);");
+    if (!bOk) return -1;
+    query.bindValue(":version",DATA_BASE_VERSION);
+    if (!query.exec()) return 11;
+
     bOk= query.exec("CREATE TABLE files (id INTEGER PRIMARY KEY ASC,"
                     " timestamp BIGINT,"
                     " filepath TEXT,"
-                    " nstrobs INTEGER);");
+                    " nstrobs INTEGER,"
+                    " filever TEXT);");
     if (!bOk) return 11;
     bOk= query.exec("CREATE TABLE strobs (id INTEGER PRIMARY KEY ASC,"
                     " seqnum INTEGER,"
                     " ncnt INTEGER,"
                     " fileid INTEGER,"
+                    " structStrobData BLOB,"
                     " FOREIGN KEY(fileid) REFERENCES files(id));");
     if (!bOk) return 12;
     bOk= query.exec("CREATE TABLE samples (id INTEGER PRIMARY KEY ASC,"
@@ -215,7 +283,7 @@ int createTables() {
 //======================================================================================================
 //
 //======================================================================================================
-qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs) {
+qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString qsFileVer) {
     quint64 iFilesId;
     bool bOk;
     QSqlRecord rec;
@@ -237,7 +305,7 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs) {
 	if (iFld==-1) {
 		tsStdOut << "failed: rec.indexOf(filesid)" << endl;
 		return -1;
-	}
+    }
     while (query.next()) {
         iFilesId=query.value(iFld).toLongLong(&bOk);
         if (!bOk) return -1;
@@ -258,11 +326,12 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs) {
         qDel.bindValue(":fileid",iFilesId);
         if (!qDel.exec()) return -1;
     }
-    query.prepare("INSERT INTO files (timestamp,filepath,nstrobs) VALUES"
-                 " (:timestamp,:filepath,:nstrobs);");
+    query.prepare("INSERT INTO files (timestamp,filepath,nstrobs,filever) VALUES"
+                 " (:timestamp,:filepath,:nstrobs,:filever);");
     query.bindValue(":timestamp",uTimeStamp);
     query.bindValue(":filepath",qsFilePath);
     query.bindValue(":nstrobs",nStrobs);
+    query.bindValue(":filever",qsFileVer);
     if (!query.exec()) return -1;
     query.prepare("SELECT id AS filesid FROM files"
                  " WHERE timestamp=:timestamp;");
@@ -280,7 +349,7 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs) {
 //======================================================================================================
 //
 //======================================================================================================
-qint64 addStrobe(int strobeNo, int beamCountsNum, qint64 iFileId) {
+qint64 addStrobe(int strobeNo, int beamCountsNum, QByteArray baStrobeHeader, qint64 iFileId) {
     bool bOk;
     QSqlRecord rec;
     int iFld;
@@ -288,31 +357,25 @@ qint64 addStrobe(int strobeNo, int beamCountsNum, qint64 iFileId) {
     QSqlDatabase db = QSqlDatabase::database();
 
     QSqlQuery query(db);
-    // tsStdOut << "addStrobe: kp01" << endl;
-    query.prepare("INSERT INTO strobs (seqnum,ncnt,fileid) VALUES"
-                 " (:seqnum,:ncnt,:fileid);");
+    query.prepare("INSERT INTO strobs (seqnum,ncnt,fileid,structStrobData) VALUES"
+                 " (:seqnum,:ncnt,:fileid,:structStrobData);");
     query.bindValue(":seqnum",strobeNo);
     query.bindValue(":ncnt",beamCountsNum);
     query.bindValue(":fileid",iFileId);
+    query.bindValue(":structStrobData",baStrobeHeader);
     if (!query.exec()) return -1;
-	// tsStdOut << "addStrobe: kp02" << endl;
     query.prepare("SELECT id AS strobid FROM strobs"
                  " WHERE fileid=:fileid AND seqnum=:seqnum;");
     query.bindValue(":fileid",iFileId);
     query.bindValue(":seqnum",strobeNo);
     if (!query.exec()) return -1;
-	// tsStdOut << "addStrobe: kp03" << endl;
     rec = query.record();
     iFld=rec.indexOf("strobid");
     if (iFld==-1) return -1;
-	// tsStdOut << "addStrobe: kp04" << endl;
     if (!query.next()) return -1;
-    // tsStdOut << "addStrobe: kp05" << endl;
     quint64 iStrobId=query.value(iFld).toLongLong(&bOk);
     if (!bOk) return -1;
-	//tsStdOut << "addStrobe: kp06" << endl;
     if (query.next()) return -1;
-	//tsStdOut << "addStrobe: kp07" << endl;
     return iStrobId;
 }
 //======================================================================================================

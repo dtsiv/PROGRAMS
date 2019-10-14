@@ -11,38 +11,43 @@ QT       -= gui
 TARGET = ChronicaParser
 CONFIG   += console
 CONFIG   -= app_bundle
-
+win32 {
+    DESTDIR = C:/PROGRAMS/ChronicaParser
+}
 CONFIG += c++11
 
-QMAKE_CXXFLAGS += -std=gnu++11 -Wno-literal-suffix \
-                  -Wno-unused-local-typedefs \
-                  -Wno-unused-variale \
-                  -Wno-unused-value \
-                  -Wno-sign-compare
+!win32 {
+    QMAKE_CXXFLAGS += -std=gnu++11 -Wno-literal-suffix \
+                      -Wno-unused-local-typedefs \
+                      -Wno-unused-variale \
+                      -Wno-unused-value \
+                      -Wno-sign-compare
+}
 
 TEMPLATE = app
 
 INCLUDEPATH += ../include/nr2
 
-SOURCES += main.cpp \
-    parser.cpp \
-    sqlmodel.cpp \
-    poi.cpp \
-    four1.cpp \
-    poiraw.cpp \
-    justdoppler.cpp \
-    sort.cpp \
-    ftest.cpp \
+SOURCES += \
     avevar.cpp \
-    gasdev.cpp \
     betacf.cpp \
-    ran1.cpp \
-    gammln.cpp \
     betai.cpp \
-    poi20190409.cpp
+    four1.cpp \
+    ftest.cpp \
+    gammln.cpp \
+    gasdev.cpp \
+    justdoppler.cpp \
+    main.cpp \
+    parser.cpp \
+    poi.cpp \
+    poi20190409.cpp \
+    poiraw.cpp \
+    ran1.cpp \
+    sort.cpp \
+    sqlmodel.cpp
 
 HEADERS += \
     parser.h \
+    poi.h \
     qchrprotoacm.h \
-    sqlmodel.h \
-    poi.h
+    sqlmodel.h

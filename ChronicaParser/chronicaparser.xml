@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
     <carrierF>1.0e4</carrierF>
-    <dataFile>/home/tsivlin/PROGRAMS/DATA/RegFixed/2019-03-04T%/00000000</dataFile>
-    <dataFile1>/home/tsivlin/PROGRAMS/DATA/RegFixed/%/00000000</dataFile1>
+    <dataFile>../DATA/RegFixed/2019-09-27T13-10-21/00000000</dataFile>
+    <dataFile1>../DATA/RegFixed/2019-03-04T12-16-58/00000000</dataFile1>
     <delayFrom>1</delayFrom>
     <delayTo>10</delayTo>
     <dopplerFrom>100</dopplerFrom>
     <dopplerTo>1948</dopplerTo>
-    <falseAlarmProb>5.0e-5</falseAlarmProb>
     <falseAlarms>1</falseAlarms>
     <maxVelocity>10000.0</maxVelocity>
-    <operation>poi20190409</operation>
+    <operation>dataImport</operation>
     <periodsPerBatch>1100</periodsPerBatch>
     <plotSliceBeam>0</plotSliceBeam>
     <plotSlicePeriod>500</plotSlicePeriod>
@@ -21,6 +20,6 @@
     <samplesPerPulse>8</samplesPerPulse>
     <samplingTime>0.120e0</samplingTime>
     <sqliteDbName>../DATA/chronicaparser.sqlite3</sqliteDbName>
-    <threshold>20</threshold>
-    <thresholdRelative>5</thresholdRelative>
+    <threshold>0.0e0</threshold>
+    <thresholdRelative>10</thresholdRelative>
 </PARAMETERS>

@@ -34,15 +34,16 @@
 #define SETTINGS_KEY_MAXVELO        "maxVelocity"
 #define SETTINGS_KEY_PFALARM        "falseAlarmProb"
 
-#define DATA_FILE_NAME              "00000000"
+#define DATA_BASE_VERSION           "20191012"
 
 int readSettings();
 int openDataFile();
 int createTables();
+int dropTables();
 int openDatabase();
 int closeDatabase();
-qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs);
-qint64 addStrobe(int strobeNo, int beamCountsNum, qint64 iFileId);
+qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString qsFileVer);
+qint64 addStrobe(int strobeNo, int beamCountsNum, QByteArray baStrobeHeader, qint64 iFileId);
 int addSamples(qint64 iStrobId, int iBeam, char *pSamples, int iSize);
 QString qsGetFileName();
 
