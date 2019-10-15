@@ -116,7 +116,7 @@ int openDataFile() {
         if (!rx.exactMatch(qslFiles.at(j))) continue;
         QString qsCurFile=qdRoot.absoluteFilePath(qslFiles.at(j));
         if (!qdRoot.exists(qsCurFile)) return 4;
-        // tsStdOut << "opening: " << qsCurFile << endl;
+        tsStdOut << "opening: " << qsCurFile << endl;
         // open
         QFile qfCurFile(qsCurFile);
         if (!qfCurFile.exists() || !qfCurFile.open(QIODevice::ReadOnly)) {
@@ -139,8 +139,11 @@ int openDataFile() {
         if (!dtTimeStamp.isValid()) continue;
 
         // map & parse contents
-        if (iRetval=parseDataFile(dtTimeStamp.toMSecsSinceEpoch(),qsCurFile, &qfCurFile, qfCurFile.size())) return 100+iRetval;
-        // tsStdOut << "parsed: " << qsTimeStamp << endl;
+        if (iRetval=parseDataFile(dtTimeStamp.toMSecsSinceEpoch(),qsCurFile, &qfCurFile, qfCurFile.size())) {
+            tsStdOut << "\nparseDataFile() returned: " << iRetval << endl;
+            return 100+iRetval;
+        }
+        tsStdOut << "parsed: " << qsTimeStamp << endl;
 
         qfCurFile.close();
         // !!! For debug:

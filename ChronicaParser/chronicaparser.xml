@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
     <carrierF>1.0e4</carrierF>
-    <dataFile>../DATA/RegFixed/2019-09-27T13-10-21/00000000</dataFile>
-    <dataFile1>../DATA/RegFixed/2019-03-04T12-16-58/00000000</dataFile1>
+    <dataFile>../DATA/RegFixed/2019-09-27T13-27-32/00000000</dataFile>
+    <dataFile1>../DATA/RegFixed/2019-09-27T13-10-21/00000000</dataFile1>
+    <dataFile2>../DATA/RegFixed/2019-03-04T12-16-58/00000000</dataFile2>
     <delayFrom>1</delayFrom>
     <delayTo>10</delayTo>
     <dopplerFrom>100</dopplerFrom>

@@ -17,7 +17,7 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
 
     // check magic string "REGI"
     if (qfCurFile->read((char*)&fileHdr,sizeof(struct sFileHdr)) != sizeof(struct sFileHdr)) return 1;
-    if (QString(QByteArray(fileHdr.sMagic,sizeof(fileHdr.sMagic)))!="REGI") return 1;
+    if (QString(QByteArray(fileHdr.sMagic,sizeof(fileHdr.sMagic)))!=REG::FILE_MAGIC) return 1;
 
     // version of the registration file
     uFileVersion = fileHdr.uVer;
@@ -43,7 +43,8 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
         // tsStdOut << "uProtoVersion = " << uProtoVersion << endl;
     }
 
-    quint32 *pOffsets=new quint32[fileHdr.nRecMax];
+    quint32 *pOffsetsArray=new quint32[fileHdr.nRecMax];
+    quint32 *pOffsets=pOffsetsArray;
     if (qfCurFile->read((char*)pOffsets,fileHdr.nRecMax*sizeof(quint32)) != fileHdr.nRecMax*sizeof(quint32)) return 1;
     quint32 uOffset=0;
     if (uFileVersion==REG_OLD_VER1::FORMAT_VERSION) {
@@ -65,8 +66,8 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
     // Loop over all records within current file
     for (quint32 i=0; i<fileHdr.nRec; i++) {
         // !!! for debug:
-        // !!! just parse 200 first records whatever they are
-        //if (i>199) break;
+        // !!! just parse 4 first records whatever they are
+        // if (i>3) break;
 
         // seek next s_dataHeader and validate it
         if (uOffset+sizeof(struct s_dataHeader)>uSize) return 4;
@@ -163,7 +164,7 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
                 // tsStdOut << pStrobeData->strobeNo << "\t" << pStrobeData->beamCountsNum << endl;
                 // ok, we have a valid strobe
                 CHR::STROBE_HEADER *pStrobeHeader = &pStrobeData->header;
-                tsStdOut << "ACM::STROBE_DATA(0x" << QString::number(pFileDataHdr->dwType,16) << ")" << "\t"
+                tsStdOut << "\t" << " ACM::STROBE_DATA(0x" << QString::number(pFileDataHdr->dwType,16) << ")" << "\t"
                          << QString::number(pStrobeHeader->execTime).rightJustified(10) << "\t"
                          << pStrobeData->inclEpsilon << "\t"
                          << pStrobeData->inclBeta << "\t"
@@ -185,19 +186,43 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
                 uBeamCountsNum=pStrobeData->beamCountsNum;
                 pSamples=(qint16*)(pStrobeData+1);
 
+                if (uStrobeNo >21643) {
+                    if (pStrobeHeader->distance == 0 || pStrobeHeader->pPeriod!=200) {
+                        // uOffset=*pOffsets++;
+                        if (pFileDataHdr) delete pFileDataHdr; pFileDataHdr=0;
+                        if (pData) delete []pData; pData=0;
+                        break;
+                    }
+                }
+                //else {
+                //    tsStdOut << "nRec = " << fileHdr.nRec << endl;
+                //    tsStdOut << "i=" << i << endl;
+                //    tsStdOut << "uOffset=" << uOffset << endl;
+                //    tsStdOut << "pOffsets-base=" << (char *)pOffsets-(char *)pOffsetsArray << endl;
+                //    tsStdOut << "file size=" << qfCurFile->size() << endl;
+                //    qFatal("Problem record");
+                //}
+
                 // add strobe to database
                 db.transaction();
                 QByteArray baStrobeHeader(pData,pFileDataHdr->dwSize);
                 qint64 iStrobId=addStrobe(uStrobeNo,uBeamCountsNum,baStrobeHeader,iFileId);
-                if (iStrobId==-1) return 61;
+                if (iStrobId==-1) {
+                    tsStdOut << "\naddStrobe() returned iStrobId==-1" << endl;
+                    return 61;
+                }
+                // tsStdOut << "\naddStrobe() returned iStrobId=" << iStrobId << endl;
                 // loop over beams
                 for (int iBeam=0; iBeam<iNumberOfBeams; iBeam++) {
                     // tsStdOut << "\t" << iBeam;
-                    if (addSamples(iStrobId,iBeam,(char*)pSamples,uBeamCountsNum*iSizeOfComplex)) return 8;
+                    if (int iRetVal=addSamples(iStrobId,iBeam,(char*)pSamples,uBeamCountsNum*iSizeOfComplex)) {
+                        tsStdOut << "\naddSamples() returned:" << iRetVal << endl;
+                        return 8;
+                    }
                     pSamples+=uBeamCountsNum*2;
+
                 }
                 db.commit();
-                // tsStdOut << "\t commit" << endl;
             }
             // unknown format version
             else {
@@ -213,10 +238,10 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
         }
 
         uOffset=*pOffsets++;
-        delete pFileDataHdr;
-        delete []pData;
+        if (pFileDataHdr) delete pFileDataHdr; pFileDataHdr=0;
+        if (pData) delete []pData; pData=0;
     }  // Loop over all records within current file
-    delete[] pOffsets;
+    delete[] pOffsetsArray;
     return 0;
 }
 //----------------------------------------------------------------
