@@ -78,8 +78,8 @@ int poi() {
         //}
 
         QByteArray baDopplerRepresentation = dopplerRepresentation(pData, iArrElemCount, iFilteredN, NT, NT_, Ntau, Np, NFFT);
-        if (NFFT!=2048) {
-            tsStdOut << "NFFT!=2048" << endl;
+        if (NFFT!=1024 && NFFT!=2048) {
+            tsStdOut << "NFFT!=1024 && NFFT!=2048" << endl;
             continue;
         }
         if (baDopplerRepresentation.isEmpty()) return 3;
@@ -228,7 +228,7 @@ QByteArray dopplerRepresentation(qint16 *pData, unsigned int iArrElemCount, unsi
         if (Np<=NFFT) break;
         NFFT=0;
     }
-    // if (NFFT!=2048) return QByteArray();
+    // if (NFFT!=1024 && NFFT!=2048) return QByteArray();
 
     QByteArray retVal(2*NFFT*iFilteredN*sizeof(double),0);
     double *pRetData=(double *)retVal.data();
@@ -332,6 +332,9 @@ int plotSignal3D() {
     if ((iRet=openDatabase())) return iRet+10;
     bool bOk;
     double dGlobalMax2=0.0e0;
+
+    tsStdOut << "Inside plotSignal3D()" << endl;
+
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     query.prepare("SELECT complexdata,seqnum,beam,ncnt,timestamp FROM"
@@ -340,10 +343,20 @@ int plotSignal3D() {
                     " WHERE beam=:beam AND f.filepath=:filepath");
     query.bindValue(":beam",iPlotSliceBeam);
     query.bindValue(":filepath",qsGetFileName());
-    if (!query.exec()) return 1;
+    if (!query.exec()) {
+        tsStdOut << "plotSignal3D(): SELECT failed" << endl; 
+        return 1;
+    }
+    tsStdOut << "plotSignal3D(): SELECT beam,file: " << iPlotSliceBeam << "\t" << qsGetFileName() << endl; 
     QSqlRecord rec;
     rec = query.record();
+    // tsStdOut << "plotSignal3D(): record empty = " << rec.isEmpty() << endl; 
+    tsStdOut << "plotSignal3D(): query at = " << query.at() << endl; 
+    query.seek(0); 
+    tsStdOut << "plotSignal3D(): query at = " << query.at() << endl; 
+
     while (query.next()) {
+        tsStdOut << "Next record" << endl; 
         int iStrob=query.value(rec.indexOf("seqnum")).toInt(&bOk);
         int beamCountsNum=query.value(rec.indexOf("ncnt")).toInt(&bOk);
         int iBeam=query.value(rec.indexOf("beam")).toInt(&bOk);
@@ -352,20 +365,35 @@ int plotSignal3D() {
         qint16 *pData = (qint16*) baSamples.data();
         int iDataSize = baSamples.size();
 
+        tsStdOut << "plotSignal3D(): iStrob = " << iStrob << endl; 
+
         int iArrElemCount = 2*Np*NT_;
         int iSizeOfComplex = 2*sizeof(qint16);
-        if (beamCountsNum != Np*NT_ || iDataSize!=Np*NT_*iSizeOfComplex) return 2;
+        if (beamCountsNum != Np*NT_ || iDataSize!=Np*NT_*iSizeOfComplex) {
+            tsStdOut << "plotSignal3D quitting:" << endl; 
+            tsStdOut << "beamCountsNum = " << beamCountsNum << endl; 
+            tsStdOut << "Np = " << Np << endl; 
+            tsStdOut << "Np*NT_ = " << Np*NT_ << endl; 
+            tsStdOut << "iDataSize,Np*NT_*iSizeOfComplex = " << iDataSize << "\t" << Np*NT_*iSizeOfComplex << endl; 
+            return 2;
+        }
 
         int iFilteredN=NT_-Ntau+1; // in-place array size
         int NFFT=0;
 
         QByteArray baDopplerRepresentation = dopplerRepresentation(pData, iArrElemCount, iFilteredN, NT, NT_, Ntau, Np, NFFT);
-        if (NFFT!=2048) {
-            tsStdOut << "NFFT!=2048" << endl;
+        if (NFFT!=2048 && NFFT!=1024) {
+            tsStdOut << "NFFT!=2048 && NFFT!=1024" << endl;
             continue;
         }
+        
+        tsStdOut << "baDopplerRepresentation.size(),2*iFilteredN*Np*sizeof(double)=" << baDopplerRepresentation.size() << "\t" << 2*iFilteredN*Np*sizeof(double) << endl;
+
         if (baDopplerRepresentation.isEmpty()) return 3;
-        if (baDopplerRepresentation.size()<2*iFilteredN*Np*sizeof(double)) return 4;
+        if (baDopplerRepresentation.size()<2*iFilteredN*Np*sizeof(double)) {
+            tsStdOut << "baDopplerRepresentation.size()<2*iFilteredN*Np*sizeof(double)" << endl;
+            return 4;
+        }
         double *pDopplerData=(double*)baDopplerRepresentation.data();
 
         iDelayFrom=qBound(0,iDelayFrom,iFilteredN);

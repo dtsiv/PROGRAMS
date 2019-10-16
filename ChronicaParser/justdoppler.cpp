@@ -56,8 +56,8 @@ int justDoppler() {
         int NFFT=0;
 
         QByteArray baDopplerRepresentation = dopplerRepresentation1(pData, iArrElemCount, NT, NT_, Ntau, Np, NFFT);
-        if (NFFT!=2048) {
-            tsStdOut << "NFFT!=2048" << endl;
+        if (NFFT!=1024 && NFFT!=2048) {
+            tsStdOut << "NFFT!=1024 && NFFT!=2048" << endl;
             continue;
         }
         if (baDopplerRepresentation.isEmpty()) return 3;
@@ -187,7 +187,7 @@ QByteArray dopplerRepresentation1(qint16 *pData, unsigned int iArrElemCount,
         if (Np<=NFFT) break;
         NFFT=0;
     }
-    // if (NFFT!=2048) return QByteArray();
+    // if (NFFT!=1024 && NFFT!=2048) return QByteArray();
 
     QByteArray retVal(2*NFFT*NT_*sizeof(double),0);
     double *pRetData=(double *)retVal.data();

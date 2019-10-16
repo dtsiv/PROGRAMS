@@ -34,6 +34,16 @@
 #define SETTINGS_KEY_MAXVELO        "maxVelocity"
 #define SETTINGS_KEY_PFALARM        "falseAlarmProb"
 
+#define OPERATION_DATA_IMPORT       "dataImport"
+#define OPERATION_POI               "poi"
+#define OPERATION_POI20190409       "poi20190409"
+#define OPERATION_JUST_DOPPLER      "justDoppler"
+#define OPERATION_POI_RAW           "poiRaw"
+#define OPERATION_POI_NONCOHER      "poiNoncoher"
+#define OPERATION_PLOT_SIGNAL       "plotSignal"
+#define OPERATION_PLOT_SIGNAL_3D    "plotSignal3D"
+
+
 #define DATA_BASE_VERSION           "20191012"
 
 int readSettings();

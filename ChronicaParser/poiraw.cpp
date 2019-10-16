@@ -88,8 +88,8 @@ int poiRaw() {
 #endif
 
         QByteArray baDopplerRepresentation = dopplerRepresentation(pData, iArrElemCount, iFilteredN, NT, NT_, Ntau, Np, NFFT);
-        if (NFFT!=2048) {
-            tsStdOut << "NFFT!=2048" << endl;
+        if (NFFT!=1024 && NFFT!=2048) {
+            tsStdOut << "NFFT!=1024 && NFFT!=2048" << endl;
             continue;
         }
         if (baDopplerRepresentation.isEmpty()) return 3;

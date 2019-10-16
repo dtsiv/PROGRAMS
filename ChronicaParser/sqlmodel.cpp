@@ -78,14 +78,14 @@ int readSettings() {
     dMaxVelocity=qSettings.value(SETTINGS_KEY_MAXVELO,0).toDouble(&bOk);
     dFalseAlarmProb=qSettings.value(SETTINGS_KEY_PFALARM,1.0e-5).toDouble(&bOk);
 
-    if (qsOperation=="dataImport") omSelectedMode=mDataImport;
-    else if (qsOperation=="poi") omSelectedMode=mPrimaryProc;
-    else if (qsOperation=="poi20190409") omSelectedMode=mPOI20190409;
-    else if (qsOperation=="justDoppler") omSelectedMode=mJustDoppler;
-    else if (qsOperation=="poiRaw") omSelectedMode=mPrimaryProcRaw;
-    else if (qsOperation=="poiNoncoher") omSelectedMode=mPrimaryProcNoncoher;
-    else if (qsOperation=="plotSignal") omSelectedMode=mSignalPlot;
-    else if (qsOperation=="plotSignal3D") omSelectedMode=mSignalPlot3D;
+    if      (qsOperation==OPERATION_DATA_IMPORT) omSelectedMode=mDataImport;
+    else if (qsOperation==OPERATION_POI) omSelectedMode=mPrimaryProc;
+    else if (qsOperation==OPERATION_POI20190409) omSelectedMode=mPOI20190409;
+    else if (qsOperation==OPERATION_JUST_DOPPLER) omSelectedMode=mJustDoppler;
+    else if (qsOperation==OPERATION_POI_RAW) omSelectedMode=mPrimaryProcRaw;
+    else if (qsOperation==OPERATION_POI_NONCOHER) omSelectedMode=mPrimaryProcNoncoher;
+    else if (qsOperation==OPERATION_PLOT_SIGNAL) omSelectedMode=mSignalPlot;
+    else if (qsOperation==OPERATION_PLOT_SIGNAL_3D) omSelectedMode=mSignalPlot3D;
     else omSelectedMode=mUndefinedMode;
     qSettings.endGroup();
 
@@ -299,10 +299,11 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString q
     //tsStdOut << "db.isOpen()=" << db.isOpen() << endl;
 
     bOk = query.prepare("SELECT id AS filesid FROM files"
-                       " WHERE timestamp=:timestamp;");
+                       " WHERE timestamp=:timestamp AND filepath=:filepath;");
     if (!bOk) return -1;
     query.bindValue(":timestamp",uTimeStamp);
-	if (!query.exec()) return -1;
+    query.bindValue(":filepath",qsFilePath);
+    if (!query.exec()) return -1;
     rec = query.record();
     iFld=rec.indexOf("filesid");
 	if (iFld==-1) {
@@ -311,6 +312,7 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString q
     }
     while (query.next()) {
         iFilesId=query.value(iFld).toLongLong(&bOk);
+        tsStdOut << "deleting iFilesId " << iFilesId << endl;
         if (!bOk) return -1;
         QSqlQuery qDel(db);
         qDel.prepare("DELETE FROM samples"
@@ -318,7 +320,10 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString q
                      " WHERE s.fileid=:fileid);");
         qDel.bindValue(":fileid",iFilesId);
         // tsStdOut << "DELETE FROM samples" << endl;
-        if (!qDel.exec()) return -1;
+        if (!qDel.exec()) {
+            tsStdOut << "DELETE FROM samples failed" << endl;
+            return -1;
+        }
         qDel.prepare("DELETE FROM strobs"
                      " WHERE fileid=:fileid;");
         qDel.bindValue(":fileid",iFilesId);
@@ -327,7 +332,10 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString q
         qDel.prepare("DELETE FROM files"
                      " WHERE id=:fileid;");
         qDel.bindValue(":fileid",iFilesId);
-        if (!qDel.exec()) return -1;
+        if (!qDel.exec()) {
+            tsStdOut << "DELETE FROM strobs failed" << endl;
+            return -1;
+        }
     }
     query.prepare("INSERT INTO files (timestamp,filepath,nstrobs,filever) VALUES"
                  " (:timestamp,:filepath,:nstrobs,:filever);");
@@ -335,18 +343,31 @@ qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString q
     query.bindValue(":filepath",qsFilePath);
     query.bindValue(":nstrobs",nStrobs);
     query.bindValue(":filever",qsFileVer);
-    if (!query.exec()) return -1;
+    if (!query.exec()) {
+        tsStdOut << "INSERT INTO files failed" << endl;
+        return -1;
+    }
     query.prepare("SELECT id AS filesid FROM files"
-                 " WHERE timestamp=:timestamp;");
+                 " WHERE timestamp=:timestamp AND filepath=:filepath;");
     query.bindValue(":timestamp",uTimeStamp);
-    if (!query.exec()) return -1;
+    query.bindValue(":filepath",qsFilePath);
+    if (!query.exec()) {
+        tsStdOut << "SELECT filesid failed" << endl;
+        return -1;
+    }
     rec = query.record();
     iFld=rec.indexOf("filesid");
     if (iFld==-1) return -1;
-    if (!query.next()) return -1;
+    if (!query.next()) {
+        tsStdOut << "SELECT filesid returned empty set" << endl;
+        return -1;
+    }
     iFilesId=query.value(iFld).toLongLong(&bOk);
     if (!bOk) return -1;
-    if (query.next()) return -1;
+    if (query.next()) {
+        tsStdOut << "SELECT filesid returned multiple entries" << endl;
+        return -1;
+    }
     return iFilesId;
 }
 //======================================================================================================
@@ -465,5 +486,9 @@ bool writeXmlFile(QIODevice &device, const QSettings::SettingsMap &map) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QString qsGetFileName() {
-    return qsDataFile;
+    QFileInfo fiDataFile(qsDataFile);
+    if (!fiDataFile.exists() || !fiDataFile.isFile()) return QString();
+    QDir qdRoot=fiDataFile.absoluteDir();
+    QString qsAbsFile=qdRoot.absoluteFilePath(fiDataFile.fileName());
+    return qsAbsFile;
 }

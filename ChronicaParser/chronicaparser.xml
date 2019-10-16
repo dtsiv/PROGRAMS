@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
     <carrierF>1.0e4</carrierF>
-    <dataFile>../DATA/RegFixed/2019-09-27T13-27-32/00000000</dataFile>
-    <dataFile1>../DATA/RegFixed/2019-09-27T13-10-21/00000000</dataFile1>
+    <dataFile>../DATA/RegFixed/2019-09-27T13-10-21/00000000</dataFile>
+    <dataFile1>../DATA/RegFixed/2019-09-27T13-27-32/00000000</dataFile1>
     <dataFile2>../DATA/RegFixed/2019-03-04T12-16-58/00000000</dataFile2>
     <delayFrom>1</delayFrom>
     <delayTo>10</delayTo>
@@ -10,14 +10,22 @@
     <dopplerTo>1948</dopplerTo>
     <falseAlarms>1</falseAlarms>
     <maxVelocity>10000.0</maxVelocity>
-    <operation>dataImport</operation>
-    <periodsPerBatch>1100</periodsPerBatch>
+    <operation>plotSignal3D</operation>
+    <operation0>dataImport</operation0>
+    <operation1>poi</operation1>
+    <operation2>poi20190409</operation2>
+    <operation3>justDoppler</operation3>
+    <operation4>poiRaw</operation4>
+    <operation5>poiNoncoher</operation5>
+    <operation6>plotSignal</operation6>
+    <operation7>plotSignal3D</operation7>
+    <periodsPerBatch>1024</periodsPerBatch>
     <plotSliceBeam>0</plotSliceBeam>
     <plotSlicePeriod>500</plotSlicePeriod>
     <rawStrobFrom>0</rawStrobFrom>
     <rawStrobTo>10000</rawStrobTo>
-    <recordedSamplesPerPeriod>48</recordedSamplesPerPeriod>
-    <samplesPerPeriod>80</samplesPerPeriod>
+    <recordedSamplesPerPeriod>80</recordedSamplesPerPeriod>
+    <samplesPerPeriod>200</samplesPerPeriod>
     <samplesPerPulse>8</samplesPerPulse>
     <samplingTime>0.120e0</samplingTime>
     <sqliteDbName>../DATA/chronicaparser.sqlite3</sqliteDbName>
