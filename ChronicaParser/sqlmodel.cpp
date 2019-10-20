@@ -73,19 +73,22 @@ int readSettings() {
                    qmParamDefaults[SETTINGS_KEY_DBNAME]).toString();
     iPlotSlicePeriod=qSettings.value(SETTINGS_KEY_SLICEPER,0).toInt(&bOk);
     iPlotSliceBeam=qSettings.value(SETTINGS_KEY_SLICEBEAM,0).toInt(&bOk);
-    iRawStrobFrom=qSettings.value(SETTINGS_KEY_RAWFROM,0).toInt(&bOk);
-    iRawStrobTo=qSettings.value(SETTINGS_KEY_RAWTO,0).toInt(&bOk);
+//    iRawStrobFrom=qSettings.value(SETTINGS_KEY_RAWFROM,0).toInt(&bOk);
+//    iRawStrobTo=qSettings.value(SETTINGS_KEY_RAWTO,0).toInt(&bOk);
     dMaxVelocity=qSettings.value(SETTINGS_KEY_MAXVELO,0).toDouble(&bOk);
     dFalseAlarmProb=qSettings.value(SETTINGS_KEY_PFALARM,1.0e-5).toDouble(&bOk);
 
     if      (qsOperation==OPERATION_DATA_IMPORT) omSelectedMode=mDataImport;
     else if (qsOperation==OPERATION_POI) omSelectedMode=mPrimaryProc;
     else if (qsOperation==OPERATION_POI20190409) omSelectedMode=mPOI20190409;
+    else if (qsOperation==OPERATION_POI20191016) omSelectedMode=mPOI20191016;
     else if (qsOperation==OPERATION_JUST_DOPPLER) omSelectedMode=mJustDoppler;
     else if (qsOperation==OPERATION_POI_RAW) omSelectedMode=mPrimaryProcRaw;
     else if (qsOperation==OPERATION_POI_NONCOHER) omSelectedMode=mPrimaryProcNoncoher;
     else if (qsOperation==OPERATION_PLOT_SIGNAL) omSelectedMode=mSignalPlot;
     else if (qsOperation==OPERATION_PLOT_SIGNAL_3D) omSelectedMode=mSignalPlot3D;
+    else if (qsOperation==OPERATION_INTF_SPEC) omSelectedMode=mInterferenceSpectrum;
+    else if (qsOperation==OPERATION_INTF_MAP) omSelectedMode=mInterferenceMap;
     else omSelectedMode=mUndefinedMode;
     qSettings.endGroup();
 
@@ -139,7 +142,9 @@ int openDataFile() {
         if (!dtTimeStamp.isValid()) continue;
 
         // map & parse contents
-        if (iRetval=parseDataFile(dtTimeStamp.toMSecsSinceEpoch(),qsCurFile, &qfCurFile, qfCurFile.size())) {
+
+        iRetval=parseDataFile(dtTimeStamp.toMSecsSinceEpoch(),qsCurFile, &qfCurFile, qfCurFile.size());
+        if (iRetval == true) {
             tsStdOut << "\nparseDataFile() returned: " << iRetval << endl;
             return 100+iRetval;
         }
@@ -201,7 +206,7 @@ int openDatabase() {
 //
 //======================================================================================================
 int closeDatabase() {
-    bool bOk;
+    // bool bOk;
     QTextStream                  tsStdOut(stdout);
     QSqlDatabase db = QSqlDatabase::database();
     db.setDatabaseName(qsSqliteDbName);

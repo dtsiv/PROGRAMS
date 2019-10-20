@@ -27,6 +27,10 @@
 #  endif
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
 // #include "stdint.h"
 #include <cstdint>
 
@@ -444,7 +448,5 @@ namespace ACM {
     };
 
 }  // namespace ACM
-
-
 
 #endif   // QCHRPROTOACM_H

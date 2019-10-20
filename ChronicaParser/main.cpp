@@ -30,57 +30,24 @@ int main(int argc, char *argv[]) {
             closeDatabase();
             break;
 
-        case mPrimaryProc:
-            if ((iErr=poi())) {
-                tsStdOut << "poi() returned: " << iErr << endl;
+        case mPOI20191016:
+            if ((iErr=poi20191016())) {
+                tsStdOut << "poi20191016() returned: " << iErr << endl;
                 return 1;
             }
             closeDatabase();
             break;
 
-        case mPOI20190409:
-            if ((iErr=poi20190409())) {
-                tsStdOut << "poi20190409() returned: " << iErr << endl;
+        case mInterferenceSpectrum:
+            if ((iErr=interferenceSpectrum())) {
+                tsStdOut << "interferenceSpectrum() returned: " << iErr << endl;
                 return 1;
             }
-            closeDatabase();
             break;
 
-        case mJustDoppler:
-            if ((iErr=justDoppler())) {
-                tsStdOut << "justDoppler() returned: " << iErr << endl;
-                return 1;
-            }
-            closeDatabase();
-            break;
-
-        case mPrimaryProcRaw:
-            if ((iErr=poiRaw())) {
-                tsStdOut << "poiRaw() returned: " << iErr << endl;
-                return 1;
-            }
-            closeDatabase();
-            break;
-
-        case mPrimaryProcNoncoher:
-            if ((iErr=poiNoncoher())) {
-                tsStdOut << "poiNoncoher() returned: " << iErr << endl;
-                return 1;
-            }
-            closeDatabase();
-            break;
-
-        case mSignalPlot:
-            if ((iErr=plotSignal())) {
-                tsStdOut << "plotSignal() returned: " << iErr << endl;
-                return 1;
-            }
-            closeDatabase();
-            break;
-
-        case mSignalPlot3D:
-            if ((iErr=plotSignal3D())) {
-                tsStdOut << "plotSignal3D() returned: " << iErr << endl;
+        case mInterferenceMap:
+            if ((iErr=interferenceMap())) {
+                tsStdOut << "interferenceMap() returned: " << iErr << endl;
                 return 1;
             }
             closeDatabase();

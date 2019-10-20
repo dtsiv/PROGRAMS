@@ -37,11 +37,14 @@
 #define OPERATION_DATA_IMPORT       "dataImport"
 #define OPERATION_POI               "poi"
 #define OPERATION_POI20190409       "poi20190409"
+#define OPERATION_POI20191016       "poi20191016"
 #define OPERATION_JUST_DOPPLER      "justDoppler"
 #define OPERATION_POI_RAW           "poiRaw"
 #define OPERATION_POI_NONCOHER      "poiNoncoher"
 #define OPERATION_PLOT_SIGNAL       "plotSignal"
 #define OPERATION_PLOT_SIGNAL_3D    "plotSignal3D"
+#define OPERATION_INTF_SPEC         "interferenceSpectrum"
+#define OPERATION_INTF_MAP          "interferenceMap"
 
 
 #define DATA_BASE_VERSION           "20191012"
@@ -62,11 +65,14 @@ extern enum OperationModes {
     mDataImport,
     mPrimaryProc,
     mPOI20190409,
+    mPOI20191016,
     mJustDoppler,
     mPrimaryProcRaw,
     mPrimaryProcNoncoher,
     mSignalPlot,
-    mSignalPlot3D
+    mSignalPlot3D,
+    mInterferenceSpectrum,
+    mInterferenceMap
 } omSelectedMode;
 
 #endif // SQLMODEL_H

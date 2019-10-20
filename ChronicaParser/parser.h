@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include "qchrprotoacm.h"
+
 #include "sqlmodel.h"
 
 int parseDataFile(quint64 uTimeStamp,QString qsFilePath, QFile *pFile, quint64 uSize);

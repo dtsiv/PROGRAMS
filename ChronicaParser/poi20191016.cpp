@@ -18,57 +18,35 @@ using namespace std;
 
 int idum=-13;
 
-#define SKIP_ZERO_DOPPLER          50
+#define SKIP_ZERO_DOPPLER          5
 #define SKIP_ZERO_DELAY            3
 #define NOISE_AVERAGING_N          7
 
-void avevar_poi(Vec_I_DP &data, DP &ave, DP &var)
-{
-	DP s;
-	int j;
-
-	int n=data.size();
-	ave=0.0;
-	var=0.0;
-	for (j=0;j<n;j++) {
-		s=data[j]-ave;
-		var += s*s;
-	}
-	var=var/n;
-}
-
-void ftest_poi(Vec_I_DP &data_noise, Vec_I_DP &data_signal, DP &f, DP &prob)
-{
-	DP var_noise,var_signal,ave_noise,ave_signal;
-
-	int n_noise=data_noise.size();
-	int n_signal=data_signal.size();
-    if (n_signal!=2) qFatal("n_signal!=2");
-	avevar_poi(data_noise,ave_noise,var_noise);
-	avevar_poi(data_signal,ave_signal,var_signal);
-    f=var_signal/var_noise; // signal-to-noise
-	prob = NR::betai(0.5*n_noise,0.5*n_signal,n_noise/(n_noise+n_signal*f));
-}
 
 //======================================================================================================
 //
 //======================================================================================================
-int poi20190409() {
+int poi20191016() {
     int iRet=0;
     QTextStream tsStdOut(stdout);
 
     if ((iRet=openDatabase())) return iRet+10;
     bool bOk;
-    double dGlobalMax2=0.0e0;
+    // double dGlobalMax2=0.0e0;
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
+//    bOk=query.prepare("SELECT complexdata,seqnum,beam,ncnt,timestamp FROM"
+//                   " files f LEFT JOIN strobs s ON f.id=s.fileid"
+//                   " LEFT JOIN samples sa ON s.id=sa.strobid"
+//                   " WHERE beam=:beam AND f.filepath LIKE :filepath"
+//                   );
     bOk=query.prepare("SELECT complexdata,seqnum,beam,ncnt,timestamp FROM"
-                    " files f LEFT JOIN strobs s ON f.id=s.fileid"
+                    " strobs s LEFT JOIN files f ON f.id=s.fileid"
                     " LEFT JOIN samples sa ON s.id=sa.strobid"
-                    " WHERE beam=:beam AND f.filepath LIKE :filepath"
+                    " ORDER BY s.seqnum ASC"
                     );
-    query.bindValue(":beam",iPlotSliceBeam);
-    query.bindValue(":filepath",qsGetFileName());
+//    query.bindValue(":beam",iPlotSliceBeam);
+//    query.bindValue(":filepath",qsGetFileName());
     if (!query.exec()) return 1;
     QSqlRecord rec;
     rec = query.record();
@@ -77,18 +55,16 @@ int poi20190409() {
     if (!qfDetectionResults.open(QIODevice::ReadWrite)) tsStdOut << "open failed" << endl;
     QTextStream tsDetectionResults(&qfDetectionResults);
 
-    int iTotStrobs=0;
     int iStrobsDetect=0;
     while (query.next()) {
         int iStrob=query.value(rec.indexOf("seqnum")).toInt(&bOk);
         int beamCountsNum=query.value(rec.indexOf("ncnt")).toInt(&bOk);
         int iBeam=query.value(rec.indexOf("beam")).toInt(&bOk);
+        // if (iBeam != iPlotSliceBeam) return 2;
         qint64 iTimestamp=query.value(rec.indexOf("timestamp")).toLongLong(&bOk);
         QByteArray baSamples=query.value(rec.indexOf("complexdata")).toByteArray();
         qint16 *pData = (qint16*) baSamples.data();
         int iDataSize = baSamples.size();
-        QDateTime dtTimeStamp=QDateTime::fromMSecsSinceEpoch(iTimestamp);
-        QDateTime dtTimeStampRef=QDateTime::fromString("2019-03-01T00-00-00","yyyy-MM-ddThh-mm-ss");
 
         int iArrElemCount = 2*Np*NT_;
         int iSizeOfComplex = 2*sizeof(qint16);
@@ -110,15 +86,23 @@ int poi20190409() {
         double *pDopplerData=(double*)baDopplerRepresentation.data();
         // phy scales
         double dVLight=300.0; // m/usec
-        double dDoppFmin=1.0e0/(NT*dTs)/NFFT; // MHz
-        double dVelCoef = 1.0e6*dVLight/2/dCarrierF; // m/s per MHz
-        dVelCoef = dVelCoef*dDoppFmin; // m/s per frequency count
-        double dDistCoef = dTs*dVLight/2; // m per sample
+        double dDoppFmin=1.0e0/(NT*dTs)/NFFT; // This is smallest Doppler frequency (MHz) possible for this sampling interval dTs
+        double dVelCoef = 1.0e6*dVLight/2/dCarrierF; // Increment of target velocity (m/s) per 1 MHz of Doppler shift
+        dVelCoef = dVelCoef*dDoppFmin; // m/s per frequency count (the "smallest" Doppler frequency possible)
+        double dDistCoef = dTs*dVLight/2; // m per sample (target distance increment per sampling interval dTs)
 
         // qfDetectionResults.resize(0);
-        int nc=0;
-        tsStdOut << iTotStrobs++ << endl;
 
+        //================================================================================================================================
+        //  ok, at this point the Doppler representation (Re,Im)=(pDopplerData[2*(k*iFilteredN+i)],pDopplerData[2*(k*iFilteredN+i)+1])
+        //  where k = 0,...,(NFFT-1) is Doppler frequency index, currently 20191016 this is 0,...,1023
+        //  and   i = 0, ..., (iFilteredN-1) is delay index, currently 20191016 this is 0,...,72
+        //================================================================================================================================
+
+        // initialize number of candidates nc
+        int nc=0;
+
+        // calculate modulus squared of signal
         double dAvrM2=0.0e0;
         int iAvrM2=0;
         if (NFFT <= 2*SKIP_ZERO_DOPPLER) qFatal("negative NFFT-SKIP_ZERO_DOPPLER");
@@ -139,6 +123,7 @@ int poi20190409() {
         dAvrM2/=iAvrM2;
 
         // candidates detection
+        double dFracMax=0.0e0, dProbMin=1.0e0;
         QList<int> kc,lc;
         QList<double> y2mc;
         for (int iDelay=SKIP_ZERO_DELAY; iDelay<iFilteredN; iDelay++) {
@@ -149,7 +134,7 @@ int poi20190409() {
                 Vec_DP dSignal(2);
                 dSignal[0]=pDopplerData[idx];
                 dSignal[1]=pDopplerData[idx+1];
-                if (pY2M[idx]>dAvrM2*dThreshold) continue;
+                // if (pY2M[idx]>dAvrM2*dThreshold) continue;
                 Vec_DP dNoise((2*NOISE_AVERAGING_N-2)*2);
                 int idxNoise=0;
                 for (int iShift=-NOISE_AVERAGING_N; iShift<=NOISE_AVERAGING_N; iShift++) {
@@ -164,25 +149,35 @@ int poi20190409() {
                 }
                 DP dFrac,dProb;
                 ftest_poi(dNoise,dSignal,dFrac,dProb);
-                if (dFrac > dRelThresh && dProb < dFalseAlarmProb) {
+                dFracMax=(dFracMax>dFrac)?dFracMax:dFrac;
+                dProbMin=(dProbMin<dProb)?dProbMin:dProb;
+                if (dFrac > dThreshold && dProb < dFalseAlarmProb) {
                     nc++;
                     kc.append(kDoppler);
                     lc.append(iDelay);
                     y2mc.append(pY2M[idx]); 
 
-                    // tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5\t%6")
-                    //                        .arg(iDelay*dDistCoef,15) 
-                    //                        .arg(dVel,15)
-                    //                        .arg(dProb,15)
-                    //                        .arg(dFrac,15)
-                    //                        .arg((dRe*dRe+dIm*dIm)/dAvrM2,15)
-                    //                        .arg(iStrob,15)
-                    //                    << endl;
+                    // text-file output of detected target
+                    #if 0
+                    {
+                        tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5\t%6")
+                                            .arg(iDelay*dDistCoef,15)
+                                            .arg(dVel,15)
+                                            .arg(dProb,15)
+                                            .arg(dFrac,15)
+                                            .arg((dRe*dRe+dIm*dIm)/dAvrM2,15)
+                                            .arg(iStrob,15)
+                                        << endl;
+                    }
+                    #endif
                     
                 }
             }
         }
-        if (!nc) continue;
+        if (!nc) {
+            tsStdOut << iStrob << "\t" << dFracMax << "\t" << dProbMin << endl;
+            continue;
+        }
 
         // multiple targets resolution
         int ntg=0;
@@ -247,37 +242,41 @@ int poi20190409() {
                 dVel=dVelCoef*kDoppler;
             }
             if (tgs.at(itg)>1) {
-                tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5")
-                                       .arg(iDelay*dDistCoef,15) 
-                                       .arg(dVel,15)
-                                       .arg(dY2M/dAvrM2,15)
-                                       .arg(iStrob,15)
-                                       .arg(QDateTime::fromMSecsSinceEpoch(iTimestamp).toString("yyMMdd-hh:mm"))
-                                   << endl;
                 bTargetsListed=true;
+                // text-file output of detected target
+                tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5")
+                                   .arg(iDelay*dDistCoef,15)
+                                   .arg(dVel,15)
+                                   .arg(dY2M/dAvrM2,15)
+                                   .arg(iStrob,15)
+                                   .arg(QDateTime::fromMSecsSinceEpoch(iTimestamp).toString("yyMMdd-hh:mm"))
+                               << endl;
             }
         }
 
-        if (0 && bTargetsListed) {
+        if (bTargetsListed) {
             QProcess::execute("gnuplot", QString(
                                   "-e_""set terminal png"""
-                                  "_-e_""set title '%1-%2' font 'arial,18'"""
-                                  "_-e_""set output '%1-%2-v.png'"""
-                                  "_-e_""set xrange [%3:%4]"""
-                                  "_-e_""set yrange [%5:%6]"""
+                                  "_-e_""set title '%1-%2-%3' font 'arial,18'"""
+                                  "_-e_""set output '%1-%2-%3-v.png'"""
+                                  "_-e_""set xrange [%4:%5]"""
+                                  "_-e_""set yrange [%6:%7]"""
                                   "_-e_""set xtics 100"""
                                   "_-e_""set ytics 100"""
                                   "_-e_""set grid"""
                                   "_-e_""plot 'detection.txt' with points pointtype 2 pointsize 2 linewidth 2 notitle""" )
                               .arg(QDateTime::fromMSecsSinceEpoch(iTimestamp).toString("yyyy-MM-dd-hh:mm:ss"))
                               .arg(iStrob)
+                              .arg(iBeam)
                               .arg(SKIP_ZERO_DELAY*dDistCoef)
                               .arg(iFilteredN*dDistCoef)
                               .arg(-(NFFT/2-SKIP_ZERO_DOPPLER)*dVelCoef)
                               .arg( (NFFT/2-SKIP_ZERO_DOPPLER)*dVelCoef)
                               .split("_"));
             iStrobsDetect++;
+
         }
+        qfDetectionResults.resize(0);
     }
     tsStdOut << "Number of strobs with candidates:\t" << iStrobsDetect << endl;
     return 0;

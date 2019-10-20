@@ -36,15 +36,14 @@ SOURCES += \
     ftest.cpp \
     gammln.cpp \
     gasdev.cpp \
-    justdoppler.cpp \
     main.cpp \
     parser.cpp \
     poi.cpp \
-    poi20190409.cpp \
-    poiraw.cpp \
     ran1.cpp \
     sort.cpp \
-    sqlmodel.cpp
+    sqlmodel.cpp \
+    poi20191016.cpp \
+    intfspec.cpp
 
 HEADERS += \
     parser.h \

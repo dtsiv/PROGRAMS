@@ -8,17 +8,20 @@
     <delayTo>10</delayTo>
     <dopplerFrom>100</dopplerFrom>
     <dopplerTo>1948</dopplerTo>
+    <falseAlarmProb>1.0e-8</falseAlarmProb>
     <falseAlarms>1</falseAlarms>
     <maxVelocity>10000.0</maxVelocity>
-    <operation>plotSignal3D</operation>
+    <operation>interferenceSpectrum</operation>
     <operation0>dataImport</operation0>
     <operation1>poi</operation1>
-    <operation2>poi20190409</operation2>
+    <operation2>poi20191016</operation2>
     <operation3>justDoppler</operation3>
     <operation4>poiRaw</operation4>
     <operation5>poiNoncoher</operation5>
     <operation6>plotSignal</operation6>
     <operation7>plotSignal3D</operation7>
+    <operation8>interferenceSpectrum</operation8>
+    <operation9>interferenceMap</operation9>
     <periodsPerBatch>1024</periodsPerBatch>
     <plotSliceBeam>0</plotSliceBeam>
     <plotSlicePeriod>500</plotSlicePeriod>
@@ -29,6 +32,6 @@
     <samplesPerPulse>8</samplesPerPulse>
     <samplingTime>0.120e0</samplingTime>
     <sqliteDbName>../DATA/chronicaparser.sqlite3</sqliteDbName>
-    <threshold>0.0e0</threshold>
+    <threshold>10.0e0</threshold>
     <thresholdRelative>10</thresholdRelative>
 </PARAMETERS>

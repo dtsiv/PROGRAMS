@@ -1,3 +1,4 @@
+rm *.png
 rm ./ChronicaParser
 export LD_LIBRARY_PATH=/opt/pg/9.6.11/lib
 qmake
