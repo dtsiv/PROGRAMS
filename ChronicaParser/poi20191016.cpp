@@ -22,6 +22,8 @@ int idum=-13;
 #define SKIP_ZERO_DELAY            3
 #define NOISE_AVERAGING_N          7
 
+// #define USE_GNUPLOT
+#define USE_TEXT_DEBUG             1
 
 //======================================================================================================
 //
@@ -73,9 +75,7 @@ int poi20191016() {
         int iFilteredN=NT_-Ntau+1; // in-place array size
         int NFFT=0;
 
-
-// if (iStrob!=202) continue;
-
+        // Doppler representation
         QByteArray baDopplerRepresentation = dopplerRepresentation(pData, iArrElemCount, iFilteredN, NT, NT_, Ntau, Np, NFFT);
         if (NFFT!=1024 && NFFT!=2048) {
             tsStdOut << "NFFT!=1024 && NFFT!=2048" << endl;
@@ -91,7 +91,25 @@ int poi20191016() {
         dVelCoef = dVelCoef*dDoppFmin; // m/s per frequency count (the "smallest" Doppler frequency possible)
         double dDistCoef = dTs*dVLight/2; // m per sample (target distance increment per sampling interval dTs)
 
-        // qfDetectionResults.resize(0);
+        // Interference map
+        QByteArray baAvrRe(NFFT*iFilteredN*sizeof(double),0);
+        QByteArray baAvrIm(NFFT*iFilteredN*sizeof(double),0);
+        QByteArray baAvrM1(NFFT*iFilteredN*sizeof(double),0);
+        QByteArray baAvrM2(NFFT*iFilteredN*sizeof(double),0);
+        QByteArray baAvrM3(NFFT*iFilteredN*sizeof(double),0);
+        QByteArray baAvrM4(NFFT*iFilteredN*sizeof(double),0);
+        double *pAvrRe=(double *)baAvrRe.data();
+        double *pAvrIm=(double *)baAvrIm.data();
+        // double *pAvrM1=(double *)baAvrM1.data();
+        double *pAvrM2=(double *)baAvrM2.data();
+        // double *pAvrM3=(double *)baAvrM3.data();
+        // double *pAvrM4=(double *)baAvrM4.data();
+        iRet = readInterferenceMap(iFilteredN, NT_, Np, NFFT,
+                baAvrRe, baAvrIm, baAvrM1, baAvrM2, baAvrM3, baAvrM4);
+        if (iRet) {
+            tsStdOut << "readInterferenceMap failed: " << iRet << endl;
+            return 10+iRet;
+        }
 
         //================================================================================================================================
         //  ok, at this point the Doppler representation (Re,Im)=(pDopplerData[2*(k*iFilteredN+i)],pDopplerData[2*(k*iFilteredN+i)+1])
@@ -102,9 +120,9 @@ int poi20191016() {
         // initialize number of candidates nc
         int nc=0;
 
-        // calculate modulus squared of signal
-        double dAvrM2=0.0e0;
-        int iAvrM2=0;
+        // calculate globalmodulus squared of signal
+        double dAvrM2global=0.0e0;
+        int iAvrM2global=0;
         if (NFFT <= 2*SKIP_ZERO_DOPPLER) qFatal("negative NFFT-SKIP_ZERO_DOPPLER");
         QByteArray baY2M(baDopplerRepresentation.size(),0);
         double *pY2M=(double*)baY2M.data();
@@ -115,12 +133,30 @@ int poi20191016() {
                 int idx=2*(kDoppler*iFilteredN+iDelay);
                 dRe=pDopplerData[idx];
                 dIm=pDopplerData[idx+1];
+                // use pre-calculated interference map
+                double dAvrRe=pAvrRe[kDoppler*iFilteredN+iDelay];
+                double dAvrIm=pAvrIm[kDoppler*iFilteredN+iDelay];
+                double dAvrM2=pAvrM2[kDoppler*iFilteredN+iDelay];
+                // subtract average
+                dRe-=dAvrRe;
+                dIm-=dAvrIm;
+                // calculate Interference dispersion
+                dAvrM2-=dAvrRe*dAvrRe;
+                dAvrM2-=dAvrIm*dAvrIm;
+                if (dAvrM2 < 0.0e0) {
+                    tsStdOut << "dAvrM2 < 0.0e0"  << endl;
+                    return 5;
+                }
+                // calculate signal in Doppler representation
                 pY2M[idx]=dRe*dRe+dIm*dIm;
-                dAvrM2+=pY2M[idx];
-                iAvrM2++;
+                // rescale with respect to interference
+                pY2M[idx]/=dAvrM2;
+                // Auxiliary global average
+                dAvrM2global+=pY2M[idx];
+                iAvrM2global++;
             }
         }
-        dAvrM2/=iAvrM2;
+        dAvrM2global/=iAvrM2global;
 
         // candidates detection
         double dFracMax=0.0e0, dProbMin=1.0e0;
@@ -134,7 +170,7 @@ int poi20191016() {
                 Vec_DP dSignal(2);
                 dSignal[0]=pDopplerData[idx];
                 dSignal[1]=pDopplerData[idx+1];
-                // if (pY2M[idx]>dAvrM2*dThreshold) continue;
+                // if (pY2M[idx]>dAvrM2global*dThreshold) continue;
                 Vec_DP dNoise((2*NOISE_AVERAGING_N-2)*2);
                 int idxNoise=0;
                 for (int iShift=-NOISE_AVERAGING_N; iShift<=NOISE_AVERAGING_N; iShift++) {
@@ -151,31 +187,30 @@ int poi20191016() {
                 ftest_poi(dNoise,dSignal,dFrac,dProb);
                 dFracMax=(dFracMax>dFrac)?dFracMax:dFrac;
                 dProbMin=(dProbMin<dProb)?dProbMin:dProb;
+
                 if (dFrac > dThreshold && dProb < dFalseAlarmProb) {
                     nc++;
                     kc.append(kDoppler);
                     lc.append(iDelay);
                     y2mc.append(pY2M[idx]); 
 
-                    // text-file output of detected target
-                    #if 0
-                    {
-                        tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5\t%6")
-                                            .arg(iDelay*dDistCoef,15)
-                                            .arg(dVel,15)
-                                            .arg(dProb,15)
-                                            .arg(dFrac,15)
-                                            .arg((dRe*dRe+dIm*dIm)/dAvrM2,15)
-                                            .arg(iStrob,15)
-                                        << endl;
+                    if (USE_TEXT_DEBUG > 1) {
+                        double dVel;
+                        if (kDoppler >= NFFT/2) {
+                            dVel=dVelCoef*(kDoppler-NFFT);
+                        }
+                        else {
+                            dVel=dVelCoef*kDoppler;
+                        }
+                        tsStdOut << iStrob << "\t" << iBeam << "\t" << iDelay*dDistCoef << "\t" << dVel << "\t" << log(pY2M[idx]) << endl;
                     }
-                    #endif
-                    
                 }
             }
         }
         if (!nc) {
-            tsStdOut << iStrob << "\t" << dFracMax << "\t" << dProbMin << endl;
+            if(USE_TEXT_DEBUG > 1) {
+                tsStdOut << iStrob << "\t" << dFracMax << "\t" << dProbMin << endl;
+            }
             continue;
         }
 
@@ -241,20 +276,33 @@ int poi20191016() {
             else {
                 dVel=dVelCoef*kDoppler;
             }
-            if (tgs.at(itg)>1) {
+            if (tgs.at(itg)>5) {
                 bTargetsListed=true;
+                #ifdef USE_GNUPLOT
                 // text-file output of detected target
                 tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5")
                                    .arg(iDelay*dDistCoef,15)
                                    .arg(dVel,15)
-                                   .arg(dY2M/dAvrM2,15)
+                                   .arg(dY2M/dAvrM2global,15)
                                    .arg(iStrob,15)
                                    .arg(QDateTime::fromMSecsSinceEpoch(iTimestamp).toString("yyMMdd-hh:mm"))
                                << endl;
+
+                #endif
+                if (USE_TEXT_DEBUG) {
+                    tsStdOut << QString("%1\t%2\t%3\t%4\t%5")
+                                       .arg(iDelay*dDistCoef,15)
+                                       .arg(dVel,15)
+                                       .arg(dY2M/dAvrM2global,15)
+                                       .arg(iStrob,15)
+                                       .arg(QDateTime::fromMSecsSinceEpoch(iTimestamp).toString("yyMMdd-hh:mm"))
+                                   << endl;
+                }
             }
         }
 
         if (bTargetsListed) {
+            #ifdef USE_GNUPLOT
             QProcess::execute("gnuplot", QString(
                                   "-e_""set terminal png"""
                                   "_-e_""set title '%1-%2-%3' font 'arial,18'"""
@@ -262,7 +310,7 @@ int poi20191016() {
                                   "_-e_""set xrange [%4:%5]"""
                                   "_-e_""set yrange [%6:%7]"""
                                   "_-e_""set xtics 100"""
-                                  "_-e_""set ytics 100"""
+                                  "_-e_""set ytics 5"""
                                   "_-e_""set grid"""
                                   "_-e_""plot 'detection.txt' with points pointtype 2 pointsize 2 linewidth 2 notitle""" )
                               .arg(QDateTime::fromMSecsSinceEpoch(iTimestamp).toString("yyyy-MM-dd-hh:mm:ss"))
@@ -270,9 +318,12 @@ int poi20191016() {
                               .arg(iBeam)
                               .arg(SKIP_ZERO_DELAY*dDistCoef)
                               .arg(iFilteredN*dDistCoef)
-                              .arg(-(NFFT/2-SKIP_ZERO_DOPPLER)*dVelCoef)
-                              .arg( (NFFT/2-SKIP_ZERO_DOPPLER)*dVelCoef)
+                              .arg(-40*dVelCoef)
+                              .arg( 40*dVelCoef)
+//                              .arg(-(NFFT/2-SKIP_ZERO_DOPPLER)*dVelCoef)
+//                              .arg( (NFFT/2-SKIP_ZERO_DOPPLER)*dVelCoef)
                               .split("_"));
+            #endif
             iStrobsDetect++;
 
         }

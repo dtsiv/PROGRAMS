@@ -33,6 +33,8 @@
 #define SETTINGS_KEY_RAWTO          "rawStrobTo"
 #define SETTINGS_KEY_MAXVELO        "maxVelocity"
 #define SETTINGS_KEY_PFALARM        "falseAlarmProb"
+#define SETTINGS_KEY_INTFMAP        "pathIntfMap"
+
 
 #define OPERATION_DATA_IMPORT       "dataImport"
 #define OPERATION_POI               "poi"
@@ -58,7 +60,7 @@ int closeDatabase();
 qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString qsFileVer);
 qint64 addStrobe(int strobeNo, int beamCountsNum, QByteArray baStrobeHeader, qint64 iFileId);
 int addSamples(qint64 iStrobId, int iBeam, char *pSamples, int iSize);
-QString qsGetFileName();
+QString getIntfMapFName();
 
 extern enum OperationModes {
     mUndefinedMode=0,

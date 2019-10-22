@@ -9,6 +9,18 @@
 int poi20191016();
 int interferenceSpectrum();
 int interferenceMap();
+int readInterferenceMap(
+        unsigned int iFilteredN,
+        unsigned int NT_,
+        unsigned int Np,
+        int NFFT,
+        QByteArray &baAvrRe,
+        QByteArray &baAvrIm,
+        QByteArray &baAvrM1,
+        QByteArray &baAvrM2,
+        QByteArray &baAvrM3,
+        QByteArray &baAvrM4);
+
 int intfSpectrumRepresentation(
         qint16 *pData,   // raw signal in (qint16,qint16) (Re,Im) complex pairs as obtained from DB field "complexdata"
         unsigned int iDataSize, // 2*Np*NT_; Np - number of periods; NT_ - recorded data samples per period

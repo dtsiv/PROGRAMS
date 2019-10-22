@@ -41,6 +41,83 @@ struct intfMapRecord {
 //======================================================================================================
 //
 //======================================================================================================
+int readInterferenceMap(
+        unsigned int iFilteredN,
+        unsigned int NT_,
+        unsigned int Np,
+        int NFFT,
+        QByteArray &baAvrRe,
+        QByteArray &baAvrIm,
+        QByteArray &baAvrM1,
+        QByteArray &baAvrM2,
+        QByteArray &baAvrM3,
+        QByteArray &baAvrM4
+) {
+    int iRet=0;
+    QTextStream tsStdOut(stdout);
+
+    //===================== input file
+    QFile qfIntfMap(getIntfMapFName());
+    if (!qfIntfMap.open(QIODevice::ReadOnly)) {
+        tsStdOut << "qfIntfMap open failed" << endl;
+        return 2;
+    }
+    struct intfMapHeader imHeader;
+    quint64 uBytesRead;
+    uBytesRead = qfIntfMap.read((char*)&imHeader,sizeof(struct intfMapHeader));
+    if (uBytesRead != sizeof(struct intfMapHeader)) {
+        tsStdOut << "qfIntfMap read failed" << endl;
+        return 3;
+    }
+    if (  imHeader.vMaj != INTF_MAP_VERSION_MAJOR
+       || imHeader.vMin != INTF_MAP_VERSION_MINOR
+       || imHeader.Np   != Np
+       || imHeader.NT_  != NT_
+       || imHeader.iFilteredN != iFilteredN
+       || imHeader.NFFT != NFFT) {
+        tsStdOut << "qfIntfMap header failed" << endl;
+        return 4;
+    }
+
+    if (  baAvrRe.size()!=NFFT*iFilteredN*sizeof(double)
+       || baAvrIm.size()!=NFFT*iFilteredN*sizeof(double)
+       || baAvrM1.size()!=NFFT*iFilteredN*sizeof(double)
+       || baAvrM2.size()!=NFFT*iFilteredN*sizeof(double)
+       || baAvrM3.size()!=NFFT*iFilteredN*sizeof(double)
+       || baAvrM4.size()!=NFFT*iFilteredN*sizeof(double)) {
+        tsStdOut << "QByteArray mismatch" << endl;
+        return 4;
+    }
+
+    double *pAvrRe=(double *)baAvrRe.data();
+    double *pAvrIm=(double *)baAvrIm.data();
+    double *pAvrM1=(double *)baAvrM1.data();
+    double *pAvrM2=(double *)baAvrM2.data();
+    double *pAvrM3=(double *)baAvrM3.data();
+    double *pAvrM4=(double *)baAvrM4.data();
+
+    for (int iDelay=0; iDelay<iFilteredN; iDelay++) {
+        for (int kDoppler=0; kDoppler<NFFT; kDoppler++) {
+            struct intfMapRecord imRecord;
+            uBytesRead = qfIntfMap.read((char*)&imRecord,sizeof(struct intfMapRecord));
+            if (uBytesRead != sizeof(struct intfMapRecord)) {
+                tsStdOut << "struct intfMapRecord read failed" << endl;
+                return 5;
+            }
+            pAvrRe[kDoppler*iFilteredN+iDelay]=imRecord.iRe;
+            pAvrIm[kDoppler*iFilteredN+iDelay]=imRecord.iIm;
+            pAvrM1[kDoppler*iFilteredN+iDelay]=imRecord.uM1;
+            pAvrM2[kDoppler*iFilteredN+iDelay]=imRecord.uM2;
+            pAvrM3[kDoppler*iFilteredN+iDelay]=imRecord.uM3;
+            pAvrM4[kDoppler*iFilteredN+iDelay]=imRecord.uM4;
+        }
+    }
+    return iRet;
+}
+
+//======================================================================================================
+//
+//======================================================================================================
 int interferenceSpectrum() {
     int iRet=0;
     QTextStream tsStdOut(stdout);
@@ -66,58 +143,24 @@ int interferenceSpectrum() {
     }
     QTextStream tsSpectrumResults(&qfSpectrumOutput);
 
-    //===================== input file
-    QFile qfIntfMap("intfmap.dat");
-    if (!qfIntfMap.open(QIODevice::ReadOnly)) {
-        tsStdOut << "qfIntfMap open failed" << endl;
-        return 2;
-    }
-    struct intfMapHeader imHeader;
-    quint64 uBytesRead;
-    uBytesRead = qfIntfMap.read((char*)&imHeader,sizeof(struct intfMapHeader));
-    if (uBytesRead != sizeof(struct intfMapHeader)) {
-        tsStdOut << "qfIntfMap read failed" << endl;
-        return 3;
-    }
-    if (  imHeader.vMaj != INTF_MAP_VERSION_MAJOR
-       || imHeader.vMin != INTF_MAP_VERSION_MINOR
-       || imHeader.Np   != Np
-       || imHeader.NT_  != NT_
-       || imHeader.iFilteredN != iFilteredN
-       || imHeader.NFFT != NFFT) {
-        tsStdOut << "qfIntfMap header failed" << endl;
-        return 4;
-    }
-
-
     QByteArray baAvrRe(NFFT*iFilteredN*sizeof(double),0);
-    double *pAvrRe=(double *)baAvrRe.data();
     QByteArray baAvrIm(NFFT*iFilteredN*sizeof(double),0);
-    double *pAvrIm=(double *)baAvrIm.data();
     QByteArray baAvrM1(NFFT*iFilteredN*sizeof(double),0);
-    double *pAvrM1=(double *)baAvrM1.data();
     QByteArray baAvrM2(NFFT*iFilteredN*sizeof(double),0);
-    double *pAvrM2=(double *)baAvrM2.data();
     QByteArray baAvrM3(NFFT*iFilteredN*sizeof(double),0);
-    double *pAvrM3=(double *)baAvrM3.data();
     QByteArray baAvrM4(NFFT*iFilteredN*sizeof(double),0);
-    double *pAvrM4=(double *)baAvrM4.data();
+    double *pAvrRe=(double *)baAvrRe.data();
+    double *pAvrIm=(double *)baAvrIm.data();
+    // double *pAvrM1=(double *)baAvrM1.data();
+    double *pAvrM2=(double *)baAvrM2.data();
+    // double *pAvrM3=(double *)baAvrM3.data();
+    // double *pAvrM4=(double *)baAvrM4.data();
 
-    for (int iDelay=0; iDelay<iFilteredN; iDelay++) {
-        for (int kDoppler=0; kDoppler<NFFT; kDoppler++) {
-            struct intfMapRecord imRecord;
-            uBytesRead = qfIntfMap.read((char*)&imRecord,sizeof(struct intfMapRecord));
-            if (uBytesRead != sizeof(struct intfMapRecord)) {
-                tsStdOut << "struct intfMapRecord read failed" << endl;
-                return 5;
-            }
-            pAvrRe[kDoppler*iFilteredN+iDelay]=imRecord.iRe;
-            pAvrIm[kDoppler*iFilteredN+iDelay]=imRecord.iIm;
-            pAvrM1[kDoppler*iFilteredN+iDelay]=imRecord.uM1;
-            pAvrM2[kDoppler*iFilteredN+iDelay]=imRecord.uM2;
-            pAvrM3[kDoppler*iFilteredN+iDelay]=imRecord.uM3;
-            pAvrM4[kDoppler*iFilteredN+iDelay]=imRecord.uM4;
-        }
+    iRet = readInterferenceMap(iFilteredN, NT_, Np, NFFT,
+            baAvrRe, baAvrIm, baAvrM1, baAvrM2, baAvrM3, baAvrM4);
+    if (iRet) {
+        tsStdOut << "readInterferenceMap failed: " << iRet << endl;
+        return 10+iRet;
     }
 
 #if 0
@@ -214,7 +257,7 @@ int interferenceMap() {
     int iArrElemCount = 2*Np*NT_;
 
     // intf map header
-    QFile qfIntfMap("intfmap.dat");
+    QFile qfIntfMap(getIntfMapFName());
     qfIntfMap.resize(0);
     if (!qfIntfMap.open(QIODevice::ReadWrite)) {
         tsStdOut << "qfIntfMap open failed" << endl;

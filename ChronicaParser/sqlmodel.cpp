@@ -15,6 +15,7 @@ QString                      qsDataFile;
 QString                      qsOperation;
 QDateTime                    dtTimeStamp;
 QString                      qsSqliteDbName;
+QString                      qsIntfMapFName;
 
 enum OperationModes omSelectedMode = mUndefinedMode;
 
@@ -42,6 +43,7 @@ int readSettings() {
     qmParamDefaults[SETTINGS_KEY_NT_]       = 80;      // "recordedSamplesPerPeriod"
     qmParamDefaults[SETTINGS_KEY_NP]        = 1024;    // "periodsPerBatch"
     qmParamDefaults[SETTINGS_KEY_DBNAME]    = QString("/home/tsivlin/PROGRAMS/DATA/chronicaparser.sqlite3");
+    qmParamDefaults[SETTINGS_KEY_INTFMAP]   = QString("/home/tsivlin/PROGRAMS/DATA/intfmap.dat");
 
     // read settings
     bool bOk;
@@ -71,6 +73,8 @@ int readSettings() {
     nFalseAlarms=qSettings.value(SETTINGS_KEY_FALSEALARMS,1).toDouble(&bOk);
     qsSqliteDbName=qSettings.value(SETTINGS_KEY_DBNAME,
                    qmParamDefaults[SETTINGS_KEY_DBNAME]).toString();
+    qsIntfMapFName=qSettings.value(SETTINGS_KEY_INTFMAP,
+                   qmParamDefaults[SETTINGS_KEY_INTFMAP]).toString();
     iPlotSlicePeriod=qSettings.value(SETTINGS_KEY_SLICEPER,0).toInt(&bOk);
     iPlotSliceBeam=qSettings.value(SETTINGS_KEY_SLICEBEAM,0).toInt(&bOk);
 //    iRawStrobFrom=qSettings.value(SETTINGS_KEY_RAWFROM,0).toInt(&bOk);
@@ -119,6 +123,8 @@ int openDataFile() {
         if (!rx.exactMatch(qslFiles.at(j))) continue;
         QString qsCurFile=qdRoot.absoluteFilePath(qslFiles.at(j));
         if (!qdRoot.exists(qsCurFile)) return 4;
+        // we only peek one file
+        if (qsCurFile!=fiDataFile.absoluteFilePath()) continue;
         tsStdOut << "opening: " << qsCurFile << endl;
         // open
         QFile qfCurFile(qsCurFile);
@@ -486,14 +492,9 @@ bool writeXmlFile(QIODevice &device, const QSettings::SettingsMap &map) {
 
     return true;
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//----------------------------------------------------------------
 //
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-QString qsGetFileName() {
-    QFileInfo fiDataFile(qsDataFile);
-    if (!fiDataFile.exists() || !fiDataFile.isFile()) return QString();
-    QDir qdRoot=fiDataFile.absoluteDir();
-    QString qsAbsFile=qdRoot.absoluteFilePath(fiDataFile.fileName());
-    return qsAbsFile;
+//----------------------------------------------------------------
+QString getIntfMapFName() {
+    return qsIntfMapFName;
 }
