@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+      <file>Resources/hdd_exch.png</file>
+      <file>Resources/spear.ico</file>
+    </qresource>
+</RCC>
