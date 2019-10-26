@@ -94,9 +94,15 @@ QVariant QIniSettings::value(const QString &key, STATUS_CODES &iStatus) {
         iStatus=QIniSettings::INIT_ERROR;
         return QVariant();
     }
-    if (m_pSettings->contains(key)) {
+    m_pSettings->beginGroup(SETTINGS_GROUP_NAME);
+    bool bHasKey = m_pSettings->contains(key);
+    m_pSettings->endGroup();
+    if (bHasKey) {
         iStatus=QIniSettings::READ_VALID;
-        return m_pSettings->value(key);
+        m_pSettings->beginGroup(SETTINGS_GROUP_NAME);
+        QVariant retval = m_pSettings->value(key);
+        m_pSettings->endGroup();
+        return retval;
     }
     if (m_qmParamDefaults.count(key)>1) {
         iStatus=QIniSettings::INIT_ERROR;

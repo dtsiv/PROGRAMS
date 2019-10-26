@@ -2,6 +2,8 @@ DESTDIR = $$PWD/../
 
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += /std:c++17
+
 TARGET = RadarIndicator
 
 RadarIndicator.depends = $$PWD/../QIndicatorWindow

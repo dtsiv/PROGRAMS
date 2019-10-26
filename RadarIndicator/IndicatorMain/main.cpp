@@ -1,8 +1,8 @@
 #include <QtCore>
 #include <QApplication>
 
-#include "QIndicatorWindow.h"
-#include "QExceptionDialog.h"
+#include "qindicatorwindow.h"
+#include "qexceptiondialog.h"
 
 class MyApplication : public QApplication {
 public:

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
-    <BlaBlaBla>No meaning at all!</BlaBlaBla>
-    <ClusterCutoff>50</ClusterCutoff>
+    <ActivePropertyPage>0</ActivePropertyPage>
+    <SQLiteFile>ChronicaParser.sqlite3</SQLiteFile>
+    <geometry>AAABaAAAAHsAAAWzAAAC5A==</geometry>
 </PARAMETERS>

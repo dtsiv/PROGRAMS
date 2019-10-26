@@ -1,4 +1,4 @@
-#include "QExceptionDialog.h"
+#include "qexceptiondialog.h"
 
 #include <QDialog>
 #include <QIcon>
@@ -59,7 +59,7 @@ QExceptionDialog::QExceptionDialog(QString exceptionWhat, QWidget *parent) :
     QPushButton *ppbDismiss = new QPushButton("Dismiss");
     QObject::connect(ppbDismiss,SIGNAL(clicked()),SLOT(close()));
     pHLayout->addWidget(ppbDismiss);
-    pVLayout->addItem(pHLayout);
+    pVLayout->addLayout(pHLayout);
     setLayout(pVLayout);
 
     QDesktopWidget *desktop = QApplication::desktop();

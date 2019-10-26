@@ -5,6 +5,8 @@
 #include <QtWidgets>
 #include <QTabWidget>
 
+#define QPROPPAGES_ACTIVE_TAB                        "ActivePropertyPage"
+
 // color selection button
 class QColorSelectionButton : public QPushButton {
 	Q_OBJECT
@@ -44,6 +46,7 @@ public:
 
 private:
     QObject *m_pOwner;
+    QTabWidget *m_pTabWidget;
 };
 
 

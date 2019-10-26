@@ -8,6 +8,7 @@
 #define RADAR_INDICATOR_INI_FILE                 "RadarIndicator.xml"
 
 class QIniSettings {
+public:
     enum STATUS_CODES {
         READ_VALID      = 0,
         READ_DEFAULT    = 1,
@@ -21,6 +22,7 @@ private:
     ~QIniSettings();
     QIniSettings( const QIniSettings&);
     QIniSettings& operator=( QIniSettings& );
+
 public:
     static QIniSettings& getInstance();
 

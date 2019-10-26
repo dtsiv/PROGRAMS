@@ -13,6 +13,8 @@ QT += core
 
 TEMPLATE = lib
 
+QMAKE_CXXFLAGS += /std:c++17
+
 HEADERS += \
     qinisettings.h	\
 	qserial.h

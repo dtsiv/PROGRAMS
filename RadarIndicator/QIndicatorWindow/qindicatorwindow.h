@@ -13,6 +13,8 @@
 #include "QPropPages.h"
 #include "QSqlModel.h"
 
+#define SETTINGS_KEY_GEOMETRY                   "geometry"
+
 class QStopper;
 
 class QIndicatorWindow : public QMainWindow
@@ -28,7 +30,7 @@ public:
 
 public slots:
     void hideStopper();
-    void showDialog();
+    void onSetup();
 
 public:
     void showStopper();
@@ -38,6 +40,26 @@ private:
     QList<QObject*> m_qlObjects;
     QSqlModel *m_pSqlModel;
     QStopper *m_pStopper;
+
+    QAction *settingsAct;
+
+    QRect qrPropDlgGeo;
+    QLabel *lbStatusArea;
+
+};
+
+//*****************************************************************************
+//
+//*****************************************************************************
+class UserControlInputFilter : public QObject {
+protected:
+    virtual bool eventFilter(QObject*, QEvent*);
+
+public:
+    UserControlInputFilter(QIndicatorWindow* pOwner, QObject *pobj=0);
+
+private:
+    QIndicatorWindow *m_pOwner;
 };
 
 //*****************************************************************************

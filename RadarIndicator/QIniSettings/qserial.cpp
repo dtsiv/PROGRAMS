@@ -1,4 +1,5 @@
-#include "QSerial.h"
+#include "qserial.h"
+
 #include <QXmlStreamReader>
 #include <QDataStream>
 #include <QtDebug>

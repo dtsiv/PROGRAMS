@@ -13,6 +13,8 @@ QT += core gui sql opengl widgets
 
 TEMPLATE = lib
 
+QMAKE_CXXFLAGS += /std:c++17
+
 INCLUDEPATH +=  \
     ../QIniSettings \
     ../QIndicatorWindow

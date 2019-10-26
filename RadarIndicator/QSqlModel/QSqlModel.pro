@@ -13,8 +13,11 @@ QT += core gui sql opengl widgets
 
 TEMPLATE = lib
 
+QMAKE_CXXFLAGS += /std:c++17
+
 INCLUDEPATH += \
-    ../QPropPages
+    ../QPropPages \
+    ../QIniSettings
 
 HEADERS += \
     qsqlmodel.h	
