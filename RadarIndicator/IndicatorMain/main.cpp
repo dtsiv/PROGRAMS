@@ -2,6 +2,7 @@
 #include <QApplication>
 
 #include "QIndicatorWindow.h"
+#include "QExceptionDialog.h"
 
 class MyApplication : public QApplication {
 public:
@@ -14,7 +15,7 @@ public:
     try {
       return QApplication::notify(receiver, event);
 	} catch(std::exception& e) {
-      // showExceptionDialog(QString("Exception thrown: ") + e.what());
+        showExceptionDialog(QString("Exception thrown: ") + e.what());
     }
     return false;
   }
@@ -23,6 +24,7 @@ public:
 int main(int argc, char *argv[]) {
 	MyApplication a(argc, argv);
     QIndicatorWindow w;
-	w.show();
-	return a.exec();
+    w.showStopper();
+    w.initComponents();
+    return a.exec();
 }

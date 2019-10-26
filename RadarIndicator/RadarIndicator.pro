@@ -5,6 +5,10 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
-SUBDIRS = QIndicatorWindow \
+SUBDIRS = QExceptionDialog \
+          QSqlModel \
+          QPropPages \
+          QIniSettings \
+          QIndicatorWindow \
           IndicatorMain
 

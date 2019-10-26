@@ -1,0 +1,1 @@
+del /F C:\PROGRAMS\RadarIndicator\RadarIndicator.exe

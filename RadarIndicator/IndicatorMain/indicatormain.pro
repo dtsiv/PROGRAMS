@@ -11,7 +11,7 @@ MOC_DIR = $$PWD/../build/.moc
 RCC_DIR = $$PWD/../build/.rcc
 UI_DIR = $$PWD/../build/.ui
 
-QT += core gui widgets opengl
+QT += core gui widgets opengl sql
 
 CONFIG -= debug
 CONFIG += release
@@ -21,7 +21,10 @@ INCLUDEPATH +=  $PWD/include
 
 INCLUDEPATH += \
     ../QIndicatorWindow \
-    $$UI_DIR
+    ../QIniSettings \
+    ../QPropPages \
+    ../QSqlModel \
+    ../QExceptionDialog
 
 SOURCES += main.cpp
 
@@ -29,7 +32,11 @@ RESOURCES += \
     indicatormain.qrc
 
 LIBS += -L..\lib \
-    -lqindicatorwindow
+    -lqindicatorwindow \
+    -lqinisettings \
+    -lqproppages \
+    -lqsqlmodel \
+    -lqexceptiondialog
 
 LIBS += -L$$PWD/../../PostgreSQL_9.4_32bit \
     -lopengl32 \

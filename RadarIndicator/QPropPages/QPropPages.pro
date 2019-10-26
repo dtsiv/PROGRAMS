@@ -15,24 +15,10 @@ TEMPLATE = lib
 
 INCLUDEPATH +=  \
     ../QIniSettings \
-    ../QPropPages \
-    ../QExceptionDialog \
-    ../QSqlModel
-
-FORMS +=
+    ../QIndicatorWindow
 
 HEADERS += \
-    qindicatorwindow.h	
+    qproppages.h	
 	
 SOURCES += \
-    qindicatorwindow.cpp
-
-INCLUDEPATH +=  \
-    $$PWD/../../PostgreSQL_9.4_32bit \
-    $$PWD/../../include \
-    $$PWD/../../include/nr2 \
-    .
-
-LIBS += -L$$PWD/../../PostgreSQL_9.4_32bit \
-    -lopengl32 \
-    -lglu32
+    qproppages.cpp
