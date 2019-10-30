@@ -19,6 +19,7 @@ INCLUDEPATH +=  \
     ../QIniSettings \
     ../QPropPages \
     ../QExceptionDialog \
+    ../QTargetsMap \
     ../QSqlModel
 
 FORMS +=

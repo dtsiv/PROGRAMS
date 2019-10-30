@@ -9,11 +9,14 @@
 #include <QMetaObject>
 #include <QtGlobal>
 
-#include "QIniSettings.h"
-#include "QPropPages.h"
-#include "QSqlModel.h"
+#include "qinisettings.h"
+#include "qproppages.h"
+#include "qsqlmodel.h"
+#include "qtargetsmap.h"
 
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
+
+#define STOPPER_MIN_DELAY_MSECS                 1000
 
 class QStopper;
 
@@ -39,6 +42,7 @@ public:
 private:
     QList<QObject*> m_qlObjects;
     QSqlModel *m_pSqlModel;
+    QTargetsMap *m_pTargetsMap;
     QStopper *m_pStopper;
 
     QAction *settingsAct;

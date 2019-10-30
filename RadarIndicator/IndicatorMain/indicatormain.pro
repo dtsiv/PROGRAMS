@@ -1,10 +1,10 @@
+TARGET = RadarIndicator
+
 DESTDIR = $$PWD/../
 
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += /std:c++17
-
-TARGET = RadarIndicator
 
 RadarIndicator.depends = $$PWD/../QIndicatorWindow
 
@@ -26,6 +26,7 @@ INCLUDEPATH += \
     ../QIniSettings \
     ../QPropPages \
     ../QSqlModel \
+    ../QTargetsMap \
     ../QExceptionDialog
 
 SOURCES += main.cpp
@@ -38,6 +39,7 @@ LIBS += -L..\lib \
     -lqinisettings \
     -lqproppages \
     -lqsqlmodel \
+    -lqtargetsmap \
     -lqexceptiondialog
 
 LIBS += -L$$PWD/../../PostgreSQL_9.4_32bit \

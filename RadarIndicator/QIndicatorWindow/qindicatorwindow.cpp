@@ -4,6 +4,7 @@
 QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
       , m_pSqlModel(NULL)
+      , m_pTargetsMap(NULL)
       , m_pStopper(NULL)
       , settingsAct(NULL) {
     setWindowIcon(QIcon(QPixmap(":/Resources/spear.ico")));
@@ -36,6 +37,9 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     m_pSqlModel = new QSqlModel();
     if (m_pSqlModel) m_qlObjects << qobject_cast<QObject *> (m_pSqlModel);
 
+    m_pTargetsMap = new QTargetsMap();
+    if (m_pTargetsMap) m_qlObjects << qobject_cast<QObject *> (m_pTargetsMap);
+
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -65,7 +69,12 @@ void QIndicatorWindow::showStopper() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QIndicatorWindow::initComponents() {
     QTime qtCurr = QTime::currentTime();
-    while(qtCurr.msecsTo(QTime::currentTime())<3000) {
+    QDockWidget *dock = new QDockWidget(QTARGETSMAP_DOC_CAPTION);
+    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    MapWidget *pMapWidget = m_pTargetsMap->getMapInstance();
+    if (pMapWidget) dock->setWidget(pMapWidget);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+    while(qtCurr.msecsTo(QTime::currentTime())<STOPPER_MIN_DELAY_MSECS) {
         qApp->processEvents();
     }
     QTimer::singleShot(0,this,SLOT(hideStopper()));

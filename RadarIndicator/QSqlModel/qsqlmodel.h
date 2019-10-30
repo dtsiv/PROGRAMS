@@ -6,7 +6,7 @@
 #include <QtSql>
 #include <QMetaObject>
 
-#include "QPropPages.h"
+#include "qproppages.h"
 
 #define SETTINGS_SQLITE_FILE                    "SQLiteFile"
 
