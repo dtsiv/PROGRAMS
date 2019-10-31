@@ -42,7 +42,9 @@ public:
 private:
     QList<QObject*> m_qlObjects;
     QSqlModel *m_pSqlModel;
+public:
     QTargetsMap *m_pTargetsMap;
+private:
     QStopper *m_pStopper;
 
     QAction *settingsAct;

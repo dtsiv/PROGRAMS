@@ -17,7 +17,8 @@ QMAKE_CXXFLAGS += /std:c++17
 
 INCLUDEPATH += \
     ../QPropPages \
-    ../QIniSettings
+    ../QIniSettings \
+    ../QExceptionDialog
 
 HEADERS += \
     qtargetsmap.h	

@@ -23,16 +23,36 @@ public:
 
     Q_INVOKABLE void addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx);
     Q_INVOKABLE void propChanged(QObject *pPropDlg);
+    void zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn = true);
 
     MapWidget *getMapInstance();
 
+signals:
+    void doUpdate();
+
 private:
     void mapPaintEvent(MapWidget *pMapWidget, QPaintEvent *qpeEvent);
-    void drawGrid(MapWidget *pMapWidget, QPainter &painter);
+    bool drawGrid(MapWidget *pMapWidget, QPainter &painter);
+    struct GridSafeParams {
+        double dScaleD; // pixels per m
+        double dScaleV; // pixels per m/s
+        double dViewD0; // along distance axis (m)
+        double dViewV0; // along velocity axis (m/s)
+    } *m_pSafeParams;
+
+    double m_dScaleD; // pixels per m
+    double m_dScaleV; // pixels per m/s
+    // the only reference values are coordinates of widget center along dimensional axes
+    double m_dViewD0; // along distance axis (m)
+    double m_dViewV0; // along velocity axis (m/s)
+    QString m_qsLastError;
 
     friend class MapWidget;
 };
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class MapWidget : public QOpenGLWidget {
 	Q_OBJECT
 
@@ -42,12 +62,9 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *qpeEvent);
-    void initializeGL() {
-              // Set up the rendering context, load shaders and other resources, etc.:
-              QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-              f->glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-              // ...
-    }
+    void initializeGL();
+    void paintGL();
+    void resizeGL(int w, int h);
 
 private:
     QTargetsMap *m_pOwner;
