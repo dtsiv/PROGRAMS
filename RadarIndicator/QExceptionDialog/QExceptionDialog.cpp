@@ -14,8 +14,8 @@
 //---------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------
-void showExceptionDialog(QString exceptionWhat) {
-    QExceptionDialog w(exceptionWhat);
+void showExceptionDialog(QString exceptionWhat, QWidget *parent /* = 0 */) {
+    QExceptionDialog w(exceptionWhat, parent);
     w.exec();
 }
 //---------------------------------------------------------------------------------
@@ -24,6 +24,13 @@ void showExceptionDialog(QString exceptionWhat) {
 QExceptionDialog::QExceptionDialog(QString exceptionWhat, QWidget *parent) :
        QDialog(parent),
        m_pgsPlane(0) {
+        // Set QExceptionDialog window flags
+    Qt::WindowFlags flags = windowFlags() | Qt::WindowStaysOnTopHint
+    #ifdef __linux
+        | Qt::X11BypassWindowManagerHint
+    #endif
+        | Qt::Dialog;
+    setWindowFlags(flags);
     resize(769,600);
     setWindowTitle("Ooops... This is embarassing!");
     // This dialog is a separate window. It needs its icon
@@ -66,13 +73,6 @@ QExceptionDialog::QExceptionDialog(QString exceptionWhat, QWidget *parent) :
     QRect qrScrGeo = desktop->screenGeometry(desktop->primaryScreen());
     QRect rectDialog = this->frameGeometry();
     move((qrScrGeo.width()-rectDialog.width())/2,(qrScrGeo.height()-rectDialog.height())/2);
-	// Set QExceptionDialog window flags
-    Qt::WindowFlags flags = Qt::WindowStaysOnTopHint
-    #ifdef __linux
-        | Qt::X11BypassWindowManagerHint
-    #endif
-    ;
-    setWindowFlags(flags);
 }
 //---------------------------------------------------------------------------------
 //

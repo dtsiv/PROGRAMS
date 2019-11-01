@@ -7,13 +7,14 @@
 #include <QPainter>
 #include <QPaintEvent>
 
-QTargetsMap::QTargetsMap()
+QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
          : QObject(0)
          , m_dScaleD(2.0e0)
          , m_dScaleV(2.0e0)
          , m_dViewD0(100)
          , m_dViewV0(0)
-         , m_pSafeParams(NULL) {
+         , m_pSafeParams(NULL)
+         , m_pOwner(pOwner) {
     [[maybe_unused]] QIniSettings &iniSettings = QIniSettings::getInstance();
     [[maybe_unused]] QIniSettings::STATUS_CODES scRes;
     // iniSettings.setDefault(SETTINGS_SOME_VALUE,"SoveValueDefault");
@@ -54,20 +55,24 @@ void QTargetsMap::propChanged(QObject *pPropDlg) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 MapWidget *QTargetsMap::getMapInstance() {
+    static bool bInit=false;
+    if (bInit) {
+        throw RmoException("MapWidget already initialized");
+        return NULL;
+    }
     MapWidget *pMapWidget = new MapWidget(this);
     QObject::connect(this,SIGNAL(doUpdate()),pMapWidget,SLOT(update()));
+    bInit = true;
     return pMapWidget;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QTargetsMap::mapPaintEvent(MapWidget *pMapWiget, [[maybe_unused]]QPaintEvent *qpeEvent) {
-    // clear last error message
-    m_qsLastError.clear();
+void QTargetsMap::mapPaintEvent(MapWidget *pMapWidget, [[maybe_unused]]QPaintEvent *qpeEvent) {
 
     // start rendering
     QPainter painter;
-    painter.begin(pMapWiget);
+    painter.begin(pMapWidget);
     painter.setRenderHint(QPainter::Antialiasing);
 
     // OpenGL requires: clear all first
@@ -75,19 +80,10 @@ void QTargetsMap::mapPaintEvent(MapWidget *pMapWiget, [[maybe_unused]]QPaintEven
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // coordinate grid
-    if (!drawGrid(pMapWiget, painter)) {
-        if (!m_pSafeParams) {
+    if (m_qsLastError.isEmpty()) {
+        if (!drawGrid(pMapWidget, painter)) {
             painter.end();
-            throw RmoException("QTargetsMap: coordinate grid failed to init");
-            return;
-        }
-        m_dViewD0 = m_pSafeParams->dViewD0;
-        m_dViewV0 = m_pSafeParams->dViewV0;
-        m_dScaleD = m_pSafeParams->dScaleD;
-        m_dScaleV = m_pSafeParams->dScaleV;
-        if (!drawGrid(pMapWiget, painter)) {
-            painter.end();
-            throw RmoException(m_qsLastError);
+            QMetaObject::invokeMethod(this,"restoreSafeParams",Qt::QueuedConnection,Q_ARG(QObject*,pMapWidget));
             return;
         }
     }
@@ -96,7 +92,27 @@ void QTargetsMap::mapPaintEvent(MapWidget *pMapWiget, [[maybe_unused]]QPaintEven
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool QTargetsMap::drawGrid(MapWidget *pMapWiget, QPainter &painter) {
+void QTargetsMap::restoreSafeParams(QObject* pobj) {
+    [[maybe_unused]]MapWidget * pMapWidget = qobject_cast<MapWidget*>(pobj);
+    if (!m_pSafeParams) {
+        m_qsLastError = "Grid safe parameters missing";
+    }
+    showExceptionDialog(m_qsLastError,pMapWidget);
+    // clear last error message
+    m_qsLastError.clear();
+    // revert to safe params
+    if (m_pSafeParams) {
+        m_dViewD0 = m_pSafeParams->dViewD0;
+        m_dViewV0 = m_pSafeParams->dViewV0;
+        m_dScaleD = m_pSafeParams->dScaleD;
+        m_dScaleV = m_pSafeParams->dScaleV;
+        if (pMapWidget) pMapWidget->resize(m_pSafeParams->iWidth,m_pSafeParams->iHeight);
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     //------------------------------------------------------------------------
     // all coordinates declared here are in widget coordinate system
     // i.e. (0,0) is left upper corner
@@ -107,8 +123,8 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWiget, QPainter &painter) {
            dX4,dY4; // left lower
 
     // some constants
-    int iHeight = pMapWiget->height();
-    int iWidth  = pMapWiget->width();
+    int iHeight = pMapWidget->height();
+    int iWidth  = pMapWidget->width();
     double dXC,dYC; // view widget center
     dXC = iWidth/2.0e0;  // Indicator center in screen coordinates
     dYC = iHeight/2.0e0; // Indicator center in screen coordinates
@@ -132,7 +148,7 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWiget, QPainter &painter) {
     font.setWeight(QFont::Normal);
     font.setPointSize(iTickLabelSize);
     painter.setFont(font);
-    QFontMetrics fmTickLabel(font,pMapWiget);
+    QFontMetrics fmTickLabel(font,pMapWidget);
 
     // colors and fonts
     QBrush qbGridBrush(qcGridColor);
@@ -192,8 +208,11 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWiget, QPainter &painter) {
     iToX   = qRound(( dX2-iMaxWidthY-iTickLabelOffsetX-dViewD0Pix)   / dDGridStepPix - 0.5e0); // right border
     iFromY = qRound((-dY4+iLabelHeight+iTickLabelOffsetY+dViewV0Pix) / dVGridStepPix + 0.5e0); // lower border
     iToY   = qRound((-dY1-iLabelHeight-iTickLabelOffsetY+dViewV0Pix) / dVGridStepPix - 0.5e0); // upper border
-    if ( (iToX-iFromX+1)*iMaxWidthX+iLeftMargin+iMargin+2*iTickLabelOffsetX > iWidth
-      || (iToX-iFromX)<1 || (iToY-iFromY)<1) {
+    if ( (iToX-iFromX)*iMaxWidthX > iWidth ) {
+        m_qsLastError = QString("No room for X labels");
+        return false;
+    }
+    if ( (iToX-iFromX)<1 || (iToY-iFromY)<1 ) {
         m_qsLastError = QString("Grid size illegal: %1 x %2").arg(iToX-iFromX).arg(iToY-iFromY);
         return false;
     }
@@ -259,11 +278,13 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWiget, QPainter &painter) {
     }
     if (!m_pSafeParams) {
         m_pSafeParams = new struct GridSafeParams;
+        m_pSafeParams->dViewD0 = m_dViewD0;
+        m_pSafeParams->dViewV0 = m_dViewV0;
+        m_pSafeParams->dScaleD = m_dScaleD;
+        m_pSafeParams->dScaleV = m_dScaleV;
+        m_pSafeParams->iWidth  = iWidth;
+        m_pSafeParams->iHeight = iHeight;
     }
-    m_pSafeParams->dViewD0 = m_dViewD0;
-    m_pSafeParams->dViewV0 = m_dViewV0;
-    m_pSafeParams->dScaleD = m_dScaleD;
-    m_pSafeParams->dScaleV = m_dScaleV;
     return true;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

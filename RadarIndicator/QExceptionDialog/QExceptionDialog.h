@@ -53,7 +53,7 @@ private:
 //-----------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------
-void showExceptionDialog(QString exceptionWhat);
+void showExceptionDialog(QString exceptionWhat, QWidget *parent = 0);
 
 #endif // QEXCEPTIONDIALOG_H
 

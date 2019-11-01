@@ -37,7 +37,7 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     m_pSqlModel = new QSqlModel();
     if (m_pSqlModel) m_qlObjects << qobject_cast<QObject *> (m_pSqlModel);
 
-    m_pTargetsMap = new QTargetsMap();
+    m_pTargetsMap = new QTargetsMap(this);
     if (m_pTargetsMap) m_qlObjects << qobject_cast<QObject *> (m_pTargetsMap);
 
 }

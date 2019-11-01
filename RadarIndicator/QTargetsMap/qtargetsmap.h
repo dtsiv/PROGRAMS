@@ -18,13 +18,16 @@ class QTargetsMap : public QObject {
 	Q_OBJECT
 
 public:
-    QTargetsMap();
+    QTargetsMap(QWidget *pOwner = 0);
 	~QTargetsMap();
 
     Q_INVOKABLE void addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx);
     Q_INVOKABLE void propChanged(QObject *pPropDlg);
     void zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn = true);
 
+    Q_INVOKABLE void restoreSafeParams(QObject *pobj);
+
+public:
     MapWidget *getMapInstance();
 
 signals:
@@ -38,6 +41,8 @@ private:
         double dScaleV; // pixels per m/s
         double dViewD0; // along distance axis (m)
         double dViewV0; // along velocity axis (m/s)
+        int    iWidth;
+        int    iHeight;
     } *m_pSafeParams;
 
     double m_dScaleD; // pixels per m
@@ -46,6 +51,7 @@ private:
     double m_dViewD0; // along distance axis (m)
     double m_dViewV0; // along velocity axis (m/s)
     QString m_qsLastError;
+    QWidget *m_pOwner;
 
     friend class MapWidget;
 };
