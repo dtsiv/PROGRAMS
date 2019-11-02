@@ -25,7 +25,8 @@ public:
     Q_INVOKABLE void propChanged(QObject *pPropDlg);
     void zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn = true);
 
-    Q_INVOKABLE void restoreSafeParams(QObject *pobj);
+private slots:
+    void onExceptionDialogClosed();
 
 public:
     MapWidget *getMapInstance();
@@ -36,17 +37,18 @@ signals:
 private:
     void mapPaintEvent(MapWidget *pMapWidget, QPaintEvent *qpeEvent);
     bool drawGrid(MapWidget *pMapWidget, QPainter &painter);
+
     struct GridSafeParams {
         double dScaleD; // pixels per m
         double dScaleV; // pixels per m/s
         double dViewD0; // along distance axis (m)
         double dViewV0; // along velocity axis (m/s)
-        int    iWidth;
-        int    iHeight;
     } *m_pSafeParams;
 
     double m_dScaleD; // pixels per m
+    double m_dMaxScaleD; // maximum scale over distance
     double m_dScaleV; // pixels per m/s
+    double m_dMaxScaleV; // maximum scale over velocity
     // the only reference values are coordinates of widget center along dimensional axes
     double m_dViewD0; // along distance axis (m)
     double m_dViewV0; // along velocity axis (m/s)

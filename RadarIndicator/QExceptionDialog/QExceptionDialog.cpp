@@ -64,7 +64,7 @@ QExceptionDialog::QExceptionDialog(QString exceptionWhat, QWidget *parent) :
     QHBoxLayout *pHLayout = new QHBoxLayout;
     pHLayout->addStretch();
     QPushButton *ppbDismiss = new QPushButton("Dismiss");
-    QObject::connect(ppbDismiss,SIGNAL(clicked()),SLOT(close()));
+    QObject::connect(ppbDismiss,SIGNAL(clicked()),SLOT(accept()));
     pHLayout->addWidget(ppbDismiss);
     pVLayout->addLayout(pHLayout);
     setLayout(pVLayout);

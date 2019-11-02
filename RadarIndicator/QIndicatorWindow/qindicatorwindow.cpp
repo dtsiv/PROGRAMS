@@ -73,6 +73,7 @@ void QIndicatorWindow::initComponents() {
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     MapWidget *pMapWidget = m_pTargetsMap->getMapInstance();
     if (pMapWidget) dock->setWidget(pMapWidget);
+
     addDockWidget(Qt::RightDockWidgetArea, dock);
     while(qtCurr.msecsTo(QTime::currentTime())<STOPPER_MIN_DELAY_MSECS) {
         qApp->processEvents();
@@ -126,8 +127,8 @@ void QIndicatorWindow::propChanged(QObject *pPropDlg) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QStopper::QStopper()
-: QSplashScreen(QPixmap(), Qt::WindowStaysOnTopHint)
-, m_pmStopper(QPixmap(":/Resources/stopper_screen.png")) {
+       : QSplashScreen(QPixmap(), Qt::WindowStaysOnTopHint)
+       , m_pmStopper(QPixmap(":/Resources/stopper_screen.png")) {
     setPixmap(m_pmStopper);
     resize(m_pmStopper.width(),m_pmStopper.height());
     QDesktopWidget *desktop = QApplication::desktop();

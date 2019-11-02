@@ -10,7 +10,9 @@
 QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
          : QObject(0)
          , m_dScaleD(2.0e0)
+         , m_dMaxScaleD(10.0e0)
          , m_dScaleV(2.0e0)
+         , m_dMaxScaleV(10.0e0)
          , m_dViewD0(100)
          , m_dViewV0(0)
          , m_pSafeParams(NULL)
@@ -20,7 +22,9 @@ QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
     // iniSettings.setDefault(SETTINGS_SOME_VALUE,"SoveValueDefault");
     // m_qsSomeValue = iniSettings.value(SETTINGS_SOME_VALUE,scRes).toString();
 }
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QTargetsMap::~QTargetsMap() {
     if (m_pSafeParams) {
         delete m_pSafeParams;
@@ -29,7 +33,9 @@ QTargetsMap::~QTargetsMap() {
     [[maybe_unused]] QIniSettings &iniSettings = QIniSettings::getInstance();
     // iniSettings.setValue(SETTINGS_SOME_VALUE, m_qsSomeValue);
 }
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     [[maybe_unused]] QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
     QTabWidget *pTabWidget = qobject_cast<QTabWidget *> (pPropTabs);
@@ -82,9 +88,13 @@ void QTargetsMap::mapPaintEvent(MapWidget *pMapWidget, [[maybe_unused]]QPaintEve
     // coordinate grid
     if (m_qsLastError.isEmpty()) {
         if (!drawGrid(pMapWidget, painter)) {
-            painter.end();
-            QMetaObject::invokeMethod(this,"restoreSafeParams",Qt::QueuedConnection,Q_ARG(QObject*,pMapWidget));
-            return;
+            if (!m_pSafeParams) {
+                m_qsLastError = "Grid safe parameters missing";
+            }
+            QExceptionDialog *pDlg = new QExceptionDialog(m_qsLastError, pMapWidget);
+            QObject::connect(pDlg,SIGNAL(accepted()),SLOT(onExceptionDialogClosed()));
+            pDlg -> setAttribute(Qt::WA_DeleteOnClose);
+            pDlg -> open();
         }
     }
     painter.end();
@@ -92,21 +102,15 @@ void QTargetsMap::mapPaintEvent(MapWidget *pMapWidget, [[maybe_unused]]QPaintEve
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QTargetsMap::restoreSafeParams(QObject* pobj) {
-    [[maybe_unused]]MapWidget * pMapWidget = qobject_cast<MapWidget*>(pobj);
-    if (!m_pSafeParams) {
-        m_qsLastError = "Grid safe parameters missing";
-    }
-    showExceptionDialog(m_qsLastError,pMapWidget);
-    // clear last error message
-    m_qsLastError.clear();
-    // revert to safe params
+void QTargetsMap::onExceptionDialogClosed() {
     if (m_pSafeParams) {
         m_dViewD0 = m_pSafeParams->dViewD0;
         m_dViewV0 = m_pSafeParams->dViewV0;
         m_dScaleD = m_pSafeParams->dScaleD;
         m_dScaleV = m_pSafeParams->dScaleV;
-        if (pMapWidget) pMapWidget->resize(m_pSafeParams->iWidth,m_pSafeParams->iHeight);
+        // clear last error message
+        m_qsLastError.clear();
+        emit doUpdate();
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -282,8 +286,6 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
         m_pSafeParams->dViewV0 = m_dViewV0;
         m_pSafeParams->dScaleD = m_dScaleD;
         m_pSafeParams->dScaleV = m_dScaleV;
-        m_pSafeParams->iWidth  = iWidth;
-        m_pSafeParams->iHeight = iHeight;
     }
     return true;
 }
@@ -291,7 +293,11 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn /* = true */ ) {
+    // no operations in error state
+    if (!m_qsLastError.isEmpty()) return;
+
     double dMultiplier;
+    double dLastVal;
     if (bZoomIn) {
         dMultiplier = 1.1;
     }
@@ -299,10 +305,14 @@ void QTargetsMap::zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn /* = 
         dMultiplier = 1/1.1;
     }
     if (bZoomAlongD) {
+        dLastVal = m_dScaleD;
         m_dScaleD *= dMultiplier;
+        if (m_dScaleD >= m_dMaxScaleD) m_dScaleD = dLastVal;
     }
     if (bZoomAlongV) {
+        dLastVal = m_dScaleV;
         m_dScaleV *= dMultiplier;
+        if (m_dScaleV >= m_dMaxScaleV) m_dScaleV = dLastVal;
     }
     emit doUpdate();
 }
@@ -313,6 +323,9 @@ MapWidget::MapWidget(QTargetsMap *owner, QWidget *parent /* =0 */)
       : QOpenGLWidget(parent)
       , m_pOwner(owner) {
     setAutoFillBackground(false);
+    setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
+    setMinimumWidth(200);
+    setMinimumHeight(200);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -325,9 +338,6 @@ MapWidget::~MapWidget() {
     // m_vbo.destroy(); m_vao.destroy();
     // doneCurrent();
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void MapWidget::paintEvent(QPaintEvent *qpeEvent) {
     m_pOwner->mapPaintEvent(this, qpeEvent);
 }
