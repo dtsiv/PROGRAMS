@@ -72,7 +72,10 @@ void QIndicatorWindow::initComponents() {
     QDockWidget *dock = new QDockWidget(QTARGETSMAP_DOC_CAPTION);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     MapWidget *pMapWidget = m_pTargetsMap->getMapInstance();
-    if (pMapWidget) dock->setWidget(pMapWidget);
+    if (pMapWidget) {
+        pMapWidget->setFocusPolicy(Qt::StrongFocus);
+        dock->setWidget(pMapWidget);
+    }
 
     addDockWidget(Qt::RightDockWidgetArea, dock);
     while(qtCurr.msecsTo(QTime::currentTime())<STOPPER_MIN_DELAY_MSECS) {
@@ -164,22 +167,7 @@ UserControlInputFilter::UserControlInputFilter(QIndicatorWindow *pOwner, QObject
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /*virtual*/ bool UserControlInputFilter::eventFilter([[maybe_unused]]QObject *pobj, QEvent *pe) {
-    QTargetsMap *pTargetsMap = m_pOwner->m_pTargetsMap;
     QEvent::Type eventType = pe->type();
-    // user input events
-    if (eventType == QEvent::Wheel) {
-        QWheelEvent *pWheelEvent = (QWheelEvent *)pe;
-        [[maybe_unused]]double dEventX = pWheelEvent->x();
-        [[maybe_unused]]double dEventY = pWheelEvent->y();
-        int iNumSteps = pWheelEvent->delta();
-        bool bMagnify = (iNumSteps>0);
-        bool bZoomAlongD = true;
-        bool bZoomAlongV = true;
-        if (pTargetsMap) {
-            pTargetsMap->zoomMap(bZoomAlongD, bZoomAlongV, bMagnify);
-            return true;
-        }
-    }
     // user input events
     if (eventType == QEvent::KeyPress) {
         QKeyEvent *pKeyEvent = (QKeyEvent*)pe;
@@ -197,20 +185,6 @@ UserControlInputFilter::UserControlInputFilter(QIndicatorWindow *pOwner, QObject
         else if (pKeyEvent->key()==Qt::Key_Escape) {
             // m_pOwner->closeView();
             return true;
-        }
-        else if ((pKeyEvent->key()==Qt::Key_Plus || pKeyEvent->key()==Qt::Key_Minus
-               || pKeyEvent->key()==Qt::Key_Equal|| pKeyEvent->key()==Qt::Key_Bar
-               || pKeyEvent->key()==Qt::Key_Underscore)
-               && ((pKeyEvent->modifiers() & Qt::ControlModifier)
-               ||  (pKeyEvent->modifiers() & Qt::ShiftModifier) )) {
-            Qt::KeyboardModifiers kbmZoomAlong = pKeyEvent->modifiers();
-            int iKey = pKeyEvent->key();
-            bool bZoomAlongD = (kbmZoomAlong & Qt::ShiftModifier);
-            bool bZoomIn = ((iKey==Qt::Key_Plus) || (iKey==Qt::Key_Equal));
-            if (pTargetsMap) {
-                pTargetsMap->zoomMap(bZoomAlongD, !bZoomAlongD, bZoomIn);
-                return true;
-            }
         }
         else if ((pKeyEvent->key()==Qt::Key_Q || pKeyEvent->key()==Qt::Key_X)
                && (pKeyEvent->modifiers() & Qt::ControlModifier || pKeyEvent->modifiers() & Qt::AltModifier)) {

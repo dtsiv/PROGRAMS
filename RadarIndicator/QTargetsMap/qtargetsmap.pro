@@ -19,9 +19,15 @@ INCLUDEPATH += \
     ../QPropPages \
     ../QIniSettings \
     ../QExceptionDialog
+#    ../../CPP_211/other
 
 HEADERS += \
-    qtargetsmap.h	
+    qtargetsmap.h \	
+    qformular.h \
+    qtargetmarker.h
 	
 SOURCES += \
-    qtargetsmap.cpp
+    qtargetsmap.cpp \
+    qformular.cpp \
+    qtargetmarker.cpp
+#    ../../CPP_211/recipes/sort.cpp

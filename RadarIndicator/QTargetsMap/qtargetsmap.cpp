@@ -7,6 +7,9 @@
 #include <QPainter>
 #include <QPaintEvent>
 
+// time delay to show formular
+const quint64 QTargetsMap::m_iFormularDelay = 1000;
+
 QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
          : QObject(0)
          , m_dScaleD(2.0e0)
@@ -16,11 +19,17 @@ QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
          , m_dViewD0(100)
          , m_dViewV0(0)
          , m_pSafeParams(NULL)
-         , m_pOwner(pOwner) {
+         , m_pOwner(pOwner)
+         , m_pMouseStill(NULL) {
     [[maybe_unused]] QIniSettings &iniSettings = QIniSettings::getInstance();
     [[maybe_unused]] QIniSettings::STATUS_CODES scRes;
+    m_qlTargets << new QTargetMarker(200,0,"SU2134");
+    m_qlTargets << new QTargetMarker(150,20,"IR011");
+    m_qlTargets << new QTargetMarker(350,-20,"IRA111");
     // iniSettings.setDefault(SETTINGS_SOME_VALUE,"SoveValueDefault");
     // m_qsSomeValue = iniSettings.value(SETTINGS_SOME_VALUE,scRes).toString();
+    QObject::connect(&m_qtFormular,SIGNAL(timeout()),SLOT(onFormularTimeout()));
+    m_qtFormular.start(m_iFormularDelay);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -32,6 +41,27 @@ QTargetsMap::~QTargetsMap() {
     }
     [[maybe_unused]] QIniSettings &iniSettings = QIniSettings::getInstance();
     // iniSettings.setValue(SETTINGS_SOME_VALUE, m_qsSomeValue);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::onFormularTimeout() {
+    // clear stale formulars
+    for (int i=0; i<m_qlFormulars.size(); i++ ) {
+        if (m_qlFormulars.at(i)->isStale()) {
+            delete m_qlFormulars.takeAt(i);
+            emit doUpdate();
+        }
+    }
+    // process location of frozen mouse
+    if (!m_pMouseStill) return;
+    if (m_pMouseStill->last.msecsTo(QTime::currentTime()) < m_iFormularDelay) return;
+    QFormular *pFormular = new QFormular(m_pMouseStill,m_dScaleD,m_dScaleV,m_dViewD0,m_dViewV0);
+    if (!pFormular->selectTarg(m_qlTargets)) { delete pFormular; return; }
+    m_qlFormulars.append(pFormular);
+    delete m_pMouseStill;
+    m_pMouseStill = 0;
+    emit doUpdate();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -55,7 +85,6 @@ void QTargetsMap::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
 void QTargetsMap::propChanged(QObject *pPropDlg) {
     [[maybe_unused]] QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
     // m_qsSomeValue = pPropPages->m_pleSomeValue->text();
-    // qDebug() << "m_qsDBFile = " << m_qsDBFile;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -70,6 +99,75 @@ MapWidget *QTargetsMap::getMapInstance() {
     QObject::connect(this,SIGNAL(doUpdate()),pMapWidget,SLOT(update()));
     bInit = true;
     return pMapWidget;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::onExceptionDialogClosed() {
+    // some QWidget shifts/rescales destry last mouse location
+    if (m_pMouseStill) {
+        delete m_pMouseStill;
+        m_pMouseStill = NULL;
+    }
+    if (m_pSafeParams) {
+        m_dViewD0 = m_pSafeParams->dViewD0;
+        m_dViewV0 = m_pSafeParams->dViewV0;
+        m_dScaleD = m_pSafeParams->dScaleD;
+        m_dScaleV = m_pSafeParams->dScaleV;
+        // clear last error message
+        m_qsLastError.clear();
+        emit doUpdate();
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::shiftView(bool bVertical, bool bPositive) {
+    double dVShiftStep=2.0e0; // m/s
+    double dDShiftStep=2.0e0;  // m
+    if (bVertical) {
+        m_dViewV0 += dVShiftStep*(-1+2*bPositive);
+    }
+    else {
+        m_dViewD0 += dDShiftStep*(-1+2*bPositive);
+    }
+    // some QWidget shifts/rescales destry last mouse location
+    if (m_pMouseStill) {
+        delete m_pMouseStill;
+        m_pMouseStill = NULL;
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::shiftView(QPoint qpShift) {
+    if (m_dScaleD) {
+        m_dViewD0 -= qpShift.x()/m_dScaleD;
+    }
+    if (m_dScaleV) {
+        m_dViewV0 += qpShift.y()/m_dScaleV;
+    }
+    // some QWidget shifts/rescales destry last mouse location
+    if (m_pMouseStill) {
+        delete m_pMouseStill;
+        m_pMouseStill = NULL;
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::resetScale() {
+    if (m_pSafeParams) {
+        m_dScaleD = m_pSafeParams->dScaleD;
+        m_dScaleV = m_pSafeParams->dScaleV;
+        m_dViewD0 = m_pSafeParams->dViewD0;
+        m_dViewV0 = m_pSafeParams->dViewV0;
+    }
+    // some QWidget shifts/rescales destry last mouse location
+    if (m_pMouseStill) {
+        delete m_pMouseStill;
+        m_pMouseStill = NULL;
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -96,22 +194,11 @@ void QTargetsMap::mapPaintEvent(MapWidget *pMapWidget, [[maybe_unused]]QPaintEve
             pDlg -> setAttribute(Qt::WA_DeleteOnClose);
             pDlg -> open();
         }
+        for (int i=0; i<m_qlFormulars.size(); i++ ) {
+            m_qlFormulars.at(i)->drawFormular(pMapWidget,m_dScaleD,m_dScaleV,m_dViewD0,m_dViewV0,painter);
+        }
     }
     painter.end();
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QTargetsMap::onExceptionDialogClosed() {
-    if (m_pSafeParams) {
-        m_dViewD0 = m_pSafeParams->dViewD0;
-        m_dViewV0 = m_pSafeParams->dViewV0;
-        m_dScaleD = m_pSafeParams->dScaleD;
-        m_dScaleV = m_pSafeParams->dScaleV;
-        // clear last error message
-        m_qsLastError.clear();
-        emit doUpdate();
-    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -314,18 +401,61 @@ void QTargetsMap::zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn /* = 
         m_dScaleV *= dMultiplier;
         if (m_dScaleV >= m_dMaxScaleV) m_dScaleV = dLastVal;
     }
-    emit doUpdate();
+    // some QWidget shifts/rescales destry last mouse location
+    if (m_pMouseStill) {
+        delete m_pMouseStill;
+        m_pMouseStill = NULL;
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::zoomMap(MapWidget *pMapWidget, int iX, int iY, bool bZoomIn /*= true*/) {
+    // no operations in error state
+    if (!m_qsLastError.isEmpty()) return;
+    // position of widget center (view coordinates)
+    double dXC = pMapWidget->width()/2.0e0;
+    double dYC = pMapWidget->height()/2.0e0;
+    // Position of physical coordinate origin in pixels (view coordinates)
+    double dViewD0Pix = dXC - m_dViewD0 * m_dScaleD;
+    double dViewV0Pix = dYC + m_dViewV0 * m_dScaleV;
+    // vector (in pixels) from mouse location to physical coordinate origin
+    double dVecX = dViewD0Pix - iX;
+    double dVecY = dViewV0Pix - iY;
+    // scaling factor
+    double dMultiplier;
+    if (bZoomIn) {
+        dMultiplier = 1.1;
+    }
+    else {
+        dMultiplier = 1/1.1;
+    }
+    double dLastValD = m_dScaleD;
+    double dLastValV = m_dScaleV;
+    m_dScaleD *= dMultiplier; m_dScaleV *= dMultiplier;
+    if (m_dScaleD >= m_dMaxScaleD || m_dScaleV >= m_dMaxScaleV || abs(m_dScaleD)+abs(m_dScaleV) < 1.0e-8) {
+        m_dScaleD = dLastValD; m_dScaleV = dLastValV;
+        return;
+    }
+    // scaling factor
+    dViewD0Pix = iX + dVecX*dMultiplier;
+    dViewV0Pix = iY + dVecY*dMultiplier;
+    // physical coordinate origin (dimensional)
+    m_dViewD0 = ( dXC - dViewD0Pix) / m_dScaleD;
+    m_dViewV0 = (-dYC + dViewV0Pix) / m_dScaleV;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 MapWidget::MapWidget(QTargetsMap *owner, QWidget *parent /* =0 */)
       : QOpenGLWidget(parent)
+      , m_bMapDragging(false)
       , m_pOwner(owner) {
     setAutoFillBackground(false);
     setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
     setMinimumWidth(200);
     setMinimumHeight(200);
+    setMouseTracking(true);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -338,6 +468,9 @@ MapWidget::~MapWidget() {
     // m_vbo.destroy(); m_vao.destroy();
     // doneCurrent();
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void MapWidget::paintEvent(QPaintEvent *qpeEvent) {
     m_pOwner->mapPaintEvent(this, qpeEvent);
 }
@@ -366,4 +499,120 @@ void MapWidget::resizeGL([[maybe_unused]]int w, [[maybe_unused]]int h) {
     // !!!doesn't work:  glViewport(0, 0, w/2, h/2);
     // glViewport() should instead appear in paintGL
     // ...
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* virtual */ void MapWidget::mousePressEvent(QMouseEvent *pe) {
+    if (pe->button() == Qt::LeftButton) {
+        m_qpLastPoint = pe->pos();
+        m_bMapDragging = true;
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* virtual */ void MapWidget::mouseMoveEvent(QMouseEvent *pe) {
+    if ((pe->buttons() & Qt::LeftButton) && m_bMapDragging) {
+        QPoint qpDelta = pe->pos() - m_qpLastPoint;
+        m_qpLastPoint = pe->pos();
+        m_pOwner->shiftView(qpDelta);
+        repaint();
+        return;
+    }
+    // mark mouse last position
+    if (!m_pOwner->m_pMouseStill) m_pOwner->m_pMouseStill = new struct QFormular::sMouseStillPos;
+    m_pOwner->m_pMouseStill->geometry = geometry();
+    m_pOwner->m_pMouseStill->pos = pe->pos();
+    m_pOwner->m_pMouseStill->last = QTime::currentTime();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* virtual */ void MapWidget::mouseReleaseEvent(QMouseEvent *pe) {
+    if (pe->button() == Qt::LeftButton && m_bMapDragging) {
+        m_bMapDragging = false;
+        QPoint qpDelta = pe->pos() - m_qpLastPoint;
+        m_pOwner->shiftView(qpDelta);
+        repaint();
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* virtual */ void MapWidget::wheelEvent(QWheelEvent *pe) {
+    if (pe->modifiers() & Qt::ControlModifier) {
+        int iNumSteps = pe->delta();
+        bool bMagnify = (iNumSteps>0);
+        if (pe->modifiers() & Qt::ShiftModifier) {
+            [[maybe_unused]]int iEventX = pe->x();
+            [[maybe_unused]]int iEventY = pe->y();
+            m_pOwner->zoomMap(this, iEventX, iEventY, bMagnify);
+            repaint();
+            return;
+        }
+        bool bZoomAlongD = true;
+        bool bZoomAlongV = true;
+        m_pOwner->zoomMap(bZoomAlongD, bZoomAlongV, bMagnify);
+        repaint();
+        return;
+    }
+    return;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* virtual */ void MapWidget::resizeEvent([[maybe_unused]]QResizeEvent *event) {
+    QOpenGLWidget::resizeEvent(event);
+    if (m_pOwner->m_pMouseStill) {
+        delete m_pOwner->m_pMouseStill;
+        m_pOwner->m_pMouseStill = NULL;
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* virtual */ void MapWidget::keyReleaseEvent(QKeyEvent *pe) {
+    if (     pe->key()==Qt::Key_Up
+          || pe->key()==Qt::Key_Right
+          || pe->key()==Qt::Key_Down
+          || pe->key()==Qt::Key_Left) {
+        switch (pe->key()) {
+            case Qt::Key_Up:
+                m_pOwner->shiftView(/*bool bVertical=*/true, /*bool bPositive=*/true); break;
+            case Qt::Key_Down:
+                m_pOwner->shiftView(/*bool bVertical=*/true, /*bool bPositive=*/false); break;
+            case Qt::Key_Right:
+                m_pOwner->shiftView(/*bool bVertical=*/false, /*bool bPositive=*/true); break;
+            case Qt::Key_Left:
+                m_pOwner->shiftView(/*bool bVertical=*/false, /*bool bPositive=*/false); break;
+            default:
+                // allow all other events
+                QOpenGLWidget::keyPressEvent(pe);
+                return;
+        }
+        repaint();
+        return;
+    }
+    else if ((pe->key()==Qt::Key_Plus || pe->key()==Qt::Key_Minus
+           || pe->key()==Qt::Key_Equal|| pe->key()==Qt::Key_Bar
+           || pe->key()==Qt::Key_Underscore)
+           && ((pe->modifiers() & Qt::ControlModifier)
+           ||  (pe->modifiers() & Qt::ShiftModifier) )) {
+        Qt::KeyboardModifiers kbmZoomAlong = pe->modifiers();
+        int iKey = pe->key();
+        bool bZoomAlongD = (kbmZoomAlong & Qt::ShiftModifier);
+        bool bZoomIn = ((iKey==Qt::Key_Plus) || (iKey==Qt::Key_Equal));
+        m_pOwner->zoomMap(bZoomAlongD, !bZoomAlongD, bZoomIn);
+        repaint();
+        return;
+    }
+    else if ( pe->key()==Qt::Key_0 && pe->modifiers() & Qt::ControlModifier) {
+        m_pOwner->resetScale();
+        repaint();
+        return;
+    }
+    // allow all other events
+    QOpenGLWidget::keyPressEvent(pe);
+    return;
 }
