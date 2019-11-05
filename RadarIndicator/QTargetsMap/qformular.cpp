@@ -8,36 +8,12 @@ const quint64 QFormular::m_uFormularCutoffPix = 10;
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QFormular::QFormular(struct sMouseStillPos *pMouseStill,
-                     // scales over horizontal and vertical direction
-                     double dScaleD, // pixels per m
-                     double dScaleV, // pixels per m/s
-                     // the only reference values are coordinates of widget center along dimensional axes
-                     double dViewD0, // along distance axis (m)
-                     double dViewV0, // along velocity axis (m/s)
                      QObject *parent /* = 0 */ )
                : QObject(parent)
-               , m_dScaleD(dScaleD)
-               , m_dScaleV(dScaleV)
-               , m_dViewD0(dViewD0)
-               , m_dViewV0(dViewV0)
                , m_pTargetMarker(NULL)
                , m_bStale(false) {
     Q_ASSERT(pMouseStill != 0);
     m_mouseStill = *pMouseStill;
-    // some constants
-    int iHeight = m_mouseStill.geometry.height();
-    int iWidth  = m_mouseStill.geometry.width();
-    double dXC,dYC; // view widget center
-    dXC = iWidth/2.0e0;  // Indicator center in screen coordinates
-    dYC = iHeight/2.0e0; // Indicator center in screen coordinates
-    // Position of physical coordinate origin in pixels (view coordinates)
-    double dViewD0Pix = dXC - dViewD0 * dScaleD;
-    double dViewV0Pix = dYC + dViewV0 * dScaleV;
-    // Pysical coordinates of mouse pointer
-    Q_ASSERT(dScaleD != 0);
-    Q_ASSERT(dScaleV != 0);
-    m_dMouseDPhys = ( m_mouseStill.pos.x() - dViewD0Pix)/dScaleD;
-    m_dMouseVPhys = (-m_mouseStill.pos.y() + dViewV0Pix)/dScaleV;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -58,18 +34,17 @@ void QFormular::setStale() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool QFormular::selectTarg(QList<QTargetMarker*> qlTargets) {
+bool QFormular::selectTarg(QList<QTargetMarker*> qlTargets, QTransform &t) {
     QList<double> qlDists;
     QList<double> qlIndxs;
     // if currently no targets detected - then skip
     if (!qlTargets.size()) return false;
     // calculate all dists (in pixels) from targets to (m_dMouseDPhys,m_dMouseVPhys)
     for (int i=0; i<qlTargets.size(); i++) {
-        double xx = qlTargets.at(i)->x()-m_dMouseDPhys;
-        double yy = qlTargets.at(i)->y()-m_dMouseVPhys;
-        xx *= m_dScaleD;
-        yy *= m_dScaleV;
-        qlDists << abs(xx)+abs(yy);
+        QPointF qpTar = qlTargets.at(i)->tar();
+        QPoint qpTarPix = (qpTar*t).toPoint();
+        qpTarPix -= m_mouseStill.pos;
+        qlDists << qpTarPix.manhattanLength();
         qlIndxs << i;
     }
     // sort the distances
@@ -96,54 +71,24 @@ bool QFormular::selectTarg(QList<QTargetMarker*> qlTargets) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QFormular::drawFormular(MapWidget *pMapWidget,
-                             // scales over horizontal and vertical direction
-                             double dScaleD, // pixels per m
-                             double dScaleV, // pixels per m/s
-                             // the only reference values are coordinates of widget center along dimensional axes
-                             double dViewD0, // along distance axis (m)
-                             double dViewV0, // along velocity axis (m/s)
-                             QPainter &painter) {
-    // check pointer valid (paranoia?)
-    if (!pMapWidget) return;
+void QFormular::drawFormular(QPainter &painter, QTransform &t) {
     // if formular is stale then m_pTargetMarker no longer exists
     if (m_bStale) return;
     // if no target marker was found close to mouse pointer - then skip
     if (!m_pTargetMarker) return;
+
     // save painter state
-    // painter.save();
-    int iHeight = pMapWidget->height();
-    int iWidth  = pMapWidget->width();
-    // view widget center
-    double dXC,dYC; // widget coordinate system
-    dXC = iWidth/2.0e0;  // Indicator center in screen coordinates
-    dYC = iHeight/2.0e0; // Indicator center in screen coordinates
-
-    // refresh current scales and origin shift
-    m_dScaleD = dScaleD;
-    m_dScaleV = dScaleV;
-    m_dViewD0 = dViewD0;
-    m_dViewV0 = dViewV0;
-
-    // Position of physical coordinate origin in pixels (view coordinates)
-    double dViewD0Pix = dXC - m_dViewD0 * m_dScaleD;
-    double dViewV0Pix = dYC + m_dViewV0 * m_dScaleV;
+    painter.save();
 
     // Position of target in pixels (view coordinates)
-    double dTarDPhys = m_pTargetMarker->x();
-    double dTarVPhys = m_pTargetMarker->y();
-    double dTarDPix = dViewD0Pix + dTarDPhys * m_dScaleD;
-    double dTarVPix = dViewV0Pix - dTarVPhys * m_dScaleV;
+    QPoint qpTarPix = (m_pTargetMarker->tar() * t).toPoint();
     // target outside widget area - skip
-    if (dTarDPix > iWidth || dTarDPix <0 || dTarVPix<0 || dTarVPix>iHeight) return;
+    QRect qrBounding=painter.window();
+    if (!qrBounding.contains(qpTarPix)) {
+        painter.restore(); return;
+    }
 
     // Draw the formular
-    QPointF qpTar(dTarDPix,dTarVPix);
-    QRectF qrBounding(0.0,0.0,iWidth,iHeight);
-    if (!qrBounding.contains(qpTar)) {
-        // painter.restore();
-        return;
-    }
     // Background color
     QColor qcFormularBg(Qt::red);
     qcFormularBg.setAlpha(128);
@@ -158,25 +103,25 @@ void QFormular::drawFormular(MapWidget *pMapWidget,
     font.setWeight(QFont::Normal);
     font.setPointSize(iLegendSize);
     painter.setFont(font);
-    QFontMetrics fmTickLabel(font,pMapWidget);
+    QFontMetrics fmTickLabel(font,painter.device());
     // formular rectangle
     QPoint qpFormularOffset = QPoint(30.,30.);
     QString qsMesg = m_pTargetMarker->mesgString();
     QRect qrTxt = fmTickLabel.boundingRect(qsMesg);
     QRectF qrFormuRect = QRectF(0.0, 0.0, qrTxt.width()+6, qrTxt.height());
-    qrFormuRect.moveTo(qpFormularOffset + qpTar);
+    qrFormuRect.moveTo(qpFormularOffset + qpTarPix);
     if (qrFormuRect.top() < 0.) qrFormuRect.translate(0.,-qrFormuRect.top());
     if (qrFormuRect.left() < 0.) qrFormuRect.translate(-qrFormuRect.left(),0.);
     if (qrFormuRect.bottom() > qrBounding.height()) qrFormuRect.translate(QPointF(0.,qrBounding.height()-qrFormuRect.bottom()));
     if (qrFormuRect.right() > qrBounding.width()) qrFormuRect.translate(QPointF(qrBounding.width()-qrFormuRect.right(),0.));
     QPointF pt0(qrFormuRect.left(),qrFormuRect.top());
-    double d0 = _hypot(qpTar.x()-pt0.x(),qpTar.y()-pt0.y());
+    double d0 = _hypot(qpTarPix.x()-pt0.x(),qpTarPix.y()-pt0.y());
     QPointF pt1(qrFormuRect.right(),qrFormuRect.top());
-    double d1 = _hypot(qpTar.x()-pt1.x(),qpTar.y()-pt1.y());
+    double d1 = _hypot(qpTarPix.x()-pt1.x(),qpTarPix.y()-pt1.y());
     QPointF pt2(qrFormuRect.right(),qrFormuRect.bottom());
-    double d2 = _hypot(qpTar.x()-pt2.x(),qpTar.y()-pt2.y());
+    double d2 = _hypot(qpTarPix.x()-pt2.x(),qpTarPix.y()-pt2.y());
     QPointF pt3(qrFormuRect.left(),qrFormuRect.bottom());
-    double d3 = _hypot(qpTar.x()-pt3.x(),qpTar.y()-pt3.y());
+    double d3 = _hypot(qpTarPix.x()-pt3.x(),qpTarPix.y()-pt3.y());
     if (d1 < d0) {
         d0 = d1; pt0 = pt1;
     }
@@ -186,7 +131,7 @@ void QFormular::drawFormular(MapWidget *pMapWidget,
     if (d3 < d0) {
         d0 = d3; pt0 = pt3;
     }
-    painter.drawLine(qpTar,pt0);
+    painter.drawLine(qpTarPix,pt0);
     QPointF qpTxt(qrFormuRect.left(),qrFormuRect.top());
     qpTxt += QPointF(3.0,qrTxt.height()-3.0);
     // start actual grawing
@@ -195,5 +140,5 @@ void QFormular::drawFormular(MapWidget *pMapWidget,
     painter.drawRect(qrFormuRect);
     painter.drawText(qpTxt,qsMesg);
     // restore painter state
-    // painter.restore();
+    painter.restore();
 }

@@ -24,10 +24,12 @@ INCLUDEPATH += \
 HEADERS += \
     qtargetsmap.h \	
     qformular.h \
-    qtargetmarker.h
+    qtargetmarker.h \
+    mapwidget.h
 	
 SOURCES += \
     qtargetsmap.cpp \
     qformular.cpp \
-    qtargetmarker.cpp
+    qtargetmarker.cpp \
+    mapwidget.cpp
 #    ../../CPP_211/recipes/sort.cpp

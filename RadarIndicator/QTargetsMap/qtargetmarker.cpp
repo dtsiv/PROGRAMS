@@ -4,11 +4,10 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-QTargetMarker::QTargetMarker(double dX, double dY, QString qsMesg /* = QString() */, QObject *parent /* = 0 */)
+QTargetMarker::QTargetMarker(QPointF qpTarPhys, QString qsMesg /* = QString() */, QObject *parent /* = 0 */)
         : QObject(parent)
         , m_pFormular(NULL)
-        , m_dTarDPhys(dX)
-        , m_dTarVPhys(dY)
+        , m_qpTarPhys(qpTarPhys)
         , m_qsMesg(qsMesg) {
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,14 +33,36 @@ void QTargetMarker::setFormular(QFormular *pFormular) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-double QTargetMarker::x() {
-    return (m_dTarDPhys);
+void QTargetMarker::drawMarker(QPainter &painter, QTransform &t) {
+    // save painter state
+    painter.save();
+
+    // Position of target in pixels (view coordinates)
+    QPoint qpTarPix = (m_qpTarPhys * t).toPoint();
+    // target outside widget area - skip
+    QRect qrBounding=painter.window();
+    if (!qrBounding.contains(qpTarPix)) {
+        painter.restore(); return;
+    }
+
+    // Draw the marker
+    int iMarkerThickness=2;
+    QBrush qbMarker(Qt::darkRed,Qt::SolidPattern);
+    painter.setBrush(qbMarker);
+    QPen qpMarkerPen(qbMarker,iMarkerThickness,Qt::SolidLine,Qt::RoundCap);
+    painter.setPen(qpMarkerPen);
+    QPoint qpBranch(5,5);
+    painter.drawLine(qpTarPix-qpBranch,qpTarPix+qpBranch);
+    qpBranch=QPoint(5,-5);
+    painter.drawLine(qpTarPix-qpBranch,qpTarPix+qpBranch);
+    // restore painter state
+    painter.restore();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-double QTargetMarker::y() {
-    return (m_dTarVPhys);
+QPointF QTargetMarker::tar() {
+    return m_qpTarPhys;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

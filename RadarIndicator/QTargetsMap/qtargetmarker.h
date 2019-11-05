@@ -4,6 +4,8 @@
 #include <QtCore>
 #include <QtGlobal>
 #include <QObject>
+#include <QPoint>
+#include <QPainter>
 
 class QFormular;
 
@@ -11,12 +13,12 @@ class QTargetMarker : public QObject
 {
     Q_OBJECT
 public:
-    explicit QTargetMarker(double dX, double dY, QString qsMesg = QString(), QObject *parent = 0);
+    explicit QTargetMarker(QPointF qpTarPhys, QString qsMesg = QString(), QObject *parent = 0);
     ~QTargetMarker();
-    double x();
-    double y();
+    QPointF tar();
     bool hasFormular();
     void setFormular(QFormular *pFormular);
+    void drawMarker(QPainter &painter, QTransform &t);
     QString &mesgString();
 
 signals:
@@ -27,8 +29,8 @@ public slots:
 private:
     QFormular *m_pFormular;
     // physical coordinates of target
-    double m_dTarDPhys; // physical coordinate D (m) of target
-    double m_dTarVPhys; // physical coordinate V (m/s) of target
+    QPointF m_qpTarPhys; // physical coordinate D (m), V(m/s) of target
+    // comment on target
     QString m_qsMesg;
 };
 
