@@ -27,6 +27,7 @@ INCLUDEPATH += \
     ../QPropPages \
     ../QSqlModel \
     ../QTargetsMap \
+    ../QPoi \
     ../QExceptionDialog
 
 SOURCES += main.cpp
@@ -40,9 +41,10 @@ LIBS += -L..\lib \
     -lqproppages \
     -lqsqlmodel \
     -lqtargetsmap \
-    -lqexceptiondialog
+    -lqexceptiondialog \
+    -lqpoi
 
-LIBS += -L$$PWD/../../PostgreSQL_9.4_32bit \
+LIBS += \
     -lopengl32 \
     -lglu32
 

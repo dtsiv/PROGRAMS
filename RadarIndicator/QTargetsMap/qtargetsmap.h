@@ -15,6 +15,11 @@
 #define QTARGETSMAP_PROP_TAB_CAPTION    "Indicator grid"
 #define QTARGETSMAP_DOC_CAPTION         "Targets map"
 
+#define QTARGETSMAP_SCALE_D             "PixelsPerDistanceM"
+#define QTARGETSMAP_SCALE_V             "PixelsPerVelMpS"
+#define QTARGETSMAP_VIEW_D0             "DistanceOriginM"
+#define QTARGETSMAP_VIEW_V0             "VelOriginMpS"
+
 class QTargetsMap : public QObject {
 	Q_OBJECT
 

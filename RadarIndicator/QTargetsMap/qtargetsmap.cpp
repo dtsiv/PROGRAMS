@@ -21,13 +21,17 @@ QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
          , m_pSafeParams(NULL)
          , m_pOwner(pOwner)
          , m_pMouseStill(NULL) {
-    [[maybe_unused]] QIniSettings &iniSettings = QIniSettings::getInstance();
-    [[maybe_unused]] QIniSettings::STATUS_CODES scRes;
-    m_qlTargets << new QTargetMarker(QPointF(200,0),"SU2134");
-    m_qlTargets << new QTargetMarker(QPointF(150,20),"IR011");
-    m_qlTargets << new QTargetMarker(QPointF(350,-20),"IRA111");
-    // iniSettings.setDefault(SETTINGS_SOME_VALUE,"SoveValueDefault");
-    // m_qsSomeValue = iniSettings.value(SETTINGS_SOME_VALUE,scRes).toString();
+    QIniSettings &iniSettings = QIniSettings::getInstance();
+    QIniSettings::STATUS_CODES scRes;
+    iniSettings.setDefault(QTARGETSMAP_SCALE_D,2.0e0);
+    m_dScaleD = iniSettings.value(QTARGETSMAP_SCALE_D,scRes).toDouble();
+    iniSettings.setDefault(QTARGETSMAP_SCALE_V,2.0e0);
+    m_dScaleV = iniSettings.value(QTARGETSMAP_SCALE_V,scRes).toDouble();
+    iniSettings.setDefault(QTARGETSMAP_VIEW_D0,-20.0e0);
+    m_dViewD0 = iniSettings.value(QTARGETSMAP_VIEW_D0,scRes).toDouble();
+    iniSettings.setDefault(QTARGETSMAP_VIEW_V0,200.0e0);
+    m_dViewV0 = iniSettings.value(QTARGETSMAP_VIEW_V0,scRes).toDouble();
+    // periodic formulars update
     QObject::connect(&m_qtFormular,SIGNAL(timeout()),SLOT(onFormularTimeout()));
     m_qtFormular.start(m_iFormularDelay);
 }
@@ -39,8 +43,11 @@ QTargetsMap::~QTargetsMap() {
         delete m_pSafeParams;
         m_pSafeParams = 0;
     }
-    [[maybe_unused]] QIniSettings &iniSettings = QIniSettings::getInstance();
-    // iniSettings.setValue(SETTINGS_SOME_VALUE, m_qsSomeValue);
+    QIniSettings &iniSettings = QIniSettings::getInstance();
+    iniSettings.setValue(QTARGETSMAP_SCALE_D, m_dScaleD);
+    iniSettings.setValue(QTARGETSMAP_SCALE_V, m_dScaleV);
+    iniSettings.setValue(QTARGETSMAP_VIEW_D0, m_dViewD0);
+    iniSettings.setValue(QTARGETSMAP_VIEW_V0, m_dViewV0);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

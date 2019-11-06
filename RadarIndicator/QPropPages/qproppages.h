@@ -43,6 +43,8 @@ public slots:
 public:
     QLineEdit *m_pleDBFileName;
     QPushButton *m_pbAccept;
+    QLineEdit *m_pleFCarrier;
+    QLineEdit *m_pleTSampl;
 
 private:
     QObject *m_pOwner;

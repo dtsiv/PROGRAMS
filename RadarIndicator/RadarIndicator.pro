@@ -7,6 +7,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS = QExceptionDialog \
+          QPoi \
           QSqlModel \
           QPropPages \
           QIniSettings \

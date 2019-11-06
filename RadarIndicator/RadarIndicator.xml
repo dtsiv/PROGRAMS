@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
     <ActivePropertyPage>0</ActivePropertyPage>
-    <SQLiteFile>ChronicaParser.sqlite3</SQLiteFile>
-    <geometry>AAAAfAAAAFgAAAT3AAAC9Q==</geometry>
+    <CarrierFreqMHz>9500</CarrierFreqMHz>
+    <DistanceOriginM>-20</DistanceOriginM>
+    <PixelsPerDistanceM>2</PixelsPerDistanceM>
+    <PixelsPerVelMpS>2</PixelsPerVelMpS>
+    <SQLiteFile>../DATA/20191020/chronicaparser_00000007.sqlite3</SQLiteFile>
+    <TSamplingNanoSec>120</TSamplingNanoSec>
+    <VelOriginMpS>159</VelOriginMpS>
+    <geometry>AAAAfAAAAFgAAAU+AAADDw==</geometry>
 </PARAMETERS>

@@ -5,11 +5,14 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
       , m_pSqlModel(NULL)
       , m_pTargetsMap(NULL)
+      , m_pPoi(NULL)
       , m_pStopper(NULL)
       , settingsAct(NULL) {
     setWindowIcon(QIcon(QPixmap(":/Resources/spear.ico")));
     lbStatusArea=new QLabel(QString::fromLocal8Bit(CONN_STATUS_DISCONN));
     statusBar()->addPermanentWidget(lbStatusArea,1);
+    lbStatusMsg=new QLabel(QString::fromLocal8Bit("Press Control-P for settings"));
+    statusBar()->addPermanentWidget(lbStatusMsg);
 
     // settings object and main window adjustments
     QIniSettings &iniSettings = QIniSettings::getInstance();
@@ -39,6 +42,9 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
 
     m_pTargetsMap = new QTargetsMap(this);
     if (m_pTargetsMap) m_qlObjects << qobject_cast<QObject *> (m_pTargetsMap);
+
+    m_pPoi = new QPoi(this);
+    if (m_pPoi) m_qlObjects << qobject_cast<QObject *> (m_pPoi);
 
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,8 +82,14 @@ void QIndicatorWindow::initComponents() {
         pMapWidget->setFocusPolicy(Qt::StrongFocus);
         dock->setWidget(pMapWidget);
     }
-
     addDockWidget(Qt::RightDockWidgetArea, dock);
+
+    // connect to sqlite DB
+    if (m_pSqlModel->openDatabase()) {
+        lbStatusArea->setText(CONN_STATUS_SQLITE);
+    }
+
+    // time eater to display the stopper window
     while(qtCurr.msecsTo(QTime::currentTime())<STOPPER_MIN_DELAY_MSECS) {
         qApp->processEvents();
     }
@@ -92,6 +104,23 @@ void QIndicatorWindow::hideStopper() {
         m_pStopper = NULL;
     }
     setVisible(true);
+
+    //if (m_pSqlModel->execQuery()) {
+    //    for (int i=0; i<10; i++) {
+    //        int iStrob;
+    //        int iBeamCountsNum;
+    //        int iBeam;
+    //        qint64 iTimeStamp;
+    //        QByteArray baSamples;
+    //        QTime qtLastTuple = QTime::currentTime();
+    //        if (!m_pSqlModel->getTuple(iStrob, iBeamCountsNum, iBeam, iTimeStamp, baSamples)) break;
+    //        lbStatusArea->setText(QString(CONN_STATUS_SQLITE)+" "+QString::number(iStrob)+" "+QString::number(iBeam));
+    //        // time eater to display the stopper window
+    //        while(qtLastTuple.msecsTo(QTime::currentTime())<500) {
+    //           qApp->processEvents();
+    //        }
+    //    }
+    //}
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

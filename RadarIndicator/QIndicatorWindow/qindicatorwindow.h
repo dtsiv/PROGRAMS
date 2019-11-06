@@ -13,6 +13,7 @@
 #include "qproppages.h"
 #include "qsqlmodel.h"
 #include "qtargetsmap.h"
+#include "qpoi.h"
 
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
 
@@ -42,8 +43,8 @@ public:
 private:
     QList<QObject*> m_qlObjects;
     QSqlModel *m_pSqlModel;
-public:
     QTargetsMap *m_pTargetsMap;
+    QPoi *m_pPoi;
 private:
     QStopper *m_pStopper;
 
@@ -51,6 +52,7 @@ private:
 
     QRect qrPropDlgGeo;
     QLabel *lbStatusArea;
+    QLabel *lbStatusMsg;
 
 };
 

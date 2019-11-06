@@ -15,25 +15,14 @@ TEMPLATE = lib
 
 QMAKE_CXXFLAGS += /std:c++17
 
-INCLUDEPATH +=  \
-    ../QIniSettings \
+INCLUDEPATH += \
     ../QPropPages \
+    ../QIniSettings \
     ../QExceptionDialog \
-    ../QTargetsMap \
-    ../QSqlModel \
-    ../QPoi
-
-FORMS +=
-
-HEADERS += \
-    qindicatorwindow.h	
-	
-SOURCES += \
-    qindicatorwindow.cpp
-
-INCLUDEPATH +=  \
     ../include/nr2
 
-LIBS += \
-     -lopengl32 \
-     -lglu32
+HEADERS += \
+    qpoi.h
+	
+SOURCES += \
+    qpoi.cpp
