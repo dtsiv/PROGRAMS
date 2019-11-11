@@ -35,6 +35,7 @@ public:
 public slots:
     void hideStopper();
     void onSetup();
+    void onSimulationTimeout();
 
 public:
     void showStopper();
@@ -53,7 +54,7 @@ private:
     QRect qrPropDlgGeo;
     QLabel *lbStatusArea;
     QLabel *lbStatusMsg;
-
+    QTimer m_simulationTimer;
 };
 
 //*****************************************************************************

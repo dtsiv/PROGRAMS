@@ -15,6 +15,8 @@ TEMPLATE = lib
 
 QMAKE_CXXFLAGS += /std:c++17
 
+QMAKE_CXXFLAGS += /wd4018 /wd4244
+
 INCLUDEPATH += \
     ../QPropPages \
     ../QIniSettings \
@@ -22,7 +24,17 @@ INCLUDEPATH += \
     ../include/nr2
 
 HEADERS += \
+    qchrprotoacm.h \
     qpoi.h
 	
 SOURCES += \
-    qpoi.cpp
+    qpoi.cpp \
+    avevar.cpp \
+    betacf.cpp \
+    betai.cpp \
+    four1.cpp \
+    ftest.cpp \
+    gammln.cpp \
+    gasdev.cpp \
+    ran1.cpp \
+    sort.cpp

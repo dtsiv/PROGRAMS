@@ -8,7 +8,7 @@
 
 #include "qproppages.h"
 
-#define SETTINGS_SQLITE_FILE                    "SQLiteFile"
+#define QSQLMODEL_SQLITE_FILE                    "SQLiteFile"
 #define DATA_BASE_VERSION           "20191012"
 
 #define QSQLMODEL_PROP_TAB_CAPTION "DB connection"
@@ -25,7 +25,8 @@ public:
 
     bool openDatabase();
     bool execQuery();
-    bool getTuple(int &iStrob, int &iBeamCountsNum, int &iBeam, qint64 &iTimestamp, QByteArray &baSamples);
+    bool getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum, qint64 &iTimestamp);
+    bool getBeamData(quint64 &iRecId, int &iBeam, QByteArray &baSamples);
 
     Q_INVOKABLE void addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx);
     Q_INVOKABLE void propChanged(QObject *pPropDlg);

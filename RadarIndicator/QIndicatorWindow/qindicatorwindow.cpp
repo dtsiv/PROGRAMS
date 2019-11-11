@@ -46,6 +46,8 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     m_pPoi = new QPoi(this);
     if (m_pPoi) m_qlObjects << qobject_cast<QObject *> (m_pPoi);
 
+    // connect simulation timer
+    QObject::connect(&m_simulationTimer,SIGNAL(timeout()),SLOT(onSimulationTimeout()));
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -87,6 +89,7 @@ void QIndicatorWindow::initComponents() {
     // connect to sqlite DB
     if (m_pSqlModel->openDatabase()) {
         lbStatusArea->setText(CONN_STATUS_SQLITE);
+        if (m_pSqlModel->execQuery()) m_simulationTimer.start(100);
     }
 
     // time eater to display the stopper window
@@ -104,23 +107,40 @@ void QIndicatorWindow::hideStopper() {
         m_pStopper = NULL;
     }
     setVisible(true);
-
-    //if (m_pSqlModel->execQuery()) {
-    //    for (int i=0; i<10; i++) {
-    //        int iStrob;
-    //        int iBeamCountsNum;
-    //        int iBeam;
-    //        qint64 iTimeStamp;
-    //        QByteArray baSamples;
-    //        QTime qtLastTuple = QTime::currentTime();
-    //        if (!m_pSqlModel->getTuple(iStrob, iBeamCountsNum, iBeam, iTimeStamp, baSamples)) break;
-    //        lbStatusArea->setText(QString(CONN_STATUS_SQLITE)+" "+QString::number(iStrob)+" "+QString::number(iBeam));
-    //        // time eater to display the stopper window
-    //        while(qtLastTuple.msecsTo(QTime::currentTime())<500) {
-    //           qApp->processEvents();
-    //        }
-    //    }
-    //}
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QIndicatorWindow::onSimulationTimeout() {
+    int iStrob;
+    int iBeamCountsNum;
+    int iBeam;
+    qint64 iTimeStamp;
+    quint64 iRecId;
+    QByteArray baSamples;
+    // get next strob record guid from DB
+    if (!m_pSqlModel->getStrobRecord(iRecId, iStrob, iBeamCountsNum, iTimeStamp)) {
+        qDebug() << "getStrobRecord failed";
+        m_simulationTimer.stop();
+        return;
+    }
+    // list linked data records for beams
+    for (iBeam=0; iBeam<4; iBeam++) {
+        baSamples.clear();
+        if (!m_pSqlModel->getBeamData(iRecId, iBeam, baSamples)) {
+            qDebug() << "getBeamData failed";
+            m_simulationTimer.stop();
+            return;
+        }
+        QList<QPointF> qlTgts = m_pPoi->detectTargets(baSamples);
+        // if (!qlTgts.size()) qDebug() << "No tgts For strob,beam " << iStrob << " " << iBeam;
+        //if (qlTgts.size()) {
+        //    qDebug() << "fOUND tgts For strob,beam " << iStrob << " " << iBeam << " " << qlTgts.at(0);
+        //}
+        for (int i=0; i< qlTgts.size(); i++) {
+            m_pTargetsMap->addTargetMarker(new QTargetMarker(qlTgts.at(i),QString::number(iBeam)));
+        }
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

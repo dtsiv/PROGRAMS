@@ -11,15 +11,15 @@ QSqlModel::QSqlModel() : QObject(0)
         , m_qsDBFile("Uninitialized") {
     QIniSettings &iniSettings = QIniSettings::getInstance();
     QIniSettings::STATUS_CODES scRes;
-    iniSettings.setDefault(SETTINGS_SQLITE_FILE,"ChronicaParser.sqlite3");
-    m_qsDBFile = iniSettings.value(SETTINGS_SQLITE_FILE,scRes).toString();
+    iniSettings.setDefault(QSQLMODEL_SQLITE_FILE,"ChronicaParser.sqlite3");
+    m_qsDBFile = iniSettings.value(QSQLMODEL_SQLITE_FILE,scRes).toString();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QSqlModel::~QSqlModel() {
     QIniSettings &iniSettings = QIniSettings::getInstance();
-    iniSettings.setValue(SETTINGS_SQLITE_FILE, m_qsDBFile);
+    iniSettings.setValue(QSQLMODEL_SQLITE_FILE, m_qsDBFile);
     closeDatabase();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,12 +110,10 @@ bool QSqlModel::execQuery() {
     QSqlDatabase db = QSqlDatabase::database();
     if (!db.isOpen()) return false;
     m_query = QSqlQuery(db);
-    bOk=m_query.prepare("SELECT complexdata,seqnum,beam,ncnt,timestamp FROM"
+    bOk=m_query.prepare("SELECT s.id AS guid, s.seqnum, s.ncnt, f.timestamp FROM"
                     " strobs s LEFT JOIN files f ON f.id=s.fileid"
-                    " LEFT JOIN samples sa ON s.id=sa.strobid"
                     " ORDER BY s.seqnum ASC"
                     );
-    //    query.bindValue(":beam",iPlotSliceBeam);
     if (!bOk) return false;
     if (!m_query.exec()) return false;
     m_record = m_query.record();
@@ -124,20 +122,38 @@ bool QSqlModel::execQuery() {
 //======================================================================================================
 //
 //======================================================================================================
-bool QSqlModel::getTuple(int &iStrob, int &iBeamCountsNum, int &iBeam, qint64 &iTimestamp, QByteArray &baSamples) {
+bool QSqlModel::getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum, qint64 &iTimestamp) {
     bool bOk;
     if (!m_query.isActive()) return false;
     if (!m_query.next()) return false;
+    iRecId=m_query.value(m_record.indexOf("guid")).toInt(&bOk);
+    if (!bOk) return false;
     iStrob=m_query.value(m_record.indexOf("seqnum")).toInt(&bOk);
     if (!bOk) return false;
     iBeamCountsNum=m_query.value(m_record.indexOf("ncnt")).toInt(&bOk);
     if (!bOk) return false;
-    iBeam=m_query.value(m_record.indexOf("beam")).toInt(&bOk);
-    if (!bOk) return false;
     iTimestamp=m_query.value(m_record.indexOf("timestamp")).toLongLong(&bOk);
     if (!bOk) return false;
-    baSamples=m_query.value(m_record.indexOf("complexdata")).toByteArray();
     return true;
 }
-
+//======================================================================================================
+//
+//======================================================================================================
+bool QSqlModel::getBeamData(quint64 &iRecId, int &iBeam, QByteArray &baSamples) {
+    bool bOk;
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) return false;
+    QSqlQuery queryData = QSqlQuery(db);
+    bOk=queryData.prepare("SELECT sa.complexdata AS complexdata FROM"
+                    " samples sa WHERE sa.strobid = :strobid AND sa.beam = :beam");
+    if (!bOk) return false;
+    queryData.bindValue(":strobid",iRecId);
+    queryData.bindValue(":beam",iBeam);
+    if (!queryData.exec()) return false;
+    if (!queryData.next()) return false;
+    QSqlRecord recData = queryData.record();
+    baSamples = queryData.value(recData.indexOf("complexdata")).toByteArray();
+    if (queryData.next()) return false;
+    return true;
+}
 

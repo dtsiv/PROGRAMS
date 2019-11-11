@@ -32,6 +32,10 @@ private:
     QPointF m_qpTarPhys; // physical coordinate D (m), V(m/s) of target
     // comment on target
     QString m_qsMesg;
+    // beam
+    int m_iBeamNo;
+    // power
+    double m_dPower;
 };
 
 #endif // QTARGETMARKER_H

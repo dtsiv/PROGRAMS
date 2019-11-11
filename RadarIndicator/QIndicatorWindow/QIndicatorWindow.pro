@@ -21,7 +21,8 @@ INCLUDEPATH +=  \
     ../QExceptionDialog \
     ../QTargetsMap \
     ../QSqlModel \
-    ../QPoi
+    ../QPoi \
+    ../include/nr2
 
 FORMS +=
 

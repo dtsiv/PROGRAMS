@@ -38,6 +38,7 @@ private slots:
 
 public:
     MapWidget *getMapInstance();
+    void addTargetMarker(QTargetMarker* pTargetMarker);
 
 signals:
     void doUpdate();

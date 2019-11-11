@@ -28,6 +28,7 @@ INCLUDEPATH += \
     ../QSqlModel \
     ../QTargetsMap \
     ../QPoi \
+    ../include/nr2 \
     ../QExceptionDialog
 
 SOURCES += main.cpp

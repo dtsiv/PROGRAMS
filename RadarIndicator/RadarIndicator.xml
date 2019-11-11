@@ -2,11 +2,18 @@
 <PARAMETERS>
     <ActivePropertyPage>0</ActivePropertyPage>
     <CarrierFreqMHz>9500</CarrierFreqMHz>
-    <DistanceOriginM>-20</DistanceOriginM>
+    <DistanceOriginM>-18</DistanceOriginM>
     <PixelsPerDistanceM>2</PixelsPerDistanceM>
     <PixelsPerVelMpS>2</PixelsPerVelMpS>
     <SQLiteFile>../DATA/20191020/chronicaparser_00000007.sqlite3</SQLiteFile>
-    <TSamplingNanoSec>120</TSamplingNanoSec>
-    <VelOriginMpS>159</VelOriginMpS>
-    <geometry>AAAAfAAAAFgAAAU+AAADDw==</geometry>
+    <TSamplingNanoSec>0.12</TSamplingNanoSec>
+    <VelOriginMpS>163.5</VelOriginMpS>
+    <falseAlarmProb>1e-08</falseAlarmProb>
+    <geometry>AAAAwgAAAFYAAAWEAAADDQ==</geometry>
+    <pathIntfMap>../DATA/20191020/intfmap_20191020.dat</pathIntfMap>
+    <periodsPerBatch>1024</periodsPerBatch>
+    <recordedSamplesPerPeriod>80</recordedSamplesPerPeriod>
+    <samplesPerPeriod>200</samplesPerPeriod>
+    <samplesPerPulse>8</samplesPerPulse>
+    <threshold>30</threshold>
 </PARAMETERS>

@@ -39,10 +39,13 @@ QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QTargetsMap::~QTargetsMap() {
+    // delete previously allocated dynamic objects
     if (m_pSafeParams) {
         delete m_pSafeParams;
         m_pSafeParams = 0;
     }
+    while (m_qlTargets.count()) delete m_qlTargets.takeLast();
+    // save module settings
     QIniSettings &iniSettings = QIniSettings::getInstance();
     iniSettings.setValue(QTARGETSMAP_SCALE_D, m_dScaleD);
     iniSettings.setValue(QTARGETSMAP_SCALE_V, m_dScaleV);
@@ -473,4 +476,11 @@ void QTargetsMap::zoomMap([[maybe_unused]]MapWidget *pMapWidget, int iX, int iY,
         delete m_pMouseStill;
         m_pMouseStill = NULL;
     }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::addTargetMarker(QTargetMarker* pTargetMarker) {
+    if (pTargetMarker) m_qlTargets.append(pTargetMarker);
+    emit doUpdate();
 }
