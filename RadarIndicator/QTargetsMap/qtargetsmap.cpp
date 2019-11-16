@@ -13,14 +13,19 @@ const quint64 QTargetsMap::m_iFormularDelay = 1000;
 QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
          : QObject(0)
          , m_dScaleD(2.0e0)
-         , m_dMaxScaleD(10.0e0)
+         , m_dMaxScaleD(QTARGETSMAP_MAXSCALED)
+         , m_dMinScaleD(QTARGETSMAP_MINSCALED)
          , m_dScaleV(2.0e0)
-         , m_dMaxScaleV(10.0e0)
+         , m_dMaxScaleV(QTARGETSMAP_MAXSCALEV)
+         , m_dMinScaleV(QTARGETSMAP_MINSCALEV)
          , m_dViewD0(-20)
          , m_dViewV0(200)
+         , m_dDGridStep(20.0e0)
+         , m_dVGridStep(20.0e0)
          , m_pSafeParams(NULL)
          , m_pOwner(pOwner)
-         , m_pMouseStill(NULL) {
+         , m_pMouseStill(NULL)
+         , m_bAdaptiveGridStep(false) {
     QIniSettings &iniSettings = QIniSettings::getInstance();
     QIniSettings::STATUS_CODES scRes;
     iniSettings.setDefault(QTARGETSMAP_SCALE_D,2.0e0);
@@ -29,8 +34,15 @@ QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
     m_dScaleV = iniSettings.value(QTARGETSMAP_SCALE_V,scRes).toDouble();
     iniSettings.setDefault(QTARGETSMAP_VIEW_D0,-20.0e0);
     m_dViewD0 = iniSettings.value(QTARGETSMAP_VIEW_D0,scRes).toDouble();
-    iniSettings.setDefault(QTARGETSMAP_VIEW_V0,200.0e0);
+    iniSettings.setDefault(QTARGETSMAP_VIEW_V0,150.0e0);
     m_dViewV0 = iniSettings.value(QTARGETSMAP_VIEW_V0,scRes).toDouble();
+    iniSettings.setDefault(QTARGETSMAP_ADAPT_GRD_STEP,false);
+    m_bAdaptiveGridStep = iniSettings.value(QTARGETSMAP_ADAPT_GRD_STEP,scRes).toBool();
+    iniSettings.setDefault(QTARGETSMAP_GRD_STEP_D,20.0e0);
+    m_dDGridStep = iniSettings.value(QTARGETSMAP_GRD_STEP_D,scRes).toDouble();
+    iniSettings.setDefault(QTARGETSMAP_GRD_STEP_V,20.0e0);
+    m_dVGridStep = iniSettings.value(QTARGETSMAP_GRD_STEP_V,scRes).toDouble();
+
     // periodic formulars update
     QObject::connect(&m_qtFormular,SIGNAL(timeout()),SLOT(onFormularTimeout()));
     m_qtFormular.start(m_iFormularDelay);
@@ -51,6 +63,9 @@ QTargetsMap::~QTargetsMap() {
     iniSettings.setValue(QTARGETSMAP_SCALE_V, m_dScaleV);
     iniSettings.setValue(QTARGETSMAP_VIEW_D0, m_dViewD0);
     iniSettings.setValue(QTARGETSMAP_VIEW_V0, m_dViewV0);
+    iniSettings.setValue(QTARGETSMAP_ADAPT_GRD_STEP, m_bAdaptiveGridStep);
+    iniSettings.setValue(QTARGETSMAP_GRD_STEP_D, m_dDGridStep);
+    iniSettings.setValue(QTARGETSMAP_GRD_STEP_V, m_dVGridStep);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -82,14 +97,19 @@ void QTargetsMap::onFormularTimeout() {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
-    [[maybe_unused]] QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
+    QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
     QTabWidget *pTabWidget = qobject_cast<QTabWidget *> (pPropTabs);
 
     QWidget *pWidget=new QWidget;
-    [[maybe_unused]] QHBoxLayout *pHLayout=new QHBoxLayout;
-    pHLayout->addWidget(new QLabel("Grid settings here..."));
+    QGridLayout *pGridLayout=new QGridLayout;
+    pGridLayout->addWidget(new QLabel("Grid step"),0,0);
+    pPropPages->m_pcbAdaptiveGrid = new QCheckBox("adaptive");
+    pPropPages->m_pcbAdaptiveGrid->setChecked(m_bAdaptiveGridStep);
+    pGridLayout->addWidget(pPropPages->m_pcbAdaptiveGrid,0,1);
+
+    pGridLayout->setColumnStretch(2,100);
     QVBoxLayout *pVLayout=new QVBoxLayout;
-    pVLayout->addLayout(pHLayout);
+    pVLayout->addLayout(pGridLayout);
     pVLayout->addStretch();
     pWidget->setLayout(pVLayout);
     pTabWidget->insertTab(iIdx,pWidget,QTARGETSMAP_PROP_TAB_CAPTION);
@@ -98,8 +118,9 @@ void QTargetsMap::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::propChanged(QObject *pPropDlg) {
-    [[maybe_unused]] QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
-    // m_qsSomeValue = pPropPages->m_pleSomeValue->text();
+    QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
+    // assign new prop values
+    m_bAdaptiveGridStep = pPropPages->m_pcbAdaptiveGrid->isChecked();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -125,15 +146,25 @@ void QTargetsMap::onExceptionDialogClosed() {
         delete m_pMouseStill;
         m_pMouseStill = NULL;
     }
-    if (m_pSafeParams) {
-        m_dViewD0 = m_pSafeParams->dViewD0;
-        m_dViewV0 = m_pSafeParams->dViewV0;
-        m_dScaleD = m_pSafeParams->dScaleD;
-        m_dScaleV = m_pSafeParams->dScaleV;
-        // clear last error message
-        m_qsLastError.clear();
-        emit doUpdate();
+    if (!m_pSafeParams) {
+        m_pSafeParams = new struct GridSafeParams;
+        QIniSettings &iniSettings = QIniSettings::getInstance();
+        m_pSafeParams->dViewD0    = iniSettings.getDefault(QTARGETSMAP_VIEW_D0).toDouble();
+        m_pSafeParams->dViewV0    = iniSettings.getDefault(QTARGETSMAP_VIEW_V0).toDouble();
+        m_pSafeParams->dScaleD    = iniSettings.getDefault(QTARGETSMAP_SCALE_D).toDouble();
+        m_pSafeParams->dScaleV    = iniSettings.getDefault(QTARGETSMAP_SCALE_V).toDouble();
+        m_pSafeParams->dDGridStep = iniSettings.getDefault(QTARGETSMAP_GRD_STEP_D).toDouble();
+        m_pSafeParams->dVGridStep = iniSettings.getDefault(QTARGETSMAP_GRD_STEP_V).toDouble();
     }
+    m_dViewD0    = m_pSafeParams->dViewD0;
+    m_dViewV0    = m_pSafeParams->dViewV0;
+    m_dScaleD    = m_pSafeParams->dScaleD;
+    m_dScaleV    = m_pSafeParams->dScaleV;
+    m_dDGridStep = m_pSafeParams->dDGridStep;
+    m_dVGridStep = m_pSafeParams->dVGridStep;
+    // clear last error message
+    m_qsLastError.clear();
+    emit doUpdate();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -174,10 +205,12 @@ void QTargetsMap::shiftView(QPoint qpShift) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::resetScale() {
     if (m_pSafeParams) {
-        m_dScaleD = m_pSafeParams->dScaleD;
-        m_dScaleV = m_pSafeParams->dScaleV;
-        m_dViewD0 = m_pSafeParams->dViewD0;
-        m_dViewV0 = m_pSafeParams->dViewV0;
+        m_dScaleD    = m_pSafeParams->dScaleD;
+        m_dScaleV    = m_pSafeParams->dScaleV;
+        m_dViewD0    = m_pSafeParams->dViewD0;
+        m_dViewV0    = m_pSafeParams->dViewV0;
+        m_dDGridStep = m_pSafeParams->dDGridStep;
+        m_dVGridStep = m_pSafeParams->dVGridStep;
     }
     // some QWidget shifts/rescales destry last mouse location
     if (m_pMouseStill) {
@@ -239,12 +272,9 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     int iMargin = 2;
     int iLeftMargin = 2;
     QColor qcGridColor(Qt::darkGray);
-    // grid steps, dimensional
-    double dVGridStep=20.0e0; // m/s
-    double dDGridStep=20.0e0;  // m
     // grid steps in pixels
-    double dVGridStepPix=dVGridStep*m_dScaleV;
-    double dDGridStepPix=dDGridStep*m_dScaleD;
+    double dVGridStepPix=m_dVGridStep*m_dScaleV;
+    double dDGridStepPix=m_dDGridStep*m_dScaleD;
     int iGridThickness = 1;
     int iAxisThickness = 2;
     int iTickLabelSize=8;
@@ -288,7 +318,7 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     int iToY  =qRound((-dY1+dViewV0Pix)/dVGridStepPix-0.5e0);  // Y1 is upper border
 
     // Limitation on too dense grid
-    int iGridMaxTicks=200;
+    int iGridMaxTicks=QTARGETSMAP_TICKS_OVERFLOW;
     // if inappropriate magnification then skip
     if (   (iToY-iFromY)<1
         || (iToX-iFromX)<1
@@ -296,6 +326,7 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
         || (iToX-iFromX+1)>iGridMaxTicks) {
         m_qsLastError = QString("Grid size illegal: %1 x %2").arg(iToX-iFromX).arg(iToY-iFromY);
         painter.restore();
+        qDebug() << "m_qsLastError = " << m_qsLastError;
         return false;
     }
 
@@ -304,17 +335,17 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     int iMaxWidthX,iSomeWidthX;
     int iMaxWidthY,iSomeWidthY;
     QString qsSomeLabel;
-    qsSomeLabel=QString::number(iFromX*dDGridStep,'f',0);
+    qsSomeLabel=QString::number(iFromX*m_dDGridStep,'f',0);
     iMaxWidthX=fmTickLabel.width(qsSomeLabel);
-    qsSomeLabel=QString::number(iFromY*dVGridStep,'f',0);
+    qsSomeLabel=QString::number(iFromY*m_dVGridStep,'f',0);
     iMaxWidthY=fmTickLabel.width(qsSomeLabel);
     for (i=iFromX; i<=iToX; i++) {
-        qsSomeLabel=QString::number(i*dDGridStep,'f',0);
+        qsSomeLabel=QString::number(i*m_dDGridStep,'f',0);
         iSomeWidthX=fmTickLabel.width(qsSomeLabel);
         iMaxWidthX=(iSomeWidthX>iMaxWidthX)?iSomeWidthX:iMaxWidthX;
     }
     for (i=iFromY; i<=iToY; i++) {
-        qsSomeLabel=QString::number(i*dVGridStep,'f',0);
+        qsSomeLabel=QString::number(i*m_dVGridStep,'f',0);
         iSomeWidthY=fmTickLabel.width(qsSomeLabel);
         iMaxWidthY=(iSomeWidthY>iMaxWidthY)?iSomeWidthY:iMaxWidthY;
     }
@@ -328,11 +359,13 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     if ( (iToX-iFromX)*iMaxWidthX > iWidth ) {
         m_qsLastError = QString("No room for X labels");
         painter.restore();
+        qDebug() << "m_qsLastError = " << m_qsLastError;
         return false;
     }
     if ( (iToX-iFromX)<1 || (iToY-iFromY)<1 ) {
         m_qsLastError = QString("Grid size illegal: %1 x %2").arg(iToX-iFromX).arg(iToY-iFromY);
         painter.restore();
+        qDebug() << "m_qsLastError = " << m_qsLastError;
         return false;
     }
 
@@ -354,7 +387,7 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     for (i=iFromX; i<=iToX; i++) {
         dXCur=dViewD0Pix+i*dDGridStepPix;
         if (dXCur<0 || dXCur>iWidth) continue;
-        QString qsLabel=QString::number(i*dDGridStep,'f',0);
+        QString qsLabel=QString::number(i*m_dDGridStep,'f',0);
         int iLabelWidth=fmTickLabel.width(qsLabel);
         painter.drawText(dXCur-iLabelWidth/2,
                          dGridTop-iLabelHeight-iTickLabelOffsetY+fmTickLabel.ascent(),
@@ -376,7 +409,7 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     for (i=iFromY; i<=iToY; i++) {
         dYCur=dViewV0Pix-i*dVGridStepPix;
         if (dYCur<0 || dYCur>iHeight) continue;
-        QString qsLabel=QString::number(i*dVGridStep,'f',0);
+        QString qsLabel=QString::number(i*m_dVGridStep,'f',0);
         int iLabelWidth=fmTickLabel.width(qsLabel);
         painter.drawText(dGridLeft-iTickLabelOffsetX-iLabelWidth,
                          dYCur-iLabelHeight/2.0+fmTickLabel.ascent(),
@@ -397,10 +430,12 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     }
     if (!m_pSafeParams) {
         m_pSafeParams = new struct GridSafeParams;
-        m_pSafeParams->dViewD0 = m_dViewD0;
-        m_pSafeParams->dViewV0 = m_dViewV0;
-        m_pSafeParams->dScaleD = m_dScaleD;
-        m_pSafeParams->dScaleV = m_dScaleV;
+        m_pSafeParams->dViewD0    = m_dViewD0;
+        m_pSafeParams->dViewV0    = m_dViewV0;
+        m_pSafeParams->dScaleD    = m_dScaleD;
+        m_pSafeParams->dScaleV    = m_dScaleV;
+        m_pSafeParams->dDGridStep = m_dDGridStep;
+        m_pSafeParams->dVGridStep = m_dVGridStep;
     }
     // pop painter settings from stack
     painter.restore();
@@ -409,9 +444,17 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QTargetsMap::zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn /* = true */ ) {
+void QTargetsMap::zoomMap(MapWidget *pMapWidget, bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn /* = true */ ) {
     // no operations in error state
     if (!m_qsLastError.isEmpty()) return;
+
+    // widget center
+    QRect qrWidgetSize = pMapWidget->geometry();
+    int iXC = qrWidgetSize.width()/2;
+    int iYC = qrWidgetSize.height()/2;
+    // vector (phy coordinates) from widget center to physical coordinate origin
+    double dVecX = -m_dViewD0 - iXC/m_dScaleD;
+    double dVecY = -m_dViewV0 + iYC/m_dScaleV;
 
     double dMultiplier;
     double dLastVal;
@@ -421,16 +464,47 @@ void QTargetsMap::zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn /* = 
     else {
         dMultiplier = 1/1.1;
     }
+    // distance zoom
     if (bZoomAlongD) {
         dLastVal = m_dScaleD;
         m_dScaleD *= dMultiplier;
-        if (m_dScaleD >= m_dMaxScaleD) m_dScaleD = dLastVal;
+        // protect from too large zoom
+        if (m_dScaleD >= m_dMaxScaleD || m_dScaleD <= m_dMinScaleD) m_dScaleD = dLastVal;
+        // use adaptive grid step
+        if (m_bAdaptiveGridStep) {
+            double dDGridStepPix=m_dDGridStep*m_dScaleD;
+            int iWidgetWidth = qrWidgetSize.width();
+            if (dDGridStepPix * QTARGETSMAP_MINTICKS > iWidgetWidth) {
+                m_dDGridStep*=0.5e0;
+            }
+            else if (dDGridStepPix * QTARGETSMAP_MAXTICKS < iWidgetWidth) {
+                m_dDGridStep*=2.0e0;
+            }
+        }
     }
+    // velocity zoom
     if (bZoomAlongV) {
         dLastVal = m_dScaleV;
         m_dScaleV *= dMultiplier;
-        if (m_dScaleV >= m_dMaxScaleV) m_dScaleV = dLastVal;
+        // protect from too large zoom
+        if (m_dScaleV >= m_dMaxScaleV || m_dScaleV <= m_dMinScaleV) m_dScaleV = dLastVal;
+        // use adaptive grid step
+        if (m_bAdaptiveGridStep) {
+            double dVGridStepPix=m_dVGridStep*m_dScaleV;
+            int iWidgetHeight = qrWidgetSize.height();
+            if (dVGridStepPix * QTARGETSMAP_MINTICKS > iWidgetHeight) {
+                m_dVGridStep*=0.5e0;
+            }
+            else if (dVGridStepPix * QTARGETSMAP_MAXTICKS < iWidgetHeight) {
+                m_dVGridStep*=2.0e0;
+            }
+        }
     }
+
+    // (dimensional) coordinate of widget (0,0) relative to physical coordinate origin, physical coordinate system
+    m_dViewD0 = -iXC/m_dScaleD - dVecX;
+    m_dViewV0 =  iYC/m_dScaleV - dVecY;
+
     // some QWidget shifts/rescales destroy last mouse location
     if (m_pMouseStill) {
         delete m_pMouseStill;
@@ -440,15 +514,14 @@ void QTargetsMap::zoomMap(bool bZoomAlongD, bool bZoomAlongV, bool bZoomIn /* = 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QTargetsMap::zoomMap([[maybe_unused]]MapWidget *pMapWidget, int iX, int iY, bool bZoomIn /*= true*/) {
+void QTargetsMap::zoomMap(MapWidget *pMapWidget, int iX, int iY, bool bZoomIn /*= true*/) {
     // no operations in error state
     if (!m_qsLastError.isEmpty()) return;
-    // Position of physical coordinate origin in pixels (view coordinates)
-    double dViewD0Pix = - m_dViewD0 * m_dScaleD;
-    double dViewV0Pix = + m_dViewV0 * m_dScaleV;
-    // vector (in pixels) from mouse location to physical coordinate origin
-    double dVecX = dViewD0Pix - iX;
-    double dVecY = dViewV0Pix - iY;
+
+    QRect qrWidgetSize = pMapWidget->geometry();
+    // vector (phy coordinates) from mouse pointer to physical coordinate origin
+    double dVecX = -m_dViewD0 - iX/m_dScaleD;
+    double dVecY = -m_dViewV0 + iY/m_dScaleV;
     // scaling factor
     double dMultiplier;
     if (bZoomIn) {
@@ -460,16 +533,37 @@ void QTargetsMap::zoomMap([[maybe_unused]]MapWidget *pMapWidget, int iX, int iY,
     double dLastValD = m_dScaleD;
     double dLastValV = m_dScaleV;
     m_dScaleD *= dMultiplier; m_dScaleV *= dMultiplier;
-    if (m_dScaleD >= m_dMaxScaleD || m_dScaleV >= m_dMaxScaleV || abs(m_dScaleD)+abs(m_dScaleV) < 1.0e-8) {
+    // protect from too large scale
+    if (m_dScaleD >= m_dMaxScaleD || m_dScaleV >= m_dMaxScaleV
+     || m_dScaleD <= m_dMinScaleD || m_dScaleV <= m_dMinScaleV) {
         m_dScaleD = dLastValD; m_dScaleV = dLastValV;
         return;
     }
-    // scaling factor
-    dViewD0Pix = iX + dVecX*dMultiplier;
-    dViewV0Pix = iY + dVecY*dMultiplier;
-    // physical coordinate origin (dimensional)
-    m_dViewD0 = -dViewD0Pix / m_dScaleD;
-    m_dViewV0 =  dViewV0Pix / m_dScaleV;
+    // adapt grid step size
+    if (m_bAdaptiveGridStep) {
+        double dDGridStepPix=m_dDGridStep*m_dScaleD;
+        double dVGridStepPix=m_dVGridStep*m_dScaleV;
+        int iWidgetWidth = qrWidgetSize.width();
+        int iWidgetHeight = qrWidgetSize.height();
+        // adapt distance grid
+        if (dDGridStepPix * QTARGETSMAP_MINTICKS > iWidgetWidth) {
+            m_dDGridStep*=0.5e0;
+        }
+        else if (dDGridStepPix * QTARGETSMAP_MAXTICKS < iWidgetWidth) {
+            m_dDGridStep*=2.0e0;
+        }
+        // adapt velocity grid
+        if (dVGridStepPix * QTARGETSMAP_MINTICKS > iWidgetHeight) {
+            m_dVGridStep*=0.5e0;
+        }
+        else if (dVGridStepPix * QTARGETSMAP_MAXTICKS < iWidgetHeight) {
+            m_dVGridStep*=2.0e0;
+        }
+    }
+
+    // (dimensional) coordinate of widget (0,0) relative to physical coordinate origin, physical coordinate system
+    m_dViewD0 = -iX/m_dScaleD - dVecX;
+    m_dViewV0 =  iY/m_dScaleV - dVecY;
 
     // some QWidget shifts/rescales destroy last mouse location
     if (m_pMouseStill) {

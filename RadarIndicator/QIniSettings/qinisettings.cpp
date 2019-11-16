@@ -125,6 +125,12 @@ void QIniSettings::setDefault(const QString &key, const QVariant &value) {
 //========================================================================
 //
 //========================================================================
+QVariant QIniSettings::getDefault(const QString &key) {
+    return m_qmParamDefaults.value(key);
+}
+//========================================================================
+//
+//========================================================================
 void QIniSettings::setDefault(const QMap<QString,QVariant> &qmNewDefaults) {
     QMapIterator<QString,QVariant> i(qmNewDefaults);
     while (i.hasNext()) {

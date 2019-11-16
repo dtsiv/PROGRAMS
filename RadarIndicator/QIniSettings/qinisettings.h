@@ -41,6 +41,7 @@ public:
     void setDefault(const QString &key, const QVariant &value);
     void setDefault(const QMap<QString,QVariant> &qmNewDefaults);
     void setValue(const QString &key, const QVariant &value);
+    QVariant getDefault(const QString &key);
 };
 
 #endif // QINISETTINGS_H

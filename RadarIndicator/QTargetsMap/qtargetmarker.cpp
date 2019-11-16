@@ -38,9 +38,12 @@ void QTargetMarker::drawMarker(QPainter &painter, QTransform &t) {
     painter.save();
 
     // Position of target in pixels (view coordinates)
+    // qDebug() << "m_qpTarPhys = " << m_qpTarPhys;
     QPoint qpTarPix = (m_qpTarPhys * t).toPoint();
+    // qDebug() << "qpTarPix = " << qpTarPix;
     // target outside widget area - skip
     QRect qrBounding=painter.window();
+    // qDebug() << "qrBounding = " << qrBounding;
     if (!qrBounding.contains(qpTarPix)) {
         painter.restore(); return;
     }

@@ -15,7 +15,7 @@ using namespace std;
 
 #define QPOI_PROP_TAB_CAPTION    "POI"
 
-#define QPOI_SAMPLING_TIME_NSEC             "TSamplingNanoSec"
+#define QPOI_SAMPLING_TIME_USEC             "TSamplingMicroSec"
 #define QPOI_CARRIER_FREQUENCY              "CarrierFreqMHz"
 #define QPOI_INTFMAP                        "pathIntfMap"
 // samples per puls

@@ -21,8 +21,8 @@ QPoi::QPoi(QObject *parent)
     QIniSettings::STATUS_CODES scRes;
     iniSettings.setDefault(QPOI_CARRIER_FREQUENCY,9500.0e0);
     m_dCarrierF = iniSettings.value(QPOI_CARRIER_FREQUENCY,scRes).toDouble();
-    iniSettings.setDefault(QPOI_SAMPLING_TIME_NSEC,0.120e0);
-    m_dTs = iniSettings.value(QPOI_SAMPLING_TIME_NSEC,scRes).toDouble();
+    iniSettings.setDefault(QPOI_SAMPLING_TIME_USEC,0.120e0);
+    m_dTs = iniSettings.value(QPOI_SAMPLING_TIME_USEC,scRes).toDouble();
     iniSettings.setDefault(QPOI_INTFMAP,"intfmap.dat");
     QString qsIntfMapFName = iniSettings.value(QPOI_INTFMAP,scRes).toString();
     m_pIntfMap = new QIntfMap(qsIntfMapFName);
@@ -60,7 +60,7 @@ QPoi::QPoi(QObject *parent)
 QPoi::~QPoi() {
     QIniSettings &iniSettings = QIniSettings::getInstance();
     iniSettings.setValue(QPOI_CARRIER_FREQUENCY, m_dCarrierF);
-    iniSettings.setValue(QPOI_SAMPLING_TIME_NSEC, m_dTs);
+    iniSettings.setValue(QPOI_SAMPLING_TIME_USEC, m_dTs);
     if (m_pIntfMap) iniSettings.setValue(QPOI_INTFMAP, m_pIntfMap->m_qsIntfMapFName);
     iniSettings.setValue(QPOI_NP, Np);
     iniSettings.setValue(QPOI_NTAU, Ntau);
@@ -83,8 +83,8 @@ void QPoi::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     pPropPages->m_pleFCarrier = new QLineEdit(QString::number(m_dCarrierF,'f',0));;
     pGridLayout->addWidget(pPropPages->m_pleFCarrier,0,1);
 
-    pGridLayout->addWidget(new QLabel("Sampling time (ns)"),1,0);
-    pPropPages->m_pleTSampl = new QLineEdit(QString::number(m_dTs,'f',0));;
+    pGridLayout->addWidget(new QLabel("Sampling time (microsec)"),1,0);
+    pPropPages->m_pleTSampl = new QLineEdit(QString::number(m_dTs,'f',3));;
     pGridLayout->addWidget(pPropPages->m_pleTSampl,1,1);
 
     pGridLayout->setColumnStretch(2,100);

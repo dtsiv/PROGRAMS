@@ -109,7 +109,7 @@ void MapWidget::resizeGL([[maybe_unused]]int w, [[maybe_unused]]int h) {
         }
         bool bZoomAlongD = true;
         bool bZoomAlongV = true;
-        m_pOwner->zoomMap(bZoomAlongD, bZoomAlongV, bMagnify);
+        m_pOwner->zoomMap(this, bZoomAlongD, bZoomAlongV, bMagnify);
         repaint();
         return;
     }
@@ -159,7 +159,7 @@ void MapWidget::resizeGL([[maybe_unused]]int w, [[maybe_unused]]int h) {
         int iKey = pe->key();
         bool bZoomAlongD = (kbmZoomAlong & Qt::ShiftModifier);
         bool bZoomIn = ((iKey==Qt::Key_Plus) || (iKey==Qt::Key_Equal));
-        m_pOwner->zoomMap(bZoomAlongD, !bZoomAlongD, bZoomIn);
+        m_pOwner->zoomMap(this, bZoomAlongD, !bZoomAlongD, bZoomIn);
         repaint();
         return;
     }

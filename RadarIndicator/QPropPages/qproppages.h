@@ -45,6 +45,7 @@ public:
     QPushButton *m_pbAccept;
     QLineEdit *m_pleFCarrier;
     QLineEdit *m_pleTSampl;
+    QCheckBox *m_pcbAdaptiveGrid;
 
 private:
     QObject *m_pOwner;
