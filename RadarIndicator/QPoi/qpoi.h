@@ -31,6 +31,9 @@ using namespace std;
 // false alarm probability
 #define QPOI_PFALARM                        "falseAlarmProb"
 
+#define QPOI_NUMBER_OF_BEAMS                4
+#define QPOI_MAXIMUM_TG_MISMATCH            10
+
 class QIntfMap;
 
 class QPoi : public QObject {
@@ -42,8 +45,16 @@ public:
     Q_INVOKABLE void addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx);
     Q_INVOKABLE void propChanged(QObject *pPropDlg);
 
-    QList<QPointF> detectTargets(QByteArray &baSamples);
+    bool detectTargets(QByteArray &baSamples, QByteArray &baStrTargets, int &nTargets);
 
+    struct sTarget {
+        unsigned int uCandNum;   // number of candidates attributed to this target
+        QPointF      qpf_wei;    // (dimensional) mass center for target delay index l, Doppler index k (0,...,NFFT)
+                                 // weighted over candidates (with y2mc) and multiplied by dDistCoef, dVelCoef
+        double       y2mc_sum;   // total energy of target
+        QPoint       qp_rep;     // representative candidate resolution element (lc_rep, kc_rep)
+        double       y2mc_rep;   // energy for representative candidate
+    };
 
 signals:
 

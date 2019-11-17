@@ -46,6 +46,7 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     m_pPoi = new QPoi(this);
     if (m_pPoi) m_qlObjects << qobject_cast<QObject *> (m_pPoi);
 
+    m_qfPeleng.setFileName("peleng.dat");
     // connect simulation timer
     QObject::connect(&m_simulationTimer,SIGNAL(timeout()),SLOT(onSimulationTimeout()));
 }
@@ -64,6 +65,8 @@ QIndicatorWindow::~QIndicatorWindow() {
         QObject *pObj=m_qlObjects.at(i);
         if (pObj) delete pObj; // need to check destructor, check order of objects in QList!
     }
+
+    if (m_qfPeleng.isOpen()) m_qfPeleng.close();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -112,35 +115,101 @@ void QIndicatorWindow::hideStopper() {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QIndicatorWindow::onSimulationTimeout() {
+    quint64 iRecId;
     int iStrob;
     int iBeamCountsNum;
-    int iBeam;
     qint64 iTimeStamp;
-    quint64 iRecId;
-    QByteArray baSamples;
+    static bool bStarted=false;
+
     // get next strob record guid from DB
     if (!m_pSqlModel->getStrobRecord(iRecId, iStrob, iBeamCountsNum, iTimeStamp)) {
         qDebug() << "getStrobRecord failed";
         m_simulationTimer.stop();
         return;
     }
+    // raw data array
+    QByteArray baSamples;
     // list linked data records for beams
-    for (iBeam=0; iBeam<4; iBeam++) {
+    QList<QByteArray> ql_baTarForBeam;
+    QList<int> ql_nTargets;
+    for (int iBeam=0; iBeam<QPOI_NUMBER_OF_BEAMS; iBeam++) {
         baSamples.clear();
         if (!m_pSqlModel->getBeamData(iRecId, iBeam, baSamples)) {
             qDebug() << "getBeamData failed";
             m_simulationTimer.stop();
             return;
         }
-        QList<QPointF> qlTgts = m_pPoi->detectTargets(baSamples);
-        // if (!qlTgts.size()) qDebug() << "No tgts For strob,beam " << iStrob << " " << iBeam;
-        //if (qlTgts.size()) {
-        //    qDebug() << "fOUND tgts For strob,beam " << iStrob << " " << iBeam << " " << qlTgts.at(0);
+
+        ql_baTarForBeam.append(QByteArray());
+        ql_nTargets.append(0);
+        if (ql_baTarForBeam.size()-1>iBeam || ql_nTargets.size()-1>iBeam) { // redundant check of list size
+            qDebug() << "list size mismatch";
+            m_simulationTimer.stop();
+            return;
+        }
+        QByteArray baStrTargets;
+        int nTargets;
+        if (!m_pPoi->detectTargets(baSamples, baStrTargets, nTargets)) {
+            // qDebug() << "detectTargets failed: " << iStrob << " " << iBeam;
+            continue;
+        }
+        ql_nTargets[iBeam] = nTargets;
+        ql_baTarForBeam[iBeam] = baStrTargets;
+        if (baStrTargets.size()!=nTargets*sizeof(struct QPoi::sTarget)) {
+            qDebug() << "struct size mismatch: " << baStrTargets.size() << " " << nTargets*sizeof(struct QPoi::sTarget);
+            m_simulationTimer.stop();
+            return;
+        }
+        //for (int i=0; i< qlTgts.size(); i++) {
+        //    m_pTargetsMap->addTargetMarker(new QTargetMarker(qlTgts.at(i),QString::number(iBeam)));
         //}
-        for (int i=0; i< qlTgts.size(); i++) {
-            m_pTargetsMap->addTargetMarker(new QTargetMarker(qlTgts.at(i),QString::number(iBeam)));
+    }
+    QTextStream tsPeleng(&m_qfPeleng);
+    if (!bStarted) {
+        m_qfPeleng.resize(0);
+        m_qfPeleng.open(QIODevice::ReadWrite);
+        if (m_qfPeleng.isOpen()) {
+            tsPeleng << QString("StrobNo").rightJustified(10);
+            for (int iBeam1=0; iBeam1<QPOI_NUMBER_OF_BEAMS-1; iBeam1++) {
+                for (int iBeam2=iBeam1+1; iBeam2<QPOI_NUMBER_OF_BEAMS; iBeam2++) {
+                    tsPeleng << "\t" << QString("%1-%2").arg(iBeam1).arg(iBeam2).rightJustified(10);
+                }
+            }
+            tsPeleng << endl;
+        }
+        bStarted=true;
+    }
+    if (m_qfPeleng.isOpen()) tsPeleng << QString("%1").arg(iStrob).rightJustified(10);
+    for (int iBeam1=0; iBeam1<QPOI_NUMBER_OF_BEAMS-1; iBeam1++) {
+        for (int iBeam2=iBeam1+1; iBeam2<QPOI_NUMBER_OF_BEAMS; iBeam2++) {
+            int nTargets1 = ql_nTargets[iBeam1];
+            int nTargets2 = ql_nTargets[iBeam2];
+            // qDebug() << iBeam1 << "-" << iBeam2 << ": " << nTargets1 << ", " << nTargets2;
+            for (int iTarget1=0; iTarget1<nTargets1; iTarget1++) {
+                for (int iTarget2=0; iTarget2<nTargets2; iTarget2++) {
+                    struct QPoi::sTarget *pTarData1 = (struct QPoi::sTarget *)ql_baTarForBeam[iBeam1].data()+iTarget1;
+                    struct QPoi::sTarget *pTarData2 = (struct QPoi::sTarget *)ql_baTarForBeam[iBeam2].data()+iTarget2;
+                    QPoint qpTar1=pTarData1->qp_rep;
+                    QPoint qpTar2=pTarData2->qp_rep;
+                    if ((qpTar1-qpTar2).manhattanLength() < QPOI_MAXIMUM_TG_MISMATCH) { // Targets must be close
+                        double dM2Tar1=pTarData1->y2mc_rep;
+                        double dM2Tar2=pTarData2->y2mc_rep;
+                        double dFrac=(dM2Tar1-dM2Tar2)/(dM2Tar1+dM2Tar2);
+                        QPointF qpfAvr = (pTarData1->qpf_wei + pTarData2->qpf_wei)/2;
+                        QString qsLegend("%1 %2-%3 F:%4");
+                        m_pTargetsMap->addTargetMarker(new QTargetMarker(qpfAvr,
+                                qsLegend.arg(iStrob).arg(iBeam1).arg(iBeam2).arg(dFrac,0,'f',2)));
+                        if (m_qfPeleng.isOpen()) tsPeleng << QString("\t%1").arg(dFrac,10,'f',2);
+                    }
+                    else {
+                        if (m_qfPeleng.isOpen()) tsPeleng << QString("\t%1").arg(QChar(' '),10);
+                        qDebug() << "qpTar1!=qpTar2: " << qpTar1 << " " << qpTar2;
+                    }
+                }
+            }
         }
     }
+    if (m_qfPeleng.isOpen()) tsPeleng << endl;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

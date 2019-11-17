@@ -2,17 +2,17 @@
 <PARAMETERS>
     <ActivePropertyPage>1</ActivePropertyPage>
     <CarrierFreqMHz>9500</CarrierFreqMHz>
-    <DistanceOriginM>-32.60656374743769</DistanceOriginM>
+    <DistanceOriginM>-40.242663747434399</DistanceOriginM>
     <GridStepAdapt>true</GridStepAdapt>
     <GridStepDistanceM>40</GridStepDistanceM>
     <GridStepVelMpS>5</GridStepVelMpS>
-    <PixelsPerDistanceM>1.652892561983478</PixelsPerDistanceM>
-    <PixelsPerVelMpS>4.2871776200000218</PixelsPerVelMpS>
+    <PixelsPerDistanceM>1.3660269107301473</PixelsPerDistanceM>
+    <PixelsPerVelMpS>12.231818089682983</PixelsPerVelMpS>
     <SQLiteFile>../DATA/20191020/chronicaparser_00000007.sqlite3</SQLiteFile>
     <TSamplingMicroSec>0.12</TSamplingMicroSec>
-    <VelOriginMpS>80.182744286256764</VelOriginMpS>
+    <VelOriginMpS>22.524194075445898</VelOriginMpS>
     <falseAlarmProb>1e-08</falseAlarmProb>
-    <geometry>AAAAdQAAADkAAAYQAAADMA==</geometry>
+    <geometry>AAAATgAAADkAAAXpAAADMA==</geometry>
     <pathIntfMap>../DATA/20191020/intfmap_20191020.dat</pathIntfMap>
     <periodsPerBatch>1024</periodsPerBatch>
     <recordedSamplesPerPeriod>80</recordedSamplesPerPeriod>

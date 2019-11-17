@@ -55,6 +55,7 @@ private:
     QLabel *lbStatusArea;
     QLabel *lbStatusMsg;
     QTimer m_simulationTimer;
+    QFile m_qfPeleng;
 };
 
 //*****************************************************************************

@@ -187,19 +187,28 @@ int QIntfMap::readInterferenceMap(  // read interference map from binary data fi
 //======================================================================================================
 //
 //======================================================================================================
-QList<QPointF> QPoi::detectTargets(QByteArray &baSamples) {
-    QList<QPointF> retVal;
+bool QPoi::detectTargets(QByteArray &baSamples, QByteArray &baStrTargets, int &nTargets) {
+    bool retVal=false;
 
     int beamCountsNum = Np*NT_;
     int iDataSize = baSamples.size();
     int iArrElemCount = 2*Np*NT_;
     int iSizeOfComplex = 2*sizeof(qint16);
-    if (iDataSize!=beamCountsNum*iSizeOfComplex) return retVal;
+    if (iDataSize!=beamCountsNum*iSizeOfComplex) {
+        qDebug() << "iDataSize!=beamCountsNum*iSizeOfComplex";
+        return retVal;
+    }
     qint16 *pData = (qint16*) baSamples.data();
 
     QByteArray baDopplerRepresentation = dopplerRepresentation(pData, iArrElemCount);
-    if (baDopplerRepresentation.isEmpty()) return retVal;
-    if (baDopplerRepresentation.size()<2*iFilteredN*NFFT*sizeof(double)) return retVal;
+    if (baDopplerRepresentation.isEmpty()) {
+        qDebug() << "baDopplerRepresentation.isEmpty()";
+        return retVal;
+    }
+    if (baDopplerRepresentation.size()<2*iFilteredN*NFFT*sizeof(double)) {
+        qDebug() << "baDopplerRepresentation.size()<2*iFilteredN*NFFT*sizeof(double)";
+        return retVal;
+    }
     double *pDopplerData=(double*)baDopplerRepresentation.data();
 
     // phy scales
@@ -301,7 +310,7 @@ QList<QPointF> QPoi::detectTargets(QByteArray &baSamples) {
         }
     }
     if (!nc) {
-        // qDebug() << "dFracMax,dProbMin=" << dFracMax << "  " << dProbMin;
+        // qDebug() << "No candidates!";
         return retVal;
     }
 
@@ -310,26 +319,29 @@ QList<QPointF> QPoi::detectTargets(QByteArray &baSamples) {
     QList<int> tgs;
     QList<double> ktg,ltg;
     QList<double> y2mtg;
+    QList<double> y2mtg_sum;
     QList<int> lmtg,kmtg;
+    QMultiMap<int,int> qmmTgStruct;
     int tglmax=8;
 
-    for (int ic=0; ic<nc; ic++) {
-        bool bFlag=false;
-        for (int itg=0; itg<ntg; itg++) {
-            int ktg_=ktg.at(itg);
-            int ltg_=ltg.at(itg);
-            int kc_=kc.at(ic);
-            int lc_=lc.at(ic);
+    for (int ic=0; ic<nc; ic++) {  // loop over all candidates - resolution elements (l,k) with threshold reached
+        bool bFlag=false;          // found candidates attributed to running target
+        for (int itg=0; itg<ntg; itg++) {  // loop over existing targets itg
+            int ktg_=ktg.at(itg);          // target mass center (Doppler)
+            int ltg_=ltg.at(itg);          // target mass center (delay)
+            int kc_=kc.at(ic);             // resolution element along Doppler dimension for candidate ic
+            int lc_=lc.at(ic);             // resolution element along delay for candidate ic
             // test delay difference
-            if (abs(lc_-ltg_)>tglmax) continue;
+            if (abs(lc_-ltg_)>tglmax) continue;     // if candidate delay is too far from target, then skip
             // test Doppler channel difference
             double kdiff=kc_-ktg_;
             if (kdiff>NFFT/2) kdiff-=NFFT;
             if (kdiff<-NFFT/2) kdiff+=NFFT;
-            if (abs(kdiff)>1) continue;
+            if (abs(kdiff)>1) continue;             // if Doppler channel difference is greater than 1, then skip
             // candidate associated with itg
             bFlag=true;
-            int tgs_=tgs.at(itg)+1;
+            int tgs_=tgs.at(itg)+1;                 // candidate belongs to target
+            y2mtg_sum[itg]+=y2mc.at(ic);            // add to target power
             // recalculate k-center
             kc_=ktg_+kdiff;
             ktg[itg]=(ktg.at(itg)*tgs.at(itg)+kc_)/tgs_;
@@ -345,13 +357,16 @@ QList<QPointF> QPoi::detectTargets(QByteArray &baSamples) {
                 kmtg[itg]=kc.at(ic);
             }
         }
-        if (bFlag) continue;
+        if (bFlag) continue; // candidate belongs to existing target, hence continue
+        // create new target from current candidate
         ltg.append(lc.at(ic));
         ktg.append(kc.at(ic));
         tgs.append(1);
         y2mtg.append(y2mc.at(ic));
+        y2mtg_sum.append(y2mc.at(ic));
         lmtg.append(lc.at(ic));
         kmtg.append(kc.at(ic));
+        qmmTgStruct.insertMulti(ntg,ic);
         ntg=ntg+1;
     }
 
@@ -359,23 +374,31 @@ QList<QPointF> QPoi::detectTargets(QByteArray &baSamples) {
     for (int itg=0; itg<ntg; itg++) {
         double kDoppler=ktg.at(itg);
         double iDelay=ltg.at(itg);
-        double dY2M=y2mtg.at(itg);
-        double dVel;
+        double dTgVel;
         if (kDoppler >= NFFT/2) {
-            dVel=dVelCoef*(kDoppler-NFFT);
+            dTgVel=dVelCoef*(kDoppler-NFFT);
         }
         else {
-            dVel=dVelCoef*kDoppler;
+            dTgVel=dVelCoef*kDoppler;
         }
+        double dTgDist = iDelay*dDistCoef;
+        baStrTargets.clear();   // return array of struct sTarget
+        nTargets=0;             // return number of valid targets
         if (tgs.at(itg)>5) {
             bTargetsListed=true;
-            double dTgDist = iDelay*dDistCoef;
-            double dTgVel = dVel;
-            double dTgPower = dY2M;
-            retVal << QPointF(dTgDist,dVel);
+            //double dTgPower = dY2M;
+            baStrTargets.resize(baStrTargets.size()+sizeof(struct sTarget));
+            struct sTarget *pStrTarget = (struct sTarget *)baStrTargets.data()+nTargets;
+            nTargets++;
+            pStrTarget->uCandNum=tgs.at(itg);
+            pStrTarget->qpf_wei=QPointF(dTgDist,dTgVel);
+            pStrTarget->y2mc_sum=y2mtg_sum[itg];
+            pStrTarget->qp_rep=QPoint(lmtg[itg],kmtg[itg]);
+            pStrTarget->y2mc_rep=y2mtg[itg];
         }
     }
-    return retVal;
+    // qDebug() << "At exit bTargetsListed = " << bTargetsListed;
+    return bTargetsListed;
 }
 //======================================================================================================
 //
