@@ -16,6 +16,7 @@
 #include "qpoi.h"
 
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
+#define SETTINGS_KEY_SHUFFLE                    "useShuffle"
 
 #define STOPPER_MIN_DELAY_MSECS                 1000
 
@@ -56,6 +57,7 @@ private:
     QLabel *lbStatusMsg;
     QTimer m_simulationTimer;
     QFile m_qfPeleng;
+    bool m_bUseShuffle;
 };
 
 //*****************************************************************************

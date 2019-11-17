@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
     <ActivePropertyPage>1</ActivePropertyPage>
+    <BeamsUsesForPeleng>33</BeamsUsesForPeleng>
     <CarrierFreqMHz>9500</CarrierFreqMHz>
-    <DistanceOriginM>-40.242663747434399</DistanceOriginM>
+    <DistanceOriginM>-15.525533401114268</DistanceOriginM>
     <GridStepAdapt>true</GridStepAdapt>
-    <GridStepDistanceM>40</GridStepDistanceM>
-    <GridStepVelMpS>5</GridStepVelMpS>
-    <PixelsPerDistanceM>1.3660269107301473</PixelsPerDistanceM>
-    <PixelsPerVelMpS>12.231818089682983</PixelsPerVelMpS>
+    <GridStepDistanceM>20</GridStepDistanceM>
+    <GridStepVelMpS>2.5</GridStepVelMpS>
+    <PixelsPerDistanceM>1.8181818181818339</PixelsPerDistanceM>
+    <PixelsPerVelMpS>13.454999898651335</PixelsPerVelMpS>
     <SQLiteFile>../DATA/20191020/chronicaparser_00000007.sqlite3</SQLiteFile>
     <TSamplingMicroSec>0.12</TSamplingMicroSec>
-    <VelOriginMpS>22.524194075445898</VelOriginMpS>
+    <VelOriginMpS>15.915765568476406</VelOriginMpS>
     <falseAlarmProb>1e-08</falseAlarmProb>
     <geometry>AAAATgAAADkAAAXpAAADMA==</geometry>
     <pathIntfMap>../DATA/20191020/intfmap_20191020.dat</pathIntfMap>
@@ -19,4 +20,5 @@
     <samplesPerPeriod>200</samplesPerPeriod>
     <samplesPerPulse>8</samplesPerPulse>
     <threshold>30</threshold>
+    <useShuffle>true</useShuffle>
 </PARAMETERS>

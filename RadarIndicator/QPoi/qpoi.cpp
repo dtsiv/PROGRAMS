@@ -2,12 +2,17 @@
 #include "qinisettings.h"
 #include "qexceptiondialog.h"
 
+#include "nr.h"
+using namespace std;
+
 #define INTF_MAP_VERSION_MAJOR 1
 #define INTF_MAP_VERSION_MINOR 0
 
 #define SKIP_ZERO_DOPPLER          5
 #define SKIP_ZERO_DELAY            3
 #define NOISE_AVERAGING_N          7
+
+int QPoi::m_idum = -13;
 
 //--------------------------------------------------------------------------------------------------
 //
@@ -53,6 +58,8 @@ QPoi::QPoi(QObject *parent)
     if (iRet) {
         qDebug() << "readInterferenceMap() returned: " << iRet;
     }
+
+    resetRandomNumberGenerators();
 }
 //--------------------------------------------------------------------------------------------------
 //
@@ -183,6 +190,18 @@ int QIntfMap::readInterferenceMap(  // read interference map from binary data fi
     }
     m_qfIntfMap.close();
     return iRet;
+}
+//======================================================================================================
+//
+//======================================================================================================
+void QPoi::resetRandomNumberGenerators() {
+    // initialize seed of stdlib.h pseudo-random numbers (iSeed is read-only)
+    unsigned int iSeed=1;
+    std::srand(iSeed);
+
+    // initialize seed of Numerical Recipes Gaussian random numbers (m_idum is read-write)
+    this->m_idum=-1;
+    NR::gasdev(this->m_idum);
 }
 //======================================================================================================
 //

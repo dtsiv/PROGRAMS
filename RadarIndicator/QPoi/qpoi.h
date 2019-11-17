@@ -56,6 +56,9 @@ public:
         double       y2mc_rep;   // energy for representative candidate
     };
 
+    // random seed
+    static int m_idum;
+
 signals:
 
 public slots:
@@ -64,6 +67,7 @@ private:
     void avevar_poi(Vec_I_DP &data, DP &ave, DP &var);
     void ftest_poi(Vec_I_DP &data_noise, Vec_I_DP &data_signal, DP &f, DP &prob);
     QByteArray dopplerRepresentation(qint16 *pData, unsigned int iArrElemCount);
+    void resetRandomNumberGenerators();
 
     double m_dCarrierF;  // Irradiation carrier frequency (MHz)
     double m_dTs;        // sampling time interval (microsecs)

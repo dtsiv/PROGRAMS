@@ -22,12 +22,13 @@
 #define QTARGETSMAP_ADAPT_GRD_STEP      "GridStepAdapt"
 #define QTARGETSMAP_GRD_STEP_D          "GridStepDistanceM"
 #define QTARGETSMAP_GRD_STEP_V          "GridStepVelMpS"
+#define QTARGETSMAP_PELENG_MASK         "BeamsUsesForPeleng"
 
 #define QTARGETSMAP_MINTICKS            5     // minimum number of major ticks along one axis
 #define QTARGETSMAP_MAXTICKS            40     // maximum number of major ticks along one axis
 #define QTARGETSMAP_TICKS_OVERFLOW      200    // number of major ticks that cause error message
-#define QTARGETSMAP_MAXSCALED           20     // pixels per m
-#define QTARGETSMAP_MAXSCALEV           50     // pixels per m/s
+#define QTARGETSMAP_MAXSCALED           80     // pixels per m
+#define QTARGETSMAP_MAXSCALEV           200     // pixels per m/s
 #define QTARGETSMAP_MINSCALED           0.1    // pixels per m
 #define QTARGETSMAP_MINSCALEV           0.25   // pixels per m/s
 
@@ -50,6 +51,7 @@ private slots:
 public:
     MapWidget *getMapInstance();
     void addTargetMarker(QTargetMarker* pTargetMarker);
+    bool bBeamsUsedForPeleng(int iBeam1, int iBeam2);
 
 signals:
     void doUpdate();
@@ -87,6 +89,7 @@ private:
     QString m_qsLastError;
     QWidget *m_pOwner;
     bool m_bAdaptiveGridStep;
+    bool m_bBeamsUsedForPeleng[QPROPPAGES_NBEAMS*(QPROPPAGES_NBEAMS-1)/2];
 
 public:
     // last position & time

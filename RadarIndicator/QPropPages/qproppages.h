@@ -6,6 +6,7 @@
 #include <QTabWidget>
 
 #define QPROPPAGES_ACTIVE_TAB                        "ActivePropertyPage"
+#define QPROPPAGES_NBEAMS                            4
 
 // color selection button
 class QColorSelectionButton : public QPushButton {
@@ -46,6 +47,7 @@ public:
     QLineEdit *m_pleFCarrier;
     QLineEdit *m_pleTSampl;
     QCheckBox *m_pcbAdaptiveGrid;
+    QCheckBox *m_pcbBeamsUsedForPeleng[QPROPPAGES_NBEAMS*(QPROPPAGES_NBEAMS-1)/2];
 
 private:
     QObject *m_pOwner;
