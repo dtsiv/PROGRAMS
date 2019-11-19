@@ -6,6 +6,8 @@
 #include <QHBoxLayout>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QtMath>
+#include <QRegExp>
 
 // time delay to show formular
 const quint64 QTargetsMap::m_iFormularDelay = 1000;
@@ -339,6 +341,13 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     // grid steps in pixels
     double dVGridStepPix=m_dVGridStep*m_dScaleV;
     double dDGridStepPix=m_dDGridStep*m_dScaleD;
+    QString qsPrecV; qsPrecV = QString::number(m_dVGridStep-qFloor(m_dVGridStep),'f').replace(QRegExp("(0|\\.|\\-|\\+)")," ").trimmed();
+    // qDebug() << "qsPrecV = " << qsPrecV;
+    int iPrecV = qsPrecV.length();
+    QString qsPrecD; qsPrecD = QString::number(m_dDGridStep-qFloor(m_dDGridStep),'f').replace(QRegExp("(0|\\.|\\-|\\+)")," ").trimmed();
+    // qDebug() << "qsPrecD = " << qsPrecD;
+    int iPrecD = qsPrecD.length();
+
     int iGridThickness = 1;
     int iAxisThickness = 2;
     int iTickLabelSize=8;
@@ -399,17 +408,17 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     int iMaxWidthX,iSomeWidthX;
     int iMaxWidthY,iSomeWidthY;
     QString qsSomeLabel;
-    qsSomeLabel=QString::number(iFromX*m_dDGridStep,'f',0);
+    qsSomeLabel=QString::number(iFromX*m_dDGridStep,'f',iPrecD);
     iMaxWidthX=fmTickLabel.width(qsSomeLabel);
-    qsSomeLabel=QString::number(iFromY*m_dVGridStep,'f',0);
+    qsSomeLabel=QString::number(iFromY*m_dVGridStep,'f',iPrecV);
     iMaxWidthY=fmTickLabel.width(qsSomeLabel);
     for (i=iFromX; i<=iToX; i++) {
-        qsSomeLabel=QString::number(i*m_dDGridStep,'f',0);
+        qsSomeLabel=QString::number(i*m_dDGridStep,'f',iPrecD);
         iSomeWidthX=fmTickLabel.width(qsSomeLabel);
         iMaxWidthX=(iSomeWidthX>iMaxWidthX)?iSomeWidthX:iMaxWidthX;
     }
     for (i=iFromY; i<=iToY; i++) {
-        qsSomeLabel=QString::number(i*m_dVGridStep,'f',0);
+        qsSomeLabel=QString::number(i*m_dVGridStep,'f',iPrecV);
         iSomeWidthY=fmTickLabel.width(qsSomeLabel);
         iMaxWidthY=(iSomeWidthY>iMaxWidthY)?iSomeWidthY:iMaxWidthY;
     }
@@ -451,7 +460,7 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     for (i=iFromX; i<=iToX; i++) {
         dXCur=dViewD0Pix+i*dDGridStepPix;
         if (dXCur<0 || dXCur>iWidth) continue;
-        QString qsLabel=QString::number(i*m_dDGridStep,'f',0);
+        QString qsLabel=QString::number(i*m_dDGridStep,'f',iPrecD);
         int iLabelWidth=fmTickLabel.width(qsLabel);
         painter.drawText(dXCur-iLabelWidth/2,
                          dGridTop-iLabelHeight-iTickLabelOffsetY+fmTickLabel.ascent(),
@@ -473,7 +482,7 @@ bool QTargetsMap::drawGrid(MapWidget *pMapWidget, QPainter &painter) {
     for (i=iFromY; i<=iToY; i++) {
         dYCur=dViewV0Pix-i*dVGridStepPix;
         if (dYCur<0 || dYCur>iHeight) continue;
-        QString qsLabel=QString::number(i*m_dVGridStep,'f',0);
+        QString qsLabel=QString::number(i*m_dVGridStep,'f',iPrecV);
         int iLabelWidth=fmTickLabel.width(qsLabel);
         painter.drawText(dGridLeft-iTickLabelOffsetX-iLabelWidth,
                          dYCur-iLabelHeight/2.0+fmTickLabel.ascent(),

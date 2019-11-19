@@ -3,17 +3,17 @@
     <ActivePropertyPage>1</ActivePropertyPage>
     <BeamsUsesForPeleng>33</BeamsUsesForPeleng>
     <CarrierFreqMHz>9500</CarrierFreqMHz>
-    <DistanceOriginM>-15.525533401114268</DistanceOriginM>
+    <DistanceOriginM>103.57795720149512</DistanceOriginM>
     <GridStepAdapt>true</GridStepAdapt>
-    <GridStepDistanceM>20</GridStepDistanceM>
+    <GridStepDistanceM>80</GridStepDistanceM>
     <GridStepVelMpS>2.5</GridStepVelMpS>
-    <PixelsPerDistanceM>1.8181818181818339</PixelsPerDistanceM>
-    <PixelsPerVelMpS>13.454999898651335</PixelsPerVelMpS>
+    <PixelsPerDistanceM>1.5026296018031708</PixelsPerDistanceM>
+    <PixelsPerVelMpS>28.841987221300236</PixelsPerVelMpS>
     <SQLiteFile>../DATA/20191020/chronicaparser_00000007.sqlite3</SQLiteFile>
     <TSamplingMicroSec>0.12</TSamplingMicroSec>
-    <VelOriginMpS>15.915765568476406</VelOriginMpS>
+    <VelOriginMpS>-2.6405804651356717</VelOriginMpS>
     <falseAlarmProb>1e-08</falseAlarmProb>
-    <geometry>AAAATgAAADkAAAXpAAADMA==</geometry>
+    <geometry>AAAATgAAADkAAALKAAAB8w==</geometry>
     <pathIntfMap>../DATA/20191020/intfmap_20191020.dat</pathIntfMap>
     <periodsPerBatch>1024</periodsPerBatch>
     <recordedSamplesPerPeriod>80</recordedSamplesPerPeriod>
