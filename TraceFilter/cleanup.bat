@@ -1,0 +1,1 @@
+del /F C:\PROGRAMS\TraceFilter\FilterMain.exe

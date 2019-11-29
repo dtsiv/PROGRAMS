@@ -1,0 +1,7 @@
+Makefile
+Makefile.Debug
+Makefile.Release
+TraceFilter.exe
+debug/
+release/
+build/

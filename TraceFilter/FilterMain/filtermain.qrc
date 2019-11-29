@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+      <file>Resources/about.png</file>
+      <file>Resources/binocle.ico</file>
+      <file>Resources/exit.png</file>
+      <file>Resources/filterstopper.png</file>
+      <file>Resources/formular.ico</file>
+      <file>Resources/hdd_exch.png</file>
+      <file>Resources/open.ico</file>
+      <file>Resources/plane_small.png</file>
+      <file>Resources/player_play.png</file>
+      <file>Resources/settings.ico</file>
+      <file>Resources/tracefilter.ico</file>
+    </qresource>
+</RCC>
