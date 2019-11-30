@@ -8,10 +8,10 @@ QFilterWindow::QFilterWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
       , m_pStopper(NULL) {
     setWindowIcon(QIcon(QPixmap(":/Resources/tracefilter.ico")));
-    lbStatusArea=new QLabel(QString::fromLocal8Bit("CONN_STATUS_DISCONN"));
-    statusBar()->addPermanentWidget(lbStatusArea,1);
-    lbStatusMsg=new QLabel(QString::fromLocal8Bit("Press Control-P for settings"));
-    statusBar()->addPermanentWidget(lbStatusMsg);
+    m_plbStatusMsg=new QLabel(QString::fromLocal8Bit(CONN_STATUS_DISCONN));
+    statusBar()->addPermanentWidget(m_plbStatusMsg,1);
+    m_plbReferenceInfo=new QLabel(QString::fromLocal8Bit("Press Control-P for settings"));
+    statusBar()->addPermanentWidget(m_plbReferenceInfo);
 
     // settings object and main window adjustments
     QIniSettings &iniSettings = QIniSettings::getInstance();
@@ -34,7 +34,6 @@ QFilterWindow::QFilterWindow(QWidget *parent, Qt::WindowFlags flags)
     settingsAct->setStatusTip(QString::fromLocal8Bit("Settings"));
     settingsAct->setText(QString::fromLocal8Bit("Settings"));
     connect(settingsAct, SIGNAL(triggered()), this, SLOT(onSetup()));
-
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -45,11 +44,18 @@ QFilterWindow::~QFilterWindow() {
     QRect qrCurGeometry=geometry();
     QString qsEncodedGeometry = QSerial(qrCurGeometry).toBase64();
     iniSettings.setValue(SETTINGS_KEY_GEOMETRY, qsEncodedGeometry);
+
     // list of components for PropPages
     for (int i=0; i<m_qlObjects.size(); i++) {
         QObject *pObj=m_qlObjects.at(i);
         if (pObj) delete pObj; // need to check destructor, check order of objects in QList!
     }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QFilterWindow::setStatusMessage(QString qsMsg) {
+    m_plbStatusMsg->setText(qsMsg);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -64,6 +70,11 @@ void QFilterWindow::showStopper() {
 void QFilterWindow::initComponents() {
     QTime qtCurr = QTime::currentTime();
 
+    // create instances of components
+    m_pSqlModel = new QSqlModel(this);
+    if (m_pSqlModel) m_qlObjects << qobject_cast<QObject *> (m_pSqlModel);
+
+    // create widgets
     QDockWidget *dock = new QDockWidget("QTARGETSMAP_DOC_CAPTION");
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     // MapWidget *pMapWidget = m_pTargetsMap->getMapInstance();
@@ -104,6 +115,33 @@ void QFilterWindow::onSetup() {
         m_qrPropDlgGeo=dlgPropPages.geometry();
         settingsAct->setEnabled(true);
         bInSetup=false;
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QFilterWindow::onTestPgConnection() {
+    QObject *pobj = QObject::sender();
+    QPropPages *pPropPages = qobject_cast<QPropPages *>(pobj);
+    if (!pPropPages || !m_pSqlModel) {
+        setStatusMessage("Could not start test");
+        return;
+    }
+
+    QString qsErrMsg;
+    bool bOk = m_pSqlModel->testPgConnection(
+                qsErrMsg,
+                pPropPages->m_pleDBDatabaseHostname->text(),
+                pPropPages->m_pleDBDatabaseName->text(),
+                pPropPages->m_pleDBDatabaseUser->text(),
+                pPropPages->m_pleDBDatabasePassword->text(),
+                pPropPages->m_pleDBDatabaseEncoding->text());
+    // set status bar message depending on result
+    if (bOk) {
+        setStatusMessage("Postgres test succeeded");
+    }
+    else {
+        setStatusMessage(qsErrMsg);
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

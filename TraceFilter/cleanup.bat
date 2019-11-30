@@ -1,1 +1,1 @@
-del /F C:\PROGRAMS\TraceFilter\FilterMain.exe
+del /F C:\PROGRAMS\TraceFilter\TraceFilter.exe

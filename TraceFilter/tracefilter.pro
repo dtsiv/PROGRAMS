@@ -5,6 +5,7 @@ CONFIG += ordered
 SUBDIRS = QExceptionDialog \
           QIniSettings \
           QPropPages \
+          QSqlModel \
           QFilterWindow \
           FilterMain
 

@@ -11,6 +11,7 @@
 
 #include "qinisettings.h"
 #include "qproppages.h"
+#include "qsqlmodel.h"
 
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
 
@@ -32,19 +33,24 @@ public:
 public slots:
     void hideStopper();
     void onSetup();
+    void onTestPgConnection();
+    void setStatusMessage(QString qsMsg);
 
 public:
     void showStopper();
     void initComponents();
 
-private:
+private:    // list of components
     QList<QObject*> m_qlObjects;
+    QSqlModel *m_pSqlModel;
+
+private:
     QStopper *m_pStopper;
     QAction *settingsAct;
 
     QRect m_qrPropDlgGeo;
-    QLabel *lbStatusArea;
-    QLabel *lbStatusMsg;
+    QLabel *m_plbStatusMsg;
+    QLabel *m_plbReferenceInfo;
 };
 
 //*****************************************************************************

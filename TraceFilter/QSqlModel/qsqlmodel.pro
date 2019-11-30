@@ -15,21 +15,13 @@ TEMPLATE = lib
 
 QMAKE_CXXFLAGS += /std:c++17
 
-INCLUDEPATH +=  \
-    ../include/nr2 \
-    ../QExceptionDialog \
-    ../QIniSettings \
+INCLUDEPATH += \
     ../QPropPages \
-    ../QSqlModel
-
-FORMS +=
+    ../QExceptionDialog \
+    ../QIniSettings
 
 HEADERS += \
-    qfilterwindow.h	
-	
+    qsqlmodel.h 
+    
 SOURCES += \
-    qfilterwindow.cpp
-
-LIBS += \
-     -lopengl32 \
-     -lglu32
+    qsqlmodel.cpp

@@ -34,8 +34,8 @@ QExceptionDialog::QExceptionDialog(QString exceptionWhat, QWidget *parent) :
     resize(769,600);
     setWindowTitle("Ooops... This is embarassing!");
     // This dialog is a separate window. It needs its icon
-    QPixmap qpmSpear(":/Resources/spear.ico");
-    setWindowIcon(QIcon(qpmSpear));
+    QPixmap qpmTraceFilter(":/Resources/tracefilter.ico");
+    setWindowIcon(QIcon(qpmTraceFilter));
     QPixmap qpmPlane(":/Resources/plane_small.png");
     m_pgsPlane = new QGraphicsScene(qpmPlane.rect());
     m_pgsPlane->addPixmap(qpmPlane);

@@ -36,17 +36,30 @@ public:
     QPropPages(QObject *pOwner, QWidget *parent = 0);
     ~QPropPages();
 
+signals:
+    void testPgConnection();
+
 public slots:
     void onAccepted();
+    void onSQLiteFileChoose();
 
     // public-visible interface controls
 public:
+    QLineEdit *m_pleDBDatabaseName;
+    QLineEdit *m_pleDBDatabaseUser;
+    QLineEdit *m_pleDBDatabasePassword;
+    QLineEdit *m_pleDBDatabaseEncoding;
+    QLineEdit *m_pleDBSqliteFileName;
+    QLineEdit *m_pleDBDatabaseHostname;
+    QLineEdit *m_pleMainCtrl;
     QPushButton *m_pbAccept;
+    QRadioButton *m_prbDBEngineSqlite;
+    QRadioButton *m_prbDBEnginePostgres;
+    QButtonGroup *m_pbgDBEngine;
 
 private:
     QObject *m_pOwner;
     QTabWidget *m_pTabWidget;
 };
-
 
 #endif // QPROPPAGES_H

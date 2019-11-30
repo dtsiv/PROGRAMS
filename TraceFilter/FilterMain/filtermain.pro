@@ -19,27 +19,29 @@ CONFIG -= debug
 CONFIG += release
 CONFIG += static
 
-INCLUDEPATH +=  $PWD/include
-
 INCLUDEPATH += \
+    ../include/nr2 \
     ../QExceptionDialog \
     ../QIniSettings \
     ../QPropPages \
-    ../QFilterWindow \
-    ../include/nr2
+    ../QSqlModel \
+    ../QFilterWindow
 
 SOURCES += main.cpp
 
 RESOURCES += \
     filtermain.qrc
 
-LIBS += -L..\lib \
+LIBS += -L../lib \
     -lqinisettings \
     -lqproppages \
+    -lqsqlmodel \
     -lqfilterwindow \
     -lqexceptiondialog
 
 LIBS += \
+    -L../PostgreSQL_9.4_32bit \
+    -llibpq \
     -lopengl32 \
     -lglu32
 
