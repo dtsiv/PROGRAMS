@@ -4,6 +4,7 @@ CONFIG += ordered
 
 SUBDIRS = QExceptionDialog \
           QIniSettings \
+          QGeoUtils \
           QPropPages \
           QSqlModel \
           QFilterWindow \

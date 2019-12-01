@@ -9,28 +9,26 @@ MOC_DIR = $$PWD/../build/.moc
 RCC_DIR = $$PWD/../build/.rcc
 UI_DIR = $$PWD/../build/.ui
 
-QT += core gui sql opengl widgets
+QT += core gui widgets
 
 TEMPLATE = lib
 
 QMAKE_CXXFLAGS += /std:c++17
 
-INCLUDEPATH +=  \
-    ../include/nr2 \
+INCLUDEPATH += \
+    ../include \
     ../QExceptionDialog \
     ../QIniSettings \
-    ../QGeoUtils \
-    ../QPropPages \
-    ../QSqlModel
-
-FORMS +=
+    ../QPropPages
 
 HEADERS += \
-    qfilterwindow.h	
-	
-SOURCES += \
-    qfilterwindow.cpp
+    tdcord.h \
+    geocent.h \
+    qpostsview.h \
+    qgeoutils.h
 
-LIBS += \
-     -lopengl32 \
-     -lglu32
+SOURCES += \
+    tdcord.cpp \
+    geocent.cpp \
+    qpostsview.cpp \
+    qgeoutils.cpp

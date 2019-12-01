@@ -7,6 +7,7 @@
     <DBHostName>127.0.0.1</DBHostName>
     <DBPassword>123</DBPassword>
     <DBUserName>postgres</DBUserName>
+    <MainCtrl>02.06.2017-09.00.22.639-mainctrl.cfg</MainCtrl>
     <SQLiteFile>../DATA/Avtobaza-2017/poite20170602.db</SQLiteFile>
-    <geometry>AAAAyAAAAMgAAAVgAAAC8w==</geometry>
+    <geometry>AAAA+gAAAJIAAAWSAAACvQ==</geometry>
 </PARAMETERS>

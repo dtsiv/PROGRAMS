@@ -48,6 +48,8 @@ public:
     bool testPgConnection(QString &qsErrMsg, QString qsHost, QString qsDBName, QString qsUser, QString qsPassword, QString qsEncoding);
     bool testSqliteConnection(QString &qsErrMsg, QString qsDBName);
 
+    void checkPoite();
+
 signals:
     void connStatusChanged(QString qsStatus);
 

@@ -20,9 +20,11 @@ CONFIG += release
 CONFIG += static
 
 INCLUDEPATH += \
+    ../include \
     ../include/nr2 \
     ../QExceptionDialog \
     ../QIniSettings \
+    ../QGeoUtils \
     ../QPropPages \
     ../QSqlModel \
     ../QFilterWindow
@@ -34,6 +36,7 @@ RESOURCES += \
 
 LIBS += -L../lib \
     -lqinisettings \
+    -lqgeoutils \
     -lqproppages \
     -lqsqlmodel \
     -lqfilterwindow \

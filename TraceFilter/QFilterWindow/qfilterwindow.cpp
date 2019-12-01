@@ -1,5 +1,6 @@
 #include "qfilterwindow.h"
 #include "qexceptiondialog.h"
+#include "qgeoutils.h"
 
 #include "nr.h"
 using namespace std;
@@ -74,6 +75,9 @@ void QFilterWindow::initComponents() {
     m_pSqlModel = new QSqlModel(this);
     if (m_pSqlModel) m_qlObjects << qobject_cast<QObject *> (m_pSqlModel);
 
+    m_pGeoUtils = new QGeoUtils;
+    if (m_pGeoUtils) m_qlObjects << qobject_cast<QObject *> (m_pGeoUtils);
+
     // create widgets
     QDockWidget *dock = new QDockWidget("QTARGETSMAP_DOC_CAPTION");
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -88,6 +92,21 @@ void QFilterWindow::initComponents() {
     while(qtCurr.msecsTo(QTime::currentTime())<STOPPER_MIN_DELAY_MSECS) {
         qApp->processEvents();
     }
+
+    /*
+    pj_Set_Geocentric_Parameters( &TdCord::gi, KRASOVSKY_MAJOR_SEMIAXIS, KRASOVSKY_MINOR_SEMIAXIS);
+    QFile qfGeo("geoparams.txt");
+    qfGeo.open(QIODevice::ReadWrite);
+    QTextStream tsGeo(&qfGeo);
+    tsGeo.setRealNumberNotation(QTextStream::FixedNotation);
+    tsGeo.setRealNumberPrecision(40);
+    tsGeo << "TdCord::gi.Geocent_a=" << TdCord::gi.Geocent_a << endl;
+    tsGeo << "TdCord::gi.Geocent_b=" << TdCord::gi.Geocent_b << endl;
+    tsGeo << "TdCord::gi.Geocent_a2=" << TdCord::gi.Geocent_a2 << endl;
+    tsGeo << "TdCord::gi.Geocent_b2=" << TdCord::gi.Geocent_b2 << endl;
+    tsGeo << "TdCord::gi.Geocent_e2=" << TdCord::gi.Geocent_e2 << endl;
+    tsGeo << "TdCord::gi.Geocent_ep2=" << TdCord::gi.Geocent_ep2 << endl;
+    */
 
     QTimer::singleShot(0,this,SLOT(hideStopper()));
 }

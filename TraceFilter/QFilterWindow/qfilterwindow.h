@@ -12,6 +12,7 @@
 #include "qinisettings.h"
 #include "qproppages.h"
 #include "qsqlmodel.h"
+#include "qgeoutils.h"
 
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
 
@@ -43,6 +44,7 @@ public:
 private:    // list of components
     QList<QObject*> m_qlObjects;
     QSqlModel *m_pSqlModel;
+    QGeoUtils *m_pGeoUtils;
 
 private:
     QStopper *m_pStopper;

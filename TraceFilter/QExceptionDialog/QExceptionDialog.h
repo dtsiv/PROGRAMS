@@ -2,7 +2,7 @@
 #define QEXCEPTIONDIALOG_H
 
 #include <QtCore>
-#include <QDialog>
+#include <QtWidgets/QDialog>
 #include <exception>
 
 #ifndef __GNUC__

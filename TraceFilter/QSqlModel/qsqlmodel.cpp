@@ -5,6 +5,11 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
+#include "qavtctrl.h"
+#include "codograms.h"
+
+#include "winbase.h"
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,7 +64,8 @@ QSqlModel::~QSqlModel() {
 bool QSqlModel::openDB() {
     if (m_db.isValid()) {
         QString qsConnName=m_db.connectionName();
-        m_db = QSqlDatabase();
+        if (m_db.isOpen()) m_db.close();
+        m_db = QSqlDatabase(); // move previous instance output of scope to call removeDatabase()
         QSqlDatabase::removeDatabase(qsConnName);
     }
     if (m_iDbEngine == DB_Engine_Postgres) {
@@ -294,4 +300,43 @@ void QSqlModel::propChanged(QObject *pPropDlg) {
         return;
     }
     emit connStatusChanged(CONN_STATUS_DISCONN);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QSqlModel::checkPoite() {
+    if (!m_db.isOpen()) return;
+    QString qsQuery("SELECT p.id AS id,"
+        " p.codogram"
+        " FROM poite p");
+    QSqlQuery query(m_db);
+    query.prepare(qsQuery);
+    if (!query.exec()) return;
+    QSqlRecord qRec=query.record();
+    QFile qfTest("poitetest.dat");
+    qfTest.open(QIODevice::ReadWrite);
+    QTextStream tsTest(&qfTest);
+    while (query.next()) {
+        QByteArray baCodogram;
+        QByteArray baUncomp;
+        PPOITE pPoite;
+
+        if (m_iDbEngine==DB_Engine_Sqlite) {
+            QString qsCodogram = query.value(qRec.indexOf("codogram")).toString();
+            baCodogram = QByteArray(qsCodogram.toLocal8Bit());
+            QByteArray baDecoded = QByteArray::fromBase64(baCodogram);
+            baUncomp = qUncompress(baDecoded);
+            pPoite = (PPOITE)baUncomp.data();
+        }
+        else if (m_iDbEngine==DB_Engine_Postgres) {
+            baCodogram = query.value(qRec.indexOf("codogram")).toByteArray();
+            pPoite = (PPOITE)baCodogram.data();
+        }
+        else return;
+
+        FILETIME ftTlock=pPoite->ftTlock;
+        SYSTEMTIME st;
+        FileTimeToSystemTime(&ftTlock,&st);
+        tsTest << st.wYear << "." << st.wMonth << "." << st.wDay << " " << st.wHour << ":" << st.wMinute << ":" << st.wSecond << endl;
+    }
 }
