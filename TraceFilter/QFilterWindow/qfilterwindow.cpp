@@ -1,9 +1,15 @@
 #include "qfilterwindow.h"
 #include "qexceptiondialog.h"
 #include "qgeoutils.h"
+#include "poitunit.h"
+
+#include "qavtctrl.h"
+#include "codograms.h"
 
 #include "nr.h"
 using namespace std;
+
+bool bQueryOk=false;
 
 QFilterWindow::QFilterWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags)
@@ -78,6 +84,13 @@ void QFilterWindow::initComponents() {
     m_pGeoUtils = new QGeoUtils;
     if (m_pGeoUtils) m_qlObjects << qobject_cast<QObject *> (m_pGeoUtils);
 
+    if (m_pSqlModel->execQuery()) {
+        bQueryOk=true;
+    }
+    else {
+        qDebug() << "m_pSqlModel->execQuery() failed!";
+    }
+
     // create widgets
     QDockWidget *dock = new QDockWidget("QTARGETSMAP_DOC_CAPTION");
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -93,21 +106,6 @@ void QFilterWindow::initComponents() {
         qApp->processEvents();
     }
 
-    /*
-    pj_Set_Geocentric_Parameters( &TdCord::gi, KRASOVSKY_MAJOR_SEMIAXIS, KRASOVSKY_MINOR_SEMIAXIS);
-    QFile qfGeo("geoparams.txt");
-    qfGeo.open(QIODevice::ReadWrite);
-    QTextStream tsGeo(&qfGeo);
-    tsGeo.setRealNumberNotation(QTextStream::FixedNotation);
-    tsGeo.setRealNumberPrecision(40);
-    tsGeo << "TdCord::gi.Geocent_a=" << TdCord::gi.Geocent_a << endl;
-    tsGeo << "TdCord::gi.Geocent_b=" << TdCord::gi.Geocent_b << endl;
-    tsGeo << "TdCord::gi.Geocent_a2=" << TdCord::gi.Geocent_a2 << endl;
-    tsGeo << "TdCord::gi.Geocent_b2=" << TdCord::gi.Geocent_b2 << endl;
-    tsGeo << "TdCord::gi.Geocent_e2=" << TdCord::gi.Geocent_e2 << endl;
-    tsGeo << "TdCord::gi.Geocent_ep2=" << TdCord::gi.Geocent_ep2 << endl;
-    */
-
     QTimer::singleShot(0,this,SLOT(hideStopper()));
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,6 +117,40 @@ void QFilterWindow::hideStopper() {
         m_pStopper = NULL;
     }
     setVisible(true);
+
+    //------ test 2D solver ------
+    if (1 && bQueryOk) {
+        int iTgs=0;
+        QFile qfTargets("targets.dat");
+        qfTargets.resize(0);
+        qfTargets.open(QIODevice::ReadWrite);
+        QTextStream tsTargets(&qfTargets);
+
+        quint64 uRecId;
+        QByteArray baCodogram;
+        while (m_pSqlModel->getTuple(uRecId,baCodogram)) {
+            PPOITE pPoite = (PPOITE)baCodogram.data();
+            if (pPoite->Count < 3 && pPoite->Count >3) {
+                baCodogram.clear();
+                continue;
+            }
+            TPoiT *pTPoiT = new TPoiT(pPoite);
+            if (pTPoiT->CalculateXY()) {
+                iTgs++;
+                XYPOINT pt = pTPoiT->m_pt;
+                tsTargets << "uRecId = " << uRecId << "; Legacy: (" << pt.dX << ", " << pt.dY << ")" << endl;
+                delete pTPoiT;
+                baCodogram.clear();
+            }
+            delete pTPoiT;
+            baCodogram.clear();
+            if (iTgs && (iTgs%1000)==0) {
+                this->setStatusMessage(QString::number(iTgs));
+                QCoreApplication::processEvents();
+            }
+        }
+    }
+    //------ end test 2D solver ------
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

@@ -22,12 +22,14 @@ INCLUDEPATH += \
     ../QPropPages
 
 HEADERS += \
+    poitunit.h \
     tdcord.h \
     geocent.h \
     qpostsview.h \
     qgeoutils.h
 
 SOURCES += \
+    poitunit.cpp \
     tdcord.cpp \
     geocent.cpp \
     qpostsview.cpp \

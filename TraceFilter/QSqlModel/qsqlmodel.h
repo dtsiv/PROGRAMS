@@ -49,6 +49,8 @@ public:
     bool testSqliteConnection(QString &qsErrMsg, QString qsDBName);
 
     void checkPoite();
+    bool execQuery();
+    bool getTuple(quint64 &iRecId, QByteArray &baCodogram);
 
 signals:
     void connStatusChanged(QString qsStatus);
@@ -66,6 +68,8 @@ private:
     QString m_qsDBPassword;
     QString m_qsDBEncoding;
     QString m_qsDBHost;
+    QSqlQuery m_query;
+    QSqlRecord m_record;
 };
 
 #endif // QSQLMODEL_H

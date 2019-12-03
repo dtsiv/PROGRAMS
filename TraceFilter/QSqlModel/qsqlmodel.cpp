@@ -56,7 +56,7 @@ QSqlModel::~QSqlModel() {
     iniSettings.setValue(QSQLMODEL_HOSTNAME, m_qsDBHost);
 
     // close postgres DB connection
-    m_db.close();
+    if (m_db.isOpen()) m_db.close();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -339,4 +339,51 @@ void QSqlModel::checkPoite() {
         FileTimeToSystemTime(&ftTlock,&st);
         tsTest << st.wYear << "." << st.wMonth << "." << st.wDay << " " << st.wHour << ":" << st.wMinute << ":" << st.wSecond << endl;
     }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool QSqlModel::execQuery() {
+    if (!m_db.isOpen()) return false;
+    // total records
+    // QSqlQuery query = QSqlQuery(m_db);
+    // if (!query.exec("SELECT COUNT (DISTINCT p.id) AS cnt FROM poite p")) return false;
+    // if (!query.next()) return false;
+    // QSqlRecord rec = query.record();
+    // qDebug() << "Total: " << query.value(rec.indexOf("cnt")).toULongLong() << " records";
+
+    // basic query - codograms POITE
+    m_query = QSqlQuery(m_db);
+    QString qsQuery("SELECT p.id AS id,"
+        " p.codogram AS cdata"
+        " FROM poite p");
+    if (!m_query.prepare(qsQuery)) return false;
+    if (!m_query.exec()) return false;
+    m_record = m_query.record();
+    return true;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool QSqlModel::getTuple(quint64 &iRecId, QByteArray &baCodogram) {
+    bool bOk;
+    if (!m_query.isActive()) {
+        qDebug() << "!m_query.isActive()";
+        return false;
+    }
+    if (!m_query.next()) {
+        // qDebug() << "!m_query.next()";
+        return false;
+    }
+    iRecId=m_query.value(m_record.indexOf("id")).toULongLong(&bOk);
+    if (!bOk) {
+        qDebug() << "m_query.value(m_record.indexOf(id)).toULongLong(&bOk) failed!";
+        return false;
+    }
+    baCodogram=m_query.value(m_record.indexOf("cdata")).toByteArray();
+    if (baCodogram.isEmpty()) {
+        qDebug() << "baCodogram.isEmpty()!";
+        return false;
+    }
+    return true;
 }

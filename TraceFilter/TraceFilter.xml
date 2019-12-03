@@ -3,7 +3,7 @@
     <ActivePropertyPage>0</ActivePropertyPage>
     <DBClientEncoding>WIN1251</DBClientEncoding>
     <DBDatabaseName>rmo</DBDatabaseName>
-    <DBEngine>1</DBEngine>
+    <DBEngine>2</DBEngine>
     <DBHostName>127.0.0.1</DBHostName>
     <DBPassword>123</DBPassword>
     <DBUserName>postgres</DBUserName>

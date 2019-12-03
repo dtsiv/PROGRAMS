@@ -278,7 +278,7 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
             else
             {  /* center of earth */
                 *Latitude = PI_OVER_2;
-                *Height = -Geocent_b;
+                *Height = -gi->Geocent_b;
                 return;
             } 
         }
