@@ -18,7 +18,7 @@ GeocentricInfo TdCord::gi = {
 };
 
 //******************************************************************************
-// BLH: radians, meters; XYZ: meters
+// blh: radians, meters; pp: meters
 //******************************************************************************
 void TdCord::Blh2Xyz(BLH blh, PXYZ pp) {
     long retVal = pj_Convert_Geodetic_To_Geocentric (
@@ -49,79 +49,97 @@ void TdCord::Blh2Xyz(BLH blh, PXYZ pp) {
 //******************************************************************************
 //
 //******************************************************************************
+bool TdCord::getViewPoint(PBLH pblhViewPoint,PMAINCTRL pMainCtrl) {
+    if (!pblhViewPoint || !pMainCtrl) return false;
+    pblhViewPoint->dLat=0.0e0; pblhViewPoint->dLon=0.0e0; pblhViewPoint->dHei=0.0e0;
+    if (pMainCtrl->p.dwPosCount<=4 || pMainCtrl->p.dwPosCount>MAX_dwPosCount) return false;
+    for (int i=1; i<=4; i++) {
+        PGROUNDINFO pgi = &pMainCtrl -> p.positions[i];
+        pblhViewPoint->dLat += pgi->blh.dLat*DEG_TO_RAD;
+        pblhViewPoint->dLon += pgi->blh.dLon*DEG_TO_RAD;
+    }
+    pblhViewPoint->dLat/=4.0e0; pblhViewPoint->dLon/=4.0e0;
+    return true;
+}
+//******************************************************************************
+//
+//******************************************************************************
+bool TdCord::getTopocentricPostsList(PBLH pblhViewPoint,QList<XYZ> &qlTcPosts,QList<int> &qlPostIds,PMAINCTRL pMainCtrl) {
+    if (!pblhViewPoint || !pMainCtrl) return false;
+    if (pMainCtrl->p.dwPosCount<=4 || pMainCtrl->p.dwPosCount>MAX_dwPosCount) return false;
+    qlTcPosts.clear();
+    for (int i=1; i<=4; i++) {
+        PGROUNDINFO pgi = &pMainCtrl -> p.positions[i];
+        XYZ postXYZ;
+        BLH postBLH;
+        postBLH.dLat=pgi->blh.dLat*DEG_TO_RAD; postBLH.dLon=pgi->blh.dLon*DEG_TO_RAD;
+        postBLH.dHei=pgi->blh.dHei;
+        toTopocentric(pblhViewPoint,postBLH,&postXYZ); // radians,meters
+        qlTcPosts << postXYZ;
+        qlPostIds << i;
+    }
+    return true;
+}
+//******************************************************************************
+//   xyz - meters, pp - radians, meters
+//******************************************************************************
 void TdCord::Xyz2Blh(XYZ xyz, PBLH pp) {
     pj_Convert_Geocentric_To_Geodetic(
         &gi, xyz.dX, xyz.dY, xyz.dZ,
         &pp->dLat, &pp->dLon, &pp->dHei);
 }
 /*=========================================================
- * PBLH pblhViewPoint,PBLH pblhTg:
+ * PBLH pblhViewPoint,BLH blhGeodetic:
  * dLat,dLon in radians
  * dHei in meters
+ * pxyzTc in meters
  *=========================================================*/
-void TdCord::toTopocentric(PBLH pblhViewPoint,PBLH pblhTg,PXYZ pxyzTc) {
-    double gc[3],tc[3];
+void TdCord::toTopocentric(PBLH pblhViewPoint,BLH blhGeodetic,PXYZ pxyzTc) {
+    if (!pblhViewPoint) {
+        throw RmoException("TdCord::toTopocentric - pblhViewPoint is NULL");
+        return;
+    }
     XYZ xyzGc;
-    Blh2Xyz(*pblhTg,&xyzGc);
-    gc[0]=xyzGc.dX; gc[1]=xyzGc.dY; gc[2]=xyzGc.dZ;
-    toTopocentric(*pblhViewPoint,&gc[0],&tc[0]);
-    pxyzTc->dX=tc[0]; pxyzTc->dY=tc[1]; pxyzTc->dZ=tc[2];
-}
-/*=========================================================
- * viewPoint: radians, meters
- * tc_loc[0],tc_loc[1],tc_loc[2] - topocentric x,y,z coordinates
- *                     (x to the North,
- *                      y to the East,
- *                      z up along the normal to ellipsoid
- * gc_loc[0],gc_loc[1],gc_loc[2] - geocentric x,y,z coordinates
- *                     (x to Equator crossing with Grinwich
- *                      y to Equator crossing with required eastern meridian
- *                      z to the North Pole
- * (See scan for more info)
- *=========================================================*/
-void TdCord::toTopocentric(BLH viewPoint,
-                   double *gc_loc,
-                   double *tc_loc) {
-    double phi=viewPoint.dLat;
-    double lam=viewPoint.dLon;
-    double h  =viewPoint.dHei;
+    Blh2Xyz(blhGeodetic,&xyzGc);
+
+    double phi=pblhViewPoint->dLat;
+    double lam=pblhViewPoint->dLon;
+    double h  =pblhViewPoint->dHei;
     double sinp = sin(phi), cosp = cos(phi), sinl = sin(lam), cosl = cos(lam);
     double e2   = gi.Geocent_e2;
     double axi = sinp*sinp; axi = 1.0e0 - e2*axi; axi = gi.Geocent_a/sqrt(axi);
 
-
-     // initialize topocentric coordinates
-    tc_loc[0] = gc_loc[0];
-    tc_loc[1] = gc_loc[1];
+    // initialize topocentric coordinates
+    pxyzTc->dX = xyzGc.dX;
+    pxyzTc->dY = xyzGc.dY;
     double dz=axi*e2*sinp;
 
-     // shift coordinate system down along Oz
-    tc_loc[2] = gc_loc[2] + dz;
+    // shift coordinate system down along Oz
+    pxyzTc->dZ = xyzGc.dZ + dz;
 
-     // temporary storage of rotated coordinates
+    // temporary storage of rotated coordinates
     double xr,yr,zr;
 
-     // rotate around Oz by lambda counter-clockwise
-    xr = cosl*tc_loc[0] + sinl*tc_loc[1];
-    yr =-sinl*tc_loc[0] + cosl*tc_loc[1];
-    tc_loc[0] = xr;
-    tc_loc[1] = yr;
+    // rotate around Oz by lambda counter-clockwise
+    xr = cosl*pxyzTc->dX + sinl*pxyzTc->dY;
+    yr =-sinl*pxyzTc->dX + cosl*pxyzTc->dY;
+    pxyzTc->dX = xr;
+    pxyzTc->dY = yr;
 
-     // rotate around Oy by pi/2-phi counter-clockwise
-    xr = sinp*tc_loc[0] - cosp*tc_loc[2];
-    zr = cosp*tc_loc[0] + sinp*tc_loc[2];
-    tc_loc[0] = xr;
-    tc_loc[2] = zr;
+    // rotate around Oy by pi/2-phi counter-clockwise
+    xr = sinp*pxyzTc->dX - cosp*pxyzTc->dZ;
+    zr = cosp*pxyzTc->dX + sinp*pxyzTc->dZ;
+    pxyzTc->dX = xr;
+    pxyzTc->dZ = zr;
 
-     // shift along Oz by a*xi+h
+    // shift along Oz by a*xi+h
     dz = axi + h;
-    tc_loc[2] = tc_loc[2] - dz;
+    pxyzTc->dZ = pxyzTc->dZ - dz;
 
-     // direct x to the North
-    tc_loc[0] = -tc_loc[0];
+    // direct x to the North
+    pxyzTc->dX = -pxyzTc->dX;
 
-    // swap x and y
-    double tmp=tc_loc[0]; tc_loc[0]=tc_loc[1]; tc_loc[1]=tmp;
-    return;
+   // swap x and y
+   double tmp=pxyzTc->dX; pxyzTc->dX=pxyzTc->dY; pxyzTc->dY=tmp;
+   return;
 }
-

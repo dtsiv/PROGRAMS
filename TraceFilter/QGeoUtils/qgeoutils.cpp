@@ -13,7 +13,6 @@ QGeoUtils::QGeoUtils()
     QIniSettings::STATUS_CODES scRes;
     iniSettings.setDefault(QGEOUTILS_MAINCTRL,"02.06.2017-09.00.22.639-mainctrl.cfg");
     m_qsMainctrlCfg = iniSettings.value(QGEOUTILS_MAINCTRL,scRes).toString();
-    // Legacy_TdCord "canonical parameters" from QAvtadu.ps4
     Legacy_TdCord::SetEllipsParams();
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -19,11 +19,7 @@ public slots:
     void onMainctrlChoose();
 
 private:
-    void getViewPoint(PBLH pblhViewPoint, PMAINCTRL pMainCtrl);
-
     QGraphicsScene m_scene;
-    QString m_qsMainctrlCfg;
-    BLH m_blhViewPoint;
 };
 
 #endif // QPOSTSVIEW_H

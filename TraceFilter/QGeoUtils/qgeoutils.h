@@ -5,6 +5,7 @@
 #include <QMetaObject>
 
 #include "qproppages.h"
+#include "tdcord.h"
 
 #define QGEOUTILS_PROP_TAB_CAPTION     "Geolocation"
 

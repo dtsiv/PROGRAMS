@@ -21,7 +21,10 @@ QSqlModel::QSqlModel(QWidget *pOwner /* = 0 */) : QObject(0)
         , m_qsDBUserName("postgres")
         , m_qsDBPassword("123")
         , m_qsDBHost("127.0.0.1")
-        , m_qsDBEncoding("WIN1251") {
+        , m_qsDBEncoding("WIN1251")
+        , m_pQuery(0)
+        , m_pRecord(0)
+        , m_qsConnectionName(QString()) {
     QIniSettings &iniSettings = QIniSettings::getInstance();
     QIniSettings::STATUS_CODES scRes;
     iniSettings.setDefault(QSQLMODEL_SQLITE_FILE,"poite20170602.db");
@@ -55,34 +58,64 @@ QSqlModel::~QSqlModel() {
     iniSettings.setValue(QSQLMODEL_ENCODING, m_qsDBEncoding);
     iniSettings.setValue(QSQLMODEL_HOSTNAME, m_qsDBHost);
 
-    // close postgres DB connection
-    if (m_db.isOpen()) m_db.close();
+    if (!m_qsConnectionName.isEmpty()) {
+        {// close DB connection and free resources carefully
+            bool bOpen=false; // do not open DB connection at this time
+            QSqlDatabase db = QSqlDatabase::database(m_qsConnectionName,bOpen);
+            if (m_pRecord) {
+                delete m_pRecord;
+                m_pRecord=0;
+            }
+            if (m_pQuery) {
+                delete m_pQuery;
+                m_pQuery=0;
+            }
+            if (db.isOpen()) db.close();
+        }
+        // free resources
+        QSqlDatabase::removeDatabase(m_qsConnectionName);
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool QSqlModel::openDB() {
-    if (m_db.isValid()) {
-        QString qsConnName=m_db.connectionName();
-        if (m_db.isOpen()) m_db.close();
-        m_db = QSqlDatabase(); // move previous instance output of scope to call removeDatabase()
-        QSqlDatabase::removeDatabase(qsConnName);
+    // close existing connection
+    if (!m_qsConnectionName.isEmpty()) {
+        { // close DB connection and free resources carefully
+            bool bOpen=false; // do not open DB connection at this time
+            QSqlDatabase db = QSqlDatabase::database(m_qsConnectionName,bOpen);
+            if (m_pRecord) {
+                delete m_pRecord;
+                m_pRecord=0;
+            }
+            if (m_pQuery) {
+                delete m_pQuery;
+                m_pQuery=0;
+            }
+            if (db.isOpen()) db.close();
+        }
+        // free resources
+        QSqlDatabase::removeDatabase(m_qsConnectionName);
     }
+    QSqlDatabase db;
     if (m_iDbEngine == DB_Engine_Postgres) {
-        m_db = QSqlDatabase::addDatabase("QPSQL",PGSQL_CONN_NAME);
-        m_db.setHostName(m_qsDBHost);
-        m_db.setDatabaseName(m_qsDatabaseName);
-        m_db.setUserName(m_qsDBUserName);
-        m_db.setPassword(m_qsDBPassword);
-        m_db.setConnectOptions(QString("client_encoding=%1").arg(m_qsDBEncoding));
+        m_qsConnectionName = PGSQL_CONN_NAME;
+        db = QSqlDatabase::addDatabase("QPSQL",m_qsConnectionName);
+        db.setHostName(m_qsDBHost);
+        db.setDatabaseName(m_qsDatabaseName);
+        db.setUserName(m_qsDBUserName);
+        db.setPassword(m_qsDBPassword);
+        db.setConnectOptions(QString("client_encoding=%1").arg(m_qsDBEncoding));
     }
     else if (m_iDbEngine == DB_Engine_Sqlite) {
-        m_db = QSqlDatabase::addDatabase("QSQLITE",SQLITE_CONN_NAME);
-        m_db.setDatabaseName(QFileInfo(m_qsDBSqliteFile).absoluteFilePath());
+        m_qsConnectionName = SQLITE_CONN_NAME;
+        db = QSqlDatabase::addDatabase("QSQLITE",m_qsConnectionName);
+        db.setDatabaseName(QFileInfo(m_qsDBSqliteFile).absoluteFilePath());
     }
     // if db open fails then show exception dialog
-    if (!m_db.open()) {
-        QString qsDBError(m_db.lastError().text());
+    if (!db.open()) {
+        QString qsDBError(db.lastError().text());
         qDebug() << "Cannot open database:" << qsDBError;
         QExceptionDialog *pDlg = new QExceptionDialog(qsDBError, m_pOwner);
         pDlg -> setAttribute(Qt::WA_DeleteOnClose);
@@ -91,8 +124,12 @@ bool QSqlModel::openDB() {
         return false;
     }
     // update connection status on the status bar
-    if (m_iDbEngine == DB_Engine_Postgres)    emit connStatusChanged(CONN_STATUS_PGCONN);
-    else if (m_iDbEngine == DB_Engine_Sqlite) emit connStatusChanged(CONN_STATUS_SQLITE);
+    if (m_iDbEngine == DB_Engine_Postgres) {
+        emit connStatusChanged(CONN_STATUS_PGCONN);
+    }
+    else if (m_iDbEngine == DB_Engine_Sqlite) {
+        emit connStatusChanged(CONN_STATUS_SQLITE);
+    }
     // open already succeeded
     return true;
 
@@ -294,10 +331,15 @@ void QSqlModel::propChanged(QObject *pPropDlg) {
     }
 
     // otherwise just emit signal about connection status
-    if (m_db.isOpen()) {
-        if (iDbEngine==DB_Engine_Sqlite) emit connStatusChanged(CONN_STATUS_SQLITE);
-        else if (iDbEngine==DB_Engine_Postgres) emit connStatusChanged(CONN_STATUS_PGCONN);
-        return;
+    if (!m_qsConnectionName.isEmpty()) {
+        // get existing connection (must already be opened)
+        bool bOpen=false; // do not open DB connection at this time
+        QSqlDatabase db = QSqlDatabase::database(m_qsConnectionName,bOpen);
+        if (db.isOpen()) {
+            if (iDbEngine==DB_Engine_Sqlite) emit connStatusChanged(CONN_STATUS_SQLITE);
+            else if (iDbEngine==DB_Engine_Postgres) emit connStatusChanged(CONN_STATUS_PGCONN);
+            return;
+        }
     }
     emit connStatusChanged(CONN_STATUS_DISCONN);
 }
@@ -305,11 +347,17 @@ void QSqlModel::propChanged(QObject *pPropDlg) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QSqlModel::checkPoite() {
-    if (!m_db.isOpen()) return;
+    QSqlDatabase db;
+    // if no connection was set - then skip all
+    if (m_qsConnectionName.isEmpty()) return;
+    // get existing connection (must already be opened)
+    bool bOpen=false; // do not open DB connection at this time
+    db = QSqlDatabase::database(m_qsConnectionName,bOpen);
+    if (!db.isOpen()) return;
     QString qsQuery("SELECT p.id AS id,"
         " p.codogram"
         " FROM poite p");
-    QSqlQuery query(m_db);
+    QSqlQuery query(db);
     query.prepare(qsQuery);
     if (!query.exec()) return;
     QSqlRecord qRec=query.record();
@@ -344,22 +392,38 @@ void QSqlModel::checkPoite() {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool QSqlModel::execQuery() {
-    if (!m_db.isOpen()) return false;
+    QSqlDatabase db;
+    // if no connection was set - then skip all
+    if (m_qsConnectionName.isEmpty()) return false;
+    // get existing connection (must already be opened)
+    bool bOpen=false; // do not open DB connection at this time
+    db = QSqlDatabase::database(m_qsConnectionName,bOpen);
+    if (!db.isOpen()) return false;
     // total records
-    // QSqlQuery query = QSqlQuery(m_db);
+    // QSqlQuery query = QSqlQuery(db);
     // if (!query.exec("SELECT COUNT (DISTINCT p.id) AS cnt FROM poite p")) return false;
     // if (!query.next()) return false;
     // QSqlRecord rec = query.record();
     // qDebug() << "Total: " << query.value(rec.indexOf("cnt")).toULongLong() << " records";
 
     // basic query - codograms POITE
-    m_query = QSqlQuery(m_db);
+    m_pQuery = new QSqlQuery(db);
+    if (!m_pQuery) return false;
     QString qsQuery("SELECT p.id AS id,"
         " p.codogram AS cdata"
         " FROM poite p");
-    if (!m_query.prepare(qsQuery)) return false;
-    if (!m_query.exec()) return false;
-    m_record = m_query.record();
+    if (!m_pQuery->prepare(qsQuery)) {
+        delete m_pQuery;
+        m_pQuery=0;
+        return false;
+    }
+    if (!m_pQuery->exec()) {
+        delete m_pQuery;
+        m_pQuery=0;
+        return false;
+    }
+    m_pRecord = new QSqlRecord();
+    *m_pRecord = m_pQuery->record();
     return true;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -367,20 +431,22 @@ bool QSqlModel::execQuery() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool QSqlModel::getTuple(quint64 &iRecId, QByteArray &baCodogram) {
     bool bOk;
-    if (!m_query.isActive()) {
-        qDebug() << "!m_query.isActive()";
+    if (!m_pQuery || !m_pQuery->isActive()) {
+        qDebug() << "!m_pQuery.isActive()";
         return false;
     }
-    if (!m_query.next()) {
-        // qDebug() << "!m_query.next()";
+    if (!m_pQuery->next()) {
         return false;
     }
-    iRecId=m_query.value(m_record.indexOf("id")).toULongLong(&bOk);
+    if (!m_pRecord) {
+        return false;
+    }
+    iRecId=m_pQuery->value(m_pRecord->indexOf("id")).toULongLong(&bOk);
     if (!bOk) {
-        qDebug() << "m_query.value(m_record.indexOf(id)).toULongLong(&bOk) failed!";
+        qDebug() << "m_pQuery->value(m_pRecord->indexOf(id)).toULongLong(&bOk) failed!";
         return false;
     }
-    baCodogram=m_query.value(m_record.indexOf("cdata")).toByteArray();
+    baCodogram=m_pQuery->value(m_pRecord->indexOf("cdata")).toByteArray();
     if (baCodogram.isEmpty()) {
         qDebug() << "baCodogram.isEmpty()!";
         return false;

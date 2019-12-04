@@ -46,6 +46,7 @@ QFilterWindow::QFilterWindow(QWidget *parent, Qt::WindowFlags flags)
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QFilterWindow::~QFilterWindow() {
+
     // settings object and main window adjustments
     QIniSettings &iniSettings = QIniSettings::getInstance();
     QRect qrCurGeometry=geometry();
@@ -119,7 +120,7 @@ void QFilterWindow::hideStopper() {
     setVisible(true);
 
     //------ test 2D solver ------
-    if (1 && bQueryOk) {
+    if (0 && bQueryOk) {
         int iTgs=0;
         QFile qfTargets("targets.dat");
         qfTargets.resize(0);

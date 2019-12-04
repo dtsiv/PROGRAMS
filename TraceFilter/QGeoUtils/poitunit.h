@@ -8,10 +8,11 @@
 #include <QString>
 #include "qavtctrl.h"
 #include "codograms.h"
+
+#include "tdcord.h"
+
 #define GEARTH          9.87  // ускорение свободного падения, м/(c*c);
 #define VERYLARGEAMOUNT 1.e10    // Чтобы больше не было
-#define RAD_TO_DEG	57.29577951308232
-#define DEG_TO_RAD	0.0174532925199432958
 
 typedef struct SOMEKOFFS_
 {   double A, B, C, D, E, F, T1, T2, T4, T6;
@@ -48,7 +49,7 @@ typedef struct RXPOINT_
     };
     double dTimeOffs, dAmp, D0, D1, D2, sD0, sD1, sD2;			// dTimeOffs in seconds
 } RXPOINT, * PRXPOINT;
-#define MAXPOSTNUM 8
+#define MAXPOSTNUM MAX_dwPosCount
 
 class TPoiT : public Legacy_TdCord
 {

@@ -8,9 +8,7 @@
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QPostsView::QPostsView(QString qsMainctrlCfg, QWidget *parent /* = 0 */)
-    : QGraphicsView(parent)
-    , m_qsMainctrlCfg(QString())
-    , m_blhViewPoint({0,0,0}) {
+    : QGraphicsView(parent) {
     setScene(&m_scene);
     scale(5,5);
     onMainctrlChanged(qsMainctrlCfg);
@@ -21,25 +19,27 @@ QPostsView::QPostsView(QString qsMainctrlCfg, QWidget *parent /* = 0 */)
 void QPostsView::onMainctrlChanged(QString qsMainctrlCfg) {
     m_scene.clear();
     QFile qfMainCtrl(qsMainctrlCfg);
+    PMAINCTRL m_pMainCtrl=NULL;
     if (qfMainCtrl.open(QIODevice::ReadOnly)) {
-        PMAINCTRL m_pMainCtrl=(PMAINCTRL)qfMainCtrl.map(0,qfMainCtrl.size());
+        m_pMainCtrl=(PMAINCTRL)qfMainCtrl.map(0,qfMainCtrl.size());
         qfMainCtrl.close();
-        double dScale=1.0e-3;
-        getViewPoint(&m_blhViewPoint,m_pMainCtrl); // radians,meters
-        for (int i=1; i<=4; i++) {
-            PGROUNDINFO pgi = &m_pMainCtrl -> p.positions[i];
-            XYZ postXYZ;
-            BLH postBLH;
-            postBLH.dLat=pgi->blh.dLat*DEG_2_RAD; postBLH.dLon=pgi->blh.dLon*DEG_2_RAD;
-            postBLH.dHei=pgi->blh.dHei;
-            TdCord::toTopocentric(&m_blhViewPoint,&postBLH,&postXYZ); // radians,meters
-            m_scene.addText(QString::number(i))->setPos(postXYZ.dX*dScale,-postXYZ.dY*dScale);
+        BLH blhViewPoint;
+        if (TdCord::getViewPoint(&blhViewPoint,m_pMainCtrl)) { // radians,meters
+            QList<XYZ> qlTcPosts;
+            QList<int> qlPostIds;
+            if (TdCord::getTopocentricPostsList(&blhViewPoint,qlTcPosts,qlPostIds,m_pMainCtrl)) {
+                double dScale=1.0e-3;
+                for (int i=0; i<qlTcPosts.count(); i++) {
+                    XYZ postXYZ = qlTcPosts.at(i);
+                    int iPostId = qlPostIds.at(i);
+                    m_scene.addText(QString::number(iPostId))->setPos(postXYZ.dX*dScale,-postXYZ.dY*dScale);
+                }
+                return;
+            }
         }
-        m_qsMainctrlCfg = qsMainctrlCfg;
     }
-    else {
-        m_scene.addText("Open failed");
-    }
+    m_scene.addText("Open failed");
+    return;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -67,17 +67,4 @@ void QPostsView::onMainctrlChoose() {
             onMainctrlChanged(qsCompactPath);
         }
     }
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//   pblhViewPoint - radians, meters
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QPostsView::getViewPoint(PBLH pblhViewPoint, PMAINCTRL pMainCtrl) {
-    pblhViewPoint->dLat=0.0e0; pblhViewPoint->dLon=0.0e0; pblhViewPoint->dHei=0.0e0;
-    if (pMainCtrl->p.dwPosCount < 5) return;
-    for (int i=1; i<=4; i++) {
-        PGROUNDINFO pgi = &pMainCtrl -> p.positions[i];
-        pblhViewPoint->dLat += pgi->blh.dLat*DEG_2_RAD;
-        pblhViewPoint->dLon += pgi->blh.dLon*DEG_2_RAD;
-    }
-    pblhViewPoint->dLat/=4.0e0; pblhViewPoint->dLon/=4.0e0;
 }

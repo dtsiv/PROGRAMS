@@ -62,14 +62,14 @@ private:
     QString m_qsDBSqliteFile;
     QSQLMODEL_DB_ENGINES m_iDbEngine;
     QWidget *m_pOwner;
-    QSqlDatabase m_db;
     QString m_qsDatabaseName;
     QString m_qsDBUserName;
     QString m_qsDBPassword;
     QString m_qsDBEncoding;
     QString m_qsDBHost;
-    QSqlQuery m_query;
-    QSqlRecord m_record;
+    QSqlQuery *m_pQuery;
+    QSqlRecord *m_pRecord;
+    QString m_qsConnectionName;
 };
 
 #endif // QSQLMODEL_H
