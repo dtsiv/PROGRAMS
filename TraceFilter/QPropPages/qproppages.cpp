@@ -56,9 +56,22 @@ void QColorSelectionButton::onColorSelected(const QColor &color) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QPropPages::QPropPages(QObject *pOwner, QWidget *parent /* =0 */)
  : QDialog(parent,Qt::Dialog),
-         m_pbAccept(NULL),
-         m_pOwner (pOwner),
-         m_pTabWidget(NULL) {
+        m_pleDBDatabaseName(NULL),
+        m_pleDBDatabaseUser(NULL),
+        m_pleDBDatabasePassword(NULL),
+        m_pleDBDatabaseEncoding(NULL),
+        m_pleDBSqliteFileName(NULL),
+        m_pleDBDatabaseHostname(NULL),
+        m_pleMainCtrl(NULL),
+        m_plbViewPtLat(NULL),
+        m_plbViewPtLon(NULL),
+        m_pbAccept(NULL),
+        m_prbDBEngineSqlite(NULL),
+        m_prbDBEnginePostgres(NULL),
+        m_pbgDBEngine(NULL),
+        m_pPostsView(NULL),
+        m_pOwner (pOwner),
+        m_pTabWidget(NULL) {
      resize(591,326);
      setWindowTitle("Properties");
      setWindowIcon(QIcon(QPixmap(":/Resources/settings.ico")));
@@ -81,7 +94,6 @@ QPropPages::QPropPages(QObject *pOwner, QWidget *parent /* =0 */)
      setLayout(pVLayout);
      QObject::connect(m_pbAccept,SIGNAL(clicked()),SLOT(onAccepted()));
      QObject::connect(pbCancel,SIGNAL(clicked()),SLOT(close()));
-     QObject::connect(this,SIGNAL(testPgConnection()),m_pOwner,SLOT(onTestPgConnection()));
      QIniSettings &iniSettings = QIniSettings::getInstance();
      QIniSettings::STATUS_CODES scStat;
      bool bOk=false;
@@ -104,32 +116,4 @@ void QPropPages::onAccepted() {
         iniSettings.setValue(QPROPPAGES_ACTIVE_TAB,m_pTabWidget->currentIndex());
     }
     done(QDialog::Accepted);
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QPropPages::onSQLiteFileChoose() {
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("SQLite db file (*.db *.sqlite *.sqlite3)"));
-    dialog.setDirectory(QDir::current());
-    if (dialog.exec()) {
-        QStringList qsSelection=dialog.selectedFiles();
-        if (qsSelection.size() != 1) return;
-        QString qsSelFilePath=qsSelection.at(0);
-        QFileInfo fiSelFilePath(qsSelFilePath);
-        if (fiSelFilePath.isFile() && fiSelFilePath.isReadable())	{
-            QDir qdCur = QDir::current();
-            QDir qdSelFilePath = fiSelFilePath.absoluteDir();
-            if (qdCur.rootPath() == qdSelFilePath.rootPath()) { // same Windows drives
-                m_pleDBSqliteFileName->setText(qdCur.relativeFilePath(fiSelFilePath.absoluteFilePath()));
-            }
-            else { // different Windows drives
-                m_pleDBSqliteFileName->setText(fiSelFilePath.absoluteFilePath());
-            }
-        }
-        else {
-            m_pleDBSqliteFileName->setText("error");
-        }
-    }
 }

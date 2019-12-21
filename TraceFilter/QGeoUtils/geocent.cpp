@@ -215,7 +215,7 @@ long pj_Convert_Geodetic_To_Geocentric (GeocentricInfo *gi,
  *    Height    : Calculated height value, in meters.         (output)
  */
 
-// #define USE_ITERATIVE_METHOD
+//#define USE_ITERATIVE_METHOD
 
 void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
                                         double X,

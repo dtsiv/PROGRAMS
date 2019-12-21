@@ -37,11 +37,12 @@ public:
     ~QPropPages();
 
 signals:
+    void chooseSqliteFile();
     void testPgConnection();
+    void chooseMainCtrl();
 
 public slots:
     void onAccepted();
-    void onSQLiteFileChoose();
 
     // public-visible interface controls
 public:
@@ -52,10 +53,13 @@ public:
     QLineEdit *m_pleDBSqliteFileName;
     QLineEdit *m_pleDBDatabaseHostname;
     QLineEdit *m_pleMainCtrl;
+    QLabel *m_plbViewPtLat;
+    QLabel *m_plbViewPtLon;
     QPushButton *m_pbAccept;
     QRadioButton *m_prbDBEngineSqlite;
     QRadioButton *m_prbDBEnginePostgres;
     QButtonGroup *m_pbgDBEngine;
+    QObject *m_pPostsView;
 
 private:
     QObject *m_pOwner;

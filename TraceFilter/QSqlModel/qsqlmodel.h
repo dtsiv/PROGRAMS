@@ -55,6 +55,10 @@ public:
 signals:
     void connStatusChanged(QString qsStatus);
 
+public slots:
+    void onSQLiteFileChoose();
+    void onTestPgConnection();
+
 private:    // database operations
     bool openDB();
 

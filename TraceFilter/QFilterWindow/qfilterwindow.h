@@ -34,7 +34,6 @@ public:
 public slots:
     void hideStopper();
     void onSetup();
-    void onTestPgConnection();
     void setStatusMessage(QString qsMsg);
 
 public:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
-    <ActivePropertyPage>0</ActivePropertyPage>
+    <ActivePropertyPage>1</ActivePropertyPage>
     <DBClientEncoding>WIN1251</DBClientEncoding>
     <DBDatabaseName>rmo</DBDatabaseName>
     <DBEngine>2</DBEngine>
@@ -9,5 +9,5 @@
     <DBUserName>postgres</DBUserName>
     <MainCtrl>02.06.2017-09.00.22.639-mainctrl.cfg</MainCtrl>
     <SQLiteFile>../DATA/Avtobaza-2017/poite20170602.db</SQLiteFile>
-    <geometry>AAAA+gAAAJIAAAWSAAACvQ==</geometry>
+    <geometry>AAABCAAAAJYAAAWgAAACwQ==</geometry>
 </PARAMETERS>

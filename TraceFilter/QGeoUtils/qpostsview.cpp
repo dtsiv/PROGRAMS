@@ -8,63 +8,122 @@
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QPostsView::QPostsView(QString qsMainctrlCfg, QWidget *parent /* = 0 */)
-    : QGraphicsView(parent) {
-    setScene(&m_scene);
-    scale(5,5);
+      : QWidget(parent, Qt::WindowFlags())
+      , m_iLabelSize(16)
+      , m_iPenWidth(4)
+      , m_iMargin(5)
+      , m_iWgtSz(80)
+      , m_iOffset(3)
+      , m_pMainCtrl(NULL) {
+    setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     onMainctrlChanged(qsMainctrlCfg);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QPostsView::onMainctrlChanged(QString qsMainctrlCfg) {
-    m_scene.clear();
-    QFile qfMainCtrl(qsMainctrlCfg);
-    PMAINCTRL m_pMainCtrl=NULL;
-    if (qfMainCtrl.open(QIODevice::ReadOnly)) {
-        m_pMainCtrl=(PMAINCTRL)qfMainCtrl.map(0,qfMainCtrl.size());
-        qfMainCtrl.close();
+bool QPostsView::onMainctrlChanged(QString qsMainctrlCfg) {
+    bool bRetVal=false;
+    m_qlPosts.clear();
+    m_qlPostIds.clear();
+    m_qfMainCtrl.setFileName(qsMainctrlCfg);
+    PMAINCTRL pMainCtrl=m_pMainCtrl=NULL;
+    if (m_qfMainCtrl.open(QIODevice::ReadOnly)) {
+        pMainCtrl=(PMAINCTRL)m_qfMainCtrl.map(0,m_qfMainCtrl.size());
+        m_qfMainCtrl.close();
         BLH blhViewPoint;
-        if (TdCord::getViewPoint(&blhViewPoint,m_pMainCtrl)) { // radians,meters
+        if (TdCord::getViewPoint(&blhViewPoint,pMainCtrl)) { // radians,meters
             QList<XYZ> qlTcPosts;
             QList<int> qlPostIds;
-            if (TdCord::getTopocentricPostsList(&blhViewPoint,qlTcPosts,qlPostIds,m_pMainCtrl)) {
-                double dScale=1.0e-3;
-                for (int i=0; i<qlTcPosts.count(); i++) {
-                    XYZ postXYZ = qlTcPosts.at(i);
-                    int iPostId = qlPostIds.at(i);
-                    m_scene.addText(QString::number(iPostId))->setPos(postXYZ.dX*dScale,-postXYZ.dY*dScale);
+            if (TdCord::getTopocentricPostsList(&blhViewPoint,qlTcPosts,qlPostIds,pMainCtrl)) {
+                if (qlTcPosts.count()==4 && qlPostIds.count()==4) {
+                    for (int i=0; i<qlTcPosts.count(); i++) {
+                        XYZ xyzTcPost = qlTcPosts.at(i);
+                        m_qlPosts << QPoint(xyzTcPost.dX,xyzTcPost.dY);
+                        m_qlPostIds << qlPostIds.at(i);
+                    }
+                    m_qsMainctrlCfg = qsMainctrlCfg;
+                    m_pMainCtrl = pMainCtrl;
+                    m_blhViewPont = blhViewPoint;
+                    bRetVal=true;
                 }
-                return;
             }
         }
     }
-    m_scene.addText("Open failed");
-    return;
+    repaint();
+    return bRetVal;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QPostsView::onMainctrlChoose() {
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("MainCtrl files (*.cfg)"));
-    dialog.setDirectory(QDir::current());
-    if (dialog.exec()) {
-        QStringList qsSelection=dialog.selectedFiles();
-        if (qsSelection.size() != 1) return;
-        QString qsSelFilePath=qsSelection.at(0);
-        QFileInfo fiSelFilePath(qsSelFilePath);
-        if (fiSelFilePath.isFile() && fiSelFilePath.isReadable()) {
-            QDir qdSelFilePath=fiSelFilePath.absoluteDir();
-            QDir qdCur=QDir::current();
-            QString qsCompactPath;
-            if (qdCur.rootPath()==qdSelFilePath.rootPath()) { // same Windows drive
-                qsCompactPath=qdCur.relativeFilePath(fiSelFilePath.absoluteFilePath());
-            }
-            else { // different Windows drives
-                qsCompactPath=fiSelFilePath.absoluteFilePath();
-            }
-            onMainctrlChanged(qsCompactPath);
-        }
+/* virtual */ void QPostsView::paintEvent(QPaintEvent *qpeEvent) {
+    QPainter painter;
+    painter.begin(this);
+    QBrush qbrBg(Qt::white,Qt::SolidPattern);
+    QSize szWgt=size();
+    painter.fillRect(0,0,szWgt.width(),szWgt.height(),qbrBg);
+    QPen qpLbl(Qt::black);
+    painter.setPen(qpLbl);
+    QFont font=QApplication::font();
+    font.setPointSize(m_iLabelSize);
+    painter.setFont(font);
+    if (m_qlPostIds.count()!=4 || m_qlPosts.count()!=4) {
+        painter.drawText(QRect(0,0,szWgt.width(),szWgt.height()),Qt::AlignCenter,"Error");
+        painter.end();
+        return;
     }
+    QFontMetrics fmTickLabel(font);
+    QPen qpenPost(Qt::black,m_iPenWidth,Qt::SolidLine,Qt::RoundCap);
+    // determine scale
+    int iXmin=1.0e10, iXmax=-1.0e10, iYmin=1.0e10, iYmax=-1.0e10;
+    int iLblWidth=0,iLblHeight=0;
+    for (int i=0; i<m_qlPosts.count(); i++) {
+        int iX=m_qlPosts.at(i).x();
+        int iY=m_qlPosts.at(i).y();
+        iXmin=(iXmin>iX)?iX:iXmin;
+        iXmax=(iXmax<iX)?iX:iXmax;
+        iYmin=(iYmin>iY)?iY:iYmin;
+        iYmax=(iYmax<iY)?iY:iYmax;
+        int iPostId=m_qlPostIds.at(i);
+        QSize szLbl = fmTickLabel.size(Qt::TextSingleLine,QString::number(iPostId));
+        iLblWidth = (szLbl.width()>iLblWidth)?szLbl.width():iLblWidth;
+        iLblHeight = (szLbl.width()>iLblHeight)?szLbl.height():iLblHeight;
+    }
+    if (iXmin>iXmax || iYmin > iYmax) {
+        painter.drawText(QRect(0,0,szWgt.width(),szWgt.height()),Qt::AlignCenter,"Error");
+        painter.end();
+        return;
+    }
+    double dPhyWidth = iXmax - iXmin;
+    double dPhyHeight = iYmax - iYmin;
+    double dScrWidth = szWgt.width() - 2*m_iMargin - iLblWidth - m_iOffset - m_iPenWidth;
+    double dScrHeight = szWgt.height() - 2*m_iMargin - iLblHeight - m_iOffset - m_iPenWidth;
+    double dScaleX=dScrWidth/dPhyWidth;
+    double dScaleY=dScrHeight/dPhyHeight;
+    if (dScaleX < 1.e-6 || dScaleY < 1.0e-6) {
+        painter.drawText(QRect(0,0,szWgt.width(),szWgt.height()),Qt::AlignCenter,"Error");
+        painter.end();
+        return;
+    }
+    double dScale=qMin(dScaleX,dScaleY);
+    int iScrX0=m_iMargin+iLblWidth+m_iOffset+m_iPenWidth;
+    int iScrY0=m_iMargin+iLblHeight+m_iOffset+m_iPenWidth;
+    for (int i=0; i<m_qlPosts.count(); i++) {
+        int iPostId = m_qlPostIds.at(i);
+        QPoint qpPost = m_qlPosts.at(i);
+        QString qsPostId = QString::number(iPostId);
+        int iPtX = iScrX0 + (qpPost.x()-iXmin)*dScale;
+        int iPtY = iScrY0 + (iYmax - qpPost.y())*dScale;
+        painter.setPen(qpenPost);
+        painter.drawPoint(iPtX,iPtY);
+        painter.setPen(qpLbl);
+        painter.drawText(iPtX-m_iOffset-iLblWidth,iPtY-m_iOffset,qsPostId);
+    }
+    painter.end();
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* virtual */ QSize  QPostsView::sizeHint() const {
+    return QSize(m_iWgtSz,m_iWgtSz);
+}
+

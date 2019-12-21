@@ -216,6 +216,7 @@ void QSqlModel::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     QPushButton *ppbTestPgConnection = new QPushButton("test");
     pGridLayout->addWidget(ppbTestPgConnection,2,4);
     QObject::connect(ppbTestPgConnection,SIGNAL(clicked()),pPropPages,SIGNAL(testPgConnection()));
+    QObject::connect(pPropPages,SIGNAL(testPgConnection()),SLOT(onTestPgConnection()));
     pGridLayout->setColumnStretch(5,100);
     pGridLayout->setColumnStretch(2,100);
     pVLayout->addLayout(pGridLayout);
@@ -227,7 +228,8 @@ void QSqlModel::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     QHBoxLayout *pHBoxLayout=new QHBoxLayout;
     pHBoxLayout->addWidget(pPropPages->m_pleDBSqliteFileName);
     QPushButton *ppbChoose=new QPushButton(QIcon(":/Resources/open.ico"),"Choose");
-    QObject::connect(ppbChoose,SIGNAL(clicked()),pPropPages,SLOT(onSQLiteFileChoose()));
+    QObject::connect(ppbChoose,SIGNAL(clicked()),pPropPages,SIGNAL(chooseSqliteFile()));
+    QObject::connect(pPropPages,SIGNAL(chooseSqliteFile()),SLOT(onSQLiteFileChoose()));
     pHBoxLayout->addWidget(ppbChoose);
     pVLayout->addLayout(pHBoxLayout);
     pVLayout->addStretch();
@@ -452,4 +454,60 @@ bool QSqlModel::getTuple(quint64 &iRecId, QByteArray &baCodogram) {
         return false;
     }
     return true;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QSqlModel::onSQLiteFileChoose() {
+    QPropPages *pPropPages = qobject_cast<QPropPages *> (QObject::sender());
+
+    QFileDialog dialog(pPropPages);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("SQLite db file (*.db *.sqlite *.sqlite3)"));
+    dialog.setDirectory(QDir::current());
+    if (dialog.exec()) {
+        QStringList qsSelection=dialog.selectedFiles();
+        if (qsSelection.size() != 1) return;
+        QString qsSelFilePath=qsSelection.at(0);
+        QFileInfo fiSelFilePath(qsSelFilePath);
+        if (fiSelFilePath.isFile() && fiSelFilePath.isReadable())	{
+            QDir qdCur = QDir::current();
+            QDir qdSelFilePath = fiSelFilePath.absoluteDir();
+            if (qdCur.rootPath() == qdSelFilePath.rootPath()) { // same Windows drives
+                pPropPages->m_pleDBSqliteFileName->setText(qdCur.relativeFilePath(fiSelFilePath.absoluteFilePath()));
+            }
+            else { // different Windows drives
+                pPropPages->m_pleDBSqliteFileName->setText(fiSelFilePath.absoluteFilePath());
+            }
+        }
+        else {
+            pPropPages->m_pleDBSqliteFileName->setText("error");
+        }
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QSqlModel::onTestPgConnection() {
+    QPropPages *pPropPages = qobject_cast<QPropPages *> (QObject::sender());
+    if (!pPropPages) {
+        emit connStatusChanged("Could not start test");
+        return;
+    }
+
+    QString qsErrMsg;
+    bool bOk = testPgConnection(
+                qsErrMsg,
+                pPropPages->m_pleDBDatabaseHostname->text(),
+                pPropPages->m_pleDBDatabaseName->text(),
+                pPropPages->m_pleDBDatabaseUser->text(),
+                pPropPages->m_pleDBDatabasePassword->text(),
+                pPropPages->m_pleDBDatabaseEncoding->text());
+    // set status bar message depending on result
+    if (bOk) {
+        emit connStatusChanged("Postgres test succeeded");
+    }
+    else {
+        emit connStatusChanged(qsErrMsg);
+    }
 }

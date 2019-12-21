@@ -7,19 +7,30 @@
 #include "qavtctrl.h"
 #include "codograms.h"
 
-class QPostsView : public QGraphicsView {
+class QPostsView : public QWidget {
     Q_OBJECT
 public:
     explicit QPostsView(QString qsMainctrlCfg, QWidget *parent = 0);
+    virtual QSize sizeHint() const;
+    bool onMainctrlChanged(QString);
 
-signals:
+protected:
+    virtual void paintEvent(QPaintEvent *qpeEvent);
 
-public slots:
-    void onMainctrlChanged(QString qsMainctrlCfg);
-    void onMainctrlChoose();
+public:
+    QString m_qsMainctrlCfg;
+    PMAINCTRL m_pMainCtrl;
+    BLH m_blhViewPont;
 
 private:
-    QGraphicsScene m_scene;
+    int m_iLabelSize;
+    int m_iPenWidth;
+    int m_iMargin;
+    QList<int> m_qlPostIds;
+    QList<QPoint> m_qlPosts;
+    int m_iWgtSz;
+    int m_iOffset;
+    QFile m_qfMainCtrl;
 };
 
 #endif // QPOSTSVIEW_H

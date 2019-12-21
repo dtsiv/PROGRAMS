@@ -85,11 +85,13 @@ void QFilterWindow::initComponents() {
     m_pGeoUtils = new QGeoUtils;
     if (m_pGeoUtils) m_qlObjects << qobject_cast<QObject *> (m_pGeoUtils);
 
-    if (m_pSqlModel->execQuery()) {
-        bQueryOk=true;
-    }
-    else {
-        qDebug() << "m_pSqlModel->execQuery() failed!";
+    if (0) {
+        if (m_pSqlModel->execQuery()) {
+            bQueryOk=true;
+        }
+        else {
+            qDebug() << "m_pSqlModel->execQuery() failed!";
+        }
     }
 
     // create widgets
@@ -167,33 +169,6 @@ void QFilterWindow::onSetup() {
         m_qrPropDlgGeo=dlgPropPages.geometry();
         settingsAct->setEnabled(true);
         bInSetup=false;
-    }
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QFilterWindow::onTestPgConnection() {
-    QObject *pobj = QObject::sender();
-    QPropPages *pPropPages = qobject_cast<QPropPages *>(pobj);
-    if (!pPropPages || !m_pSqlModel) {
-        setStatusMessage("Could not start test");
-        return;
-    }
-
-    QString qsErrMsg;
-    bool bOk = m_pSqlModel->testPgConnection(
-                qsErrMsg,
-                pPropPages->m_pleDBDatabaseHostname->text(),
-                pPropPages->m_pleDBDatabaseName->text(),
-                pPropPages->m_pleDBDatabaseUser->text(),
-                pPropPages->m_pleDBDatabasePassword->text(),
-                pPropPages->m_pleDBDatabaseEncoding->text());
-    // set status bar message depending on result
-    if (bOk) {
-        setStatusMessage("Postgres test succeeded");
-    }
-    else {
-        setStatusMessage(qsErrMsg);
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

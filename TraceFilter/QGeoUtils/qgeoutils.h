@@ -21,6 +21,12 @@ public:
     Q_INVOKABLE void addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx);
     Q_INVOKABLE void propChanged(QObject *pPropDlg);
 
+public slots:
+    void onMainctrlChoose();
+
+public:
+    BLH m_blhViewPoint;
+
 private:
     QString m_qsMainctrlCfg;
 
