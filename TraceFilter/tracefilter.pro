@@ -11,5 +11,5 @@ SUBDIRS = QExceptionDialog \
           FilterMain
 
 win32 {
-    !system(del /F FilterMain.exe)
+    !system(del /F TraceFilter.exe)
 }

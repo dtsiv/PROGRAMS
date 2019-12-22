@@ -179,12 +179,12 @@ void TdCord::toTopocentric(PBLH pblhViewPoint,BLH blhGeodetic,PXYZ pxyzTc, struc
    // swap x and y
    double tmp=pxyzTc->dX; pxyzTc->dX=pxyzTc->dY; pxyzTc->dY=tmp;
 
-   {
-       Legacy_TdCord::SetEllipsParams();
-       XYZ xyzGc;
-       Legacy_TdCord::Blh2Xyz(blhGeodetic,&xyzGc);
-       // qDebug() << "LegacyGeocentric: " <<  "(" << xyzGc.dX <<  ", " << xyzGc.dY <<  ", " << xyzGc.dZ <<  "); ";
-   }
+   //{
+   //    Legacy_TdCord::SetEllipsParams();
+   //    XYZ xyzGc;
+   //    Legacy_TdCord::Blh2Xyz(blhGeodetic,&xyzGc);
+   //    // qDebug() << "LegacyGeocentric: " <<  "(" << xyzGc.dX <<  ", " << xyzGc.dY <<  ", " << xyzGc.dZ <<  "); ";
+   //}
    return;
 }
 /*=========================================================

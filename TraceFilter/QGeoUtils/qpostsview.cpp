@@ -31,7 +31,7 @@ bool QPostsView::onMainctrlChanged(QString qsMainctrlCfg) {
         pMainCtrl=(PMAINCTRL)m_qfMainCtrl.map(0,m_qfMainCtrl.size());
         m_qfMainCtrl.close();
         BLH blhViewPoint;
-        if (TdCord::getViewPoint(&blhViewPoint,pMainCtrl)) { // radians,meters
+        if (pMainCtrl && TdCord::getViewPoint(&blhViewPoint,pMainCtrl)) { // radians,meters
             QList<XYZ> qlTcPosts;
             QList<int> qlPostIds;
             if (TdCord::getTopocentricPostsList(&blhViewPoint,qlTcPosts,qlPostIds,pMainCtrl)) {
@@ -75,7 +75,8 @@ bool QPostsView::onMainctrlChanged(QString qsMainctrlCfg) {
     QPen qpenPost(Qt::black,m_iPenWidth,Qt::SolidLine,Qt::RoundCap);
     // determine scale
     int iXmin=1.0e10, iXmax=-1.0e10, iYmin=1.0e10, iYmax=-1.0e10;
-    int iLblWidth=0,iLblHeight=0;
+    int iLblWidth=0;
+    int iLblHeight=0;
     for (int i=0; i<m_qlPosts.count(); i++) {
         int iX=m_qlPosts.at(i).x();
         int iY=m_qlPosts.at(i).y();
@@ -83,10 +84,12 @@ bool QPostsView::onMainctrlChanged(QString qsMainctrlCfg) {
         iXmax=(iXmax<iX)?iX:iXmax;
         iYmin=(iYmin>iY)?iY:iYmin;
         iYmax=(iYmax<iY)?iY:iYmax;
-        int iPostId=m_qlPostIds.at(i);
-        QSize szLbl = fmTickLabel.size(Qt::TextSingleLine,QString::number(iPostId));
-        iLblWidth = (szLbl.width()>iLblWidth)?szLbl.width():iLblWidth;
-        iLblHeight = (szLbl.width()>iLblHeight)?szLbl.height():iLblHeight;
+
+        QRect qrLbl = fmTickLabel.tightBoundingRect(QString::number(m_qlPostIds.at(i)));
+        int iWidth = qrLbl.width();
+        int iHeight = qrLbl.height();
+        iLblWidth = (iWidth>iLblWidth)?iWidth:iLblWidth;
+        iLblHeight = (iHeight>iLblHeight)?iHeight:iLblHeight;
     }
     if (iXmin>iXmax || iYmin > iYmax) {
         painter.drawText(QRect(0,0,szWgt.width(),szWgt.height()),Qt::AlignCenter,"Error");
@@ -104,15 +107,14 @@ bool QPostsView::onMainctrlChanged(QString qsMainctrlCfg) {
         painter.end();
         return;
     }
-    double dScale=qMin(dScaleX,dScaleY);
-    int iScrX0=m_iMargin+iLblWidth+m_iOffset+m_iPenWidth;
-    int iScrY0=m_iMargin+iLblHeight+m_iOffset+m_iPenWidth;
+    int iScrX0=m_iMargin+iLblWidth+m_iOffset;
+    int iScrY0=m_iMargin+iLblHeight+m_iOffset;
     for (int i=0; i<m_qlPosts.count(); i++) {
         int iPostId = m_qlPostIds.at(i);
         QPoint qpPost = m_qlPosts.at(i);
         QString qsPostId = QString::number(iPostId);
-        int iPtX = iScrX0 + (qpPost.x()-iXmin)*dScale;
-        int iPtY = iScrY0 + (iYmax - qpPost.y())*dScale;
+        int iPtX = iScrX0 + (qpPost.x()-iXmin)*dScaleX;
+        int iPtY = iScrY0 + (iYmax - qpPost.y())*dScaleY;
         painter.setPen(qpenPost);
         painter.drawPoint(iPtX,iPtY);
         painter.setPen(qpLbl);

@@ -8,47 +8,18 @@
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QGeoUtils::QGeoUtils()
-        : m_qsMainctrlCfg(QString()) {
+        : m_qsMainctrlCfg(QString())
+        , m_blhViewPoint({0,0,0}) /* BLH struct */
+        , m_postBlh{{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0}} /* 9 array el-ts BLH */
+        , m_postTc {{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0}} /* 9 array el-ts XYZ */
+         {
     QIniSettings &iniSettings = QIniSettings::getInstance();
     QIniSettings::STATUS_CODES scRes;
     iniSettings.setDefault(QGEOUTILS_MAINCTRL,"02.06.2017-09.00.22.639-mainctrl.cfg");
     m_qsMainctrlCfg = iniSettings.value(QGEOUTILS_MAINCTRL,scRes).toString();
     Legacy_TdCord::SetEllipsParams();
-
-    QFile qfMainCtrl(m_qsMainctrlCfg);
-    PMAINCTRL pMainCtrl=NULL;
-    if (qfMainCtrl.open(QIODevice::ReadOnly)) {
-        pMainCtrl=(PMAINCTRL)qfMainCtrl.map(0,qfMainCtrl.size());
-        qfMainCtrl.close();
-        BLH blhViewPoint;
-        if (TdCord::getViewPoint(&blhViewPoint,pMainCtrl)) { // radians,meters
-            // qDebug() << "ViewPoint: " <<  "(" << blhViewPoint.dLat <<  ", " << blhViewPoint.dLon <<  ", " << blhViewPoint.dHei <<  "); ";
-            m_blhViewPoint = blhViewPoint;
-            // TEST
-            // TEST
-            // TEST
-            // TdCord::GeodeticToTopocentricCache sCache;
-            // TdCord::initGeodeticToTopocentricCache(&blhViewPoint,&sCache);
-            // QList<XYZ> qlTcPosts;
-            // QList<int> qlPostIds;
-            // if (TdCord::getTopocentricPostsList(&blhViewPoint,qlTcPosts,qlPostIds,pMainCtrl)) {
-            //
-                // for (int i=0; i<qlTcPosts.count(); i++) {
-                //     XYZ postXYZ = qlTcPosts.at(i);
-                //     BLH blhPostBL;
-                //     int iPostId = qlPostIds.at(i);
-                //     TdCord::fromTopocentric(&blhViewPoint,postXYZ,&blhPostBL,&sCache);
-                //     BLH blhPos = pMainCtrl->p.positions[iPostId].blh;
-                //     blhPos.dLat*=DEG_TO_RAD;
-                //     blhPos.dLon*=DEG_TO_RAD;
-                //     // qDebug() << "Post " << iPostId << ": "
-                //     //          <<  "(" << blhPostBL.dLat <<  ", " << blhPostBL.dLon <<  ", " << blhPostBL.dHei <<  "); ";
-                //     // qDebug() << "Topocentric " <<  "(" << postXYZ.dX <<  ", " << postXYZ.dY <<  ", " << postXYZ.dZ <<  "); ";
-                //     // qDebug() << "Original: "
-                //     //          <<  "(" << blhPos.dLat <<  ", " << blhPos.dLon <<  ", " << blhPos.dHei <<  "); " ;
-                // }
-            // }
-        }
+    if (!readMainCtrlCfg()) {
+        qDebug() << "QGeoUtils::QGeoUtils(): readMainCtrlCfg() failed!";
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,10 +51,10 @@ void QGeoUtils::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     pGridLayout->addWidget(new QLabel("Posts map:"),0,0);
     QPostsView *pPostsView = new QPostsView(m_qsMainctrlCfg);
     pPropPages->m_pPostsView=pPostsView;
-    pGridLayout->addWidget(pPostsView,1,0,3,3);
+    pGridLayout->addWidget(pPostsView,0,1,3,2,Qt::AlignVCenter | Qt::AlignLeft);
     QObject::connect(ppbChoose,SIGNAL(clicked()),pPropPages,SIGNAL(chooseMainCtrl()));
     QObject::connect(pPropPages,SIGNAL(chooseMainCtrl()),SLOT(onMainctrlChoose()));
-    pGridLayout->addWidget(new QLabel("View point geodetic coordinates"),4,0,1,3);
+    pGridLayout->addWidget(new QLabel("View point geodetic coordinates"),3,0,1,3);
     double dVPLat=0, dVPLon=0;
     if (pPostsView) {
         BLH blhViewPoint;
@@ -96,10 +67,16 @@ void QGeoUtils::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     }
     pPropPages->m_plbViewPtLat = new QLabel(QString::number(dVPLat,'f',6));
     pPropPages->m_plbViewPtLon = new QLabel(QString::number(dVPLon,'f',6));
-    pGridLayout->addWidget(new QLabel("Lat (deg)"),5,0);
-    pGridLayout->addWidget(pPropPages->m_plbViewPtLat,5,1);
-    pGridLayout->addWidget(new QLabel("Lon (deg)"),6,0);
-    pGridLayout->addWidget(pPropPages->m_plbViewPtLon,6,1);
+    pGridLayout->addWidget(new QLabel("Lat (deg)"),4,0);
+    pGridLayout->addWidget(pPropPages->m_plbViewPtLat,4,1);
+    pGridLayout->addWidget(new QLabel("Lon (deg)"),5,0);
+    pGridLayout->addWidget(pPropPages->m_plbViewPtLon,5,1);
+    pGridLayout->addWidget(new QLabel("Dummy"),0,3);
+    pGridLayout->addWidget(new QLabel("DummyVal"),0,4);
+    pGridLayout->addWidget(new QLabel("Dummy1"),1,3);
+    pGridLayout->addWidget(new QLabel("Dummy1Val"),1,4);
+    pGridLayout->addWidget(new QLabel("Dummy2"),2,3);
+    pGridLayout->addWidget(new QLabel("Dummy2Val"),2,4);
     pGridLayout->setColumnStretch(2,100);
     pGridLayout->setColumnStretch(5,100);
     pVLayout->addLayout(pHLayout);
@@ -112,31 +89,14 @@ void QGeoUtils::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QGeoUtils::propChanged(QObject *pPropDlg) {
-    [[maybe_unused]]QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
-
-//    QFile qfMainCtrl(qsMainctrlCfg);
-//    PMAINCTRL pMainCtrl=NULL;
-//    if (qfMainCtrl.open(QIODevice::ReadOnly)) {
-//        pMainCtrl=(PMAINCTRL)qfMainCtrl.map(0,qfMainCtrl.size());
-//        qfMainCtrl.close();
-//        BLH blhViewPoint;
-//        if (TdCord::getViewPoint(&blhViewPoint,pMainCtrl)) { // radians,meters
-//            QList<XYZ> qlTcPosts;
-//            QList<int> qlPostIds;
-//            if (TdCord::getTopocentricPostsList(&blhViewPoint,qlTcPosts,qlPostIds,pMainCtrl)) {
-//                double dScale=1.0e-3;
-//                for (int i=0; i<qlTcPosts.count(); i++) {
-//                    XYZ postXYZ = qlTcPosts.at(i);
-//                    int iPostId = qlPostIds.at(i);
-//                    m_scene.addText(QString::number(iPostId))->setPos(postXYZ.dX*dScale,-postXYZ.dY*dScale);
-//                }
-//                return;
-//            }
-//        }
-//    }
-//    m_scene.addText("Open failed");
-//    return;
-
+    QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
+    QString qsNewText = pPropPages->m_pleMainCtrl->text();
+    if (qsNewText != m_qsMainctrlCfg) {
+        m_qsMainctrlCfg = qsNewText;
+        if (!readMainCtrlCfg()) {
+            qDebug() << "QGeoUtils::propChanged(): readMainCtrlCfg() failed!";
+        }
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -185,4 +145,34 @@ void QGeoUtils::onMainctrlChoose() {
         pPropPages->m_plbViewPtLat->setText(QString::number(dVPLat,'f',6));
         pPropPages->m_plbViewPtLon->setText(QString::number(dVPLon,'f',6));
     }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool QGeoUtils::readMainCtrlCfg() {
+    QFile qfMainCtrl(m_qsMainctrlCfg);
+    PMAINCTRL pMainCtrl=NULL;
+    if (qfMainCtrl.open(QIODevice::ReadOnly)) {
+        pMainCtrl=(PMAINCTRL)qfMainCtrl.map(0,qfMainCtrl.size());
+        qfMainCtrl.close();
+        if (!pMainCtrl) return false;
+        BLH blhViewPoint;
+        if (TdCord::getViewPoint(&blhViewPoint,pMainCtrl)) { // radians,meters
+            m_blhViewPoint = blhViewPoint;
+            TdCord::GeodeticToTopocentricCache sCache;
+            TdCord::initGeodeticToTopocentricCache(&m_blhViewPoint,&sCache);
+            if (pMainCtrl->p.dwPosCount<=4 || pMainCtrl->p.dwPosCount>MAX_dwPosCount) return false;
+            for (unsigned int i=1; i<=pMainCtrl->p.dwPosCount; i++) {
+                PGROUNDINFO pgi = &pMainCtrl -> p.positions[i];
+                m_postBlh[i].dLat=pgi->blh.dLat*DEG_TO_RAD;
+                m_postBlh[i].dLon=pgi->blh.dLon*DEG_TO_RAD;
+                m_postBlh[i].dHei=pgi->blh.dHei;
+                TdCord::toTopocentric(&m_blhViewPoint,m_postBlh[i],&m_postTc[i],&sCache); // radians,meters
+            }
+        }
+    }
+    else {
+        return false;
+    }
+    return true;
 }

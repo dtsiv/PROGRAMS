@@ -26,8 +26,12 @@ public slots:
 
 public:
     BLH m_blhViewPoint;
+    BLH m_postBlh[MAX_dwPosCount+1];
+    XYZ m_postTc[MAX_dwPosCount+1];
 
 private:
+    bool readMainCtrlCfg();
+
     QString m_qsMainctrlCfg;
 
 };
