@@ -1,0 +1,724 @@
+opening: C:/PROGRAMS/DATA/RegFixed/2019-12-25T15-37-36/00000000
+REGI checked
+deleting iFilesId 1
+uFileVersion = 3
+nRec = 716
+nRecMax = 1000
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4521	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	56	0	1076926873	4522	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30126401058	0	0	4521	49152	0	2912	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30126788794	0	0	4522	49152	0	3021	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	1	0	1076966195	4523	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30127182416	0	12780	4523	49152	0	3131	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	1	0	1077005516	4524	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30127571876	0	13071	4524	49152	0	3240	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	92	0	1077044838	4525	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30127961268	0	0	4525	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4526	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	1	0	1077123481	4527	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30128349510	0	0	4526	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30128739518	0	13029	4527	49152	0	3568	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	56	0	1077162803	4528	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30129129796	0	0	4528	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	56	0	1077202124	4529	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4530	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30129523628	0	0	4529	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30129909096	65417	57746	4530	49152	0	3895	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4531	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	0	0	1076887552	4532	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30130303900	0	0	4531	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30130689224	0	0	4532	49152	0	2912	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4533	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30131079766	0	12937	4533	49152	0	3021	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	1	0	1076966195	4534	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30131470366	0	0	4534	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	0	0	1077005516	4535	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30131860290	0	0	4535	49152	0	3240	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4536	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30132249450	0	12737	4536	49152	0	3349	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4537	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30132639708	0	0	4537	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	129	0	1077123481	4538	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30133035820	0	0	4538	49152	0	3568	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4539	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30133424998	0	12780	4539	49152	0	3677	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	1	0	1077202124	4540	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	0	0	1077241446	4541	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30133817806	0	13071	4540	49152	0	3786	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30134199600	0	0	4541	49152	0	3895	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4542	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4543	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30134596564	0	0	4542	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30134979150	0	13029	4543	49152	0	2912	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4544	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30135369342	0	0	4544	49152	0	3021	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	1	0	1076966195	4545	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30135760250	0	0	4545	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	1	0	1077005516	4546	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30136149822	65417	57746	4546	49152	0	3240	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	0	0	1077044838	4547	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30136540126	0	0	4547	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4548	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30136929964	0	0	4548	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	1	0	1077123481	4549	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30137326232	0	12937	4549	49152	0	3568	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	0	0	1077162803	4550	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30137714606	0	0	4550	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	1	0	1077202124	4551	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4552	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30138106416	0	0	4551	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30138489284	0	12737	4552	49152	0	3895	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	0	0	1077280768	4553	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4554	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30138886946	0	0	4553	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30139269704	0	0	4554	49152	0	2912	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4555	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30139663632	0	12780	4555	49152	0	3021	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	0	0	1076966195	4556	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30140050788	0	13071	4556	49152	0	3131	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	1	0	1077005516	4557	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30140440982	0	0	4557	49152	0	3240	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4558	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30140829974	0	0	4558	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4559	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30141221190	0	13029	4559	49152	0	3458	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	0	0	1077123481	4560	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30141613324	0	0	4560	49152	0	3568	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4561	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30142004190	0	0	4561	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	1	0	1077202124	4562	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4563	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30142396504	65417	57746	4562	49152	0	3786	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30142779654	0	0	4563	49152	0	3895	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4564	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4565	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30143175248	0	0	4564	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30143559152	0	12937	4565	49152	0	2912	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4566	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30143949584	0	0	4566	49152	0	3021	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	1	0	1076966195	4567	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30144340134	0	0	4567	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	1	0	1077005516	4568	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30144730414	0	12737	4568	49152	0	3240	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	0	0	1077044838	4569	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30145119880	0	0	4569	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4570	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30145509894	0	0	4570	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	1	0	1077123481	4571	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30145901836	0	12780	4571	49152	0	3568	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	0	0	1077162803	4572	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30146290046	0	13071	4572	49152	0	3677	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	1	0	1077202124	4573	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4574	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30146681560	0	0	4573	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30147069060	0	0	4574	49152	0	3895	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	0	0	1077280768	4575	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4576	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30147464796	0	13029	4575	49152	0	4004	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30147849472	0	0	4576	49152	0	2912	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4577	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30148243148	0	0	4577	49152	0	3021	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	0	0	1076966195	4578	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30148633118	65417	57746	4578	49152	0	3131	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	1	0	1077005516	4579	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30149022284	0	0	4579	49152	0	3240	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4580	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30149410166	0	0	4580	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4581	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30149801488	0	12937	4581	49152	0	3458	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	1	0	1077123481	4582	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30150193520	0	0	4582	49152	0	3568	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4583	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30150581992	0	0	4583	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	0	0	1077202124	4584	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4585	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30150975992	0	12737	4584	49152	0	3786	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30151359720	0	0	4585	49152	0	3895	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4586	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4587	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30151754456	0	0	4586	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30152139170	0	12780	4587	49152	0	2912	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4588	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30152529992	0	13071	4588	49152	0	3021	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	1	0	1076966195	4589	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30152920912	0	0	4589	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	0	0	1077005516	4590	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30153311058	0	0	4590	49152	0	3240	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4591	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30153701378	0	13029	4591	49152	0	3349	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4592	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30154089892	0	0	4592	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	0	0	1077123481	4593	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30154483150	0	0	4593	49152	0	3568	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4594	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30154874150	65417	57746	4594	49152	0	3677	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	1	0	1077202124	4595	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4596	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30155268492	0	0	4595	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30155649248	0	0	4596	49152	0	3895	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	0	0	1077280768	4597	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4598	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30156046690	0	12937	4597	49152	0	4004	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30156429638	0	0	4598	49152	0	2912	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4599	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30156819952	0	0	4599	49152	0	3021	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	0	0	1076966195	4600	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30157209708	0	12737	4600	49152	0	3131	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	1	0	1077005516	4601	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30157600422	0	0	4601	49152	0	3240	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4602	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30157991270	0	0	4602	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4603	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30158381370	0	12780	4603	49152	0	3458	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	1	0	1077123481	4604	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30158772478	0	13071	4604	49152	0	3568	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4605	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30159161768	0	0	4605	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	0	0	1077202124	4606	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4607	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30159554594	0	0	4606	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30159939288	0	13029	4607	49152	0	3895	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4608	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4609	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30160334950	0	0	4608	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30160719362	0	0	4609	49152	0	2912	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	1	0	1076926873	4610	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30161110120	65417	57746	4610	49152	0	3021	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	1	0	1076966195	4611	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30161510060	0	0	4611	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	0	0	1077005516	4612	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30161897916	0	0	4612	49152	0	3240	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4613	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30162287162	0	12937	4613	49152	0	3349	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4614	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	0	0	1077123481	4615	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30162680816	0	0	4614	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30163059852	0	0	4615	49152	0	3568	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4616	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30163450014	0	12737	4616	49152	0	3677	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	1	0	1077202124	4617	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	0	0	1077241446	4618	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30163845396	0	0	4617	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30164229702	0	0	4618	49152	0	3895	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4619	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	1	0	1076887552	4620	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30164626426	0	12780	4619	49152	0	4004	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30165009362	0	13071	4620	49152	0	2912	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	0	0	1076926873	4621	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30165403292	0	0	4621	49152	0	3021	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	1	0	1076966195	4622	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30165791480	0	0	4622	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	1	0	1077005516	4623	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30166180176	0	13029	4623	49152	0	3240	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4624	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30166570584	0	0	4624	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	0	0	1077084160	4625	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30166960496	0	0	4625	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	1	0	1077123481	4626	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30167351694	65417	57746	4626	49152	0	3568	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4627	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30167742120	0	0	4627	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	1	0	1077202124	4628	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	1	0	1077241446	4629	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30168132914	0	0	4628	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30168519378	0	12937	4629	49152	0	3895	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4630	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	92	0	1076887552	4631	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30168913492	0	0	4630	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30169300914	0	0	4631	49152	0	2912	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	92	0	1076926873	4632	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30169690894	0	12737	4632	49152	0	3021	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	92	0	1076966195	4633	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30170080312	0	0	4633	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	92	0	1077005516	4634	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4635	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30170557146	0	0	4634	49152	0	3240	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30170859220	0	12780	4635	49152	0	3349	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4636	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30171249666	0	13071	4636	49152	0	3458	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	56	0	1077123481	4637	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30171643464	0	0	4637	49152	0	3568	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	1	0	1077162803	4638	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30172033714	0	0	4638	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	92	0	1077202124	4639	1	1024	48	80	
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	92	0	1077241446	4640	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30172426952	0	13029	4639	49152	0	3786	-360	14562	21444	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30172809274	0	0	4640	49152	0	3895	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	92	0	1077280768	4641	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	2912	0	0	1	92	0	1076887552	4642	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30173206410	0	0	4641	49152	0	4004	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30173589446	65417	57746	4642	49152	0	2912	-360	14562	49165	242	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3021	0	0	1	92	0	1076926873	4643	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30173980098	0	0	4643	49152	0	3021	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3131	0	0	1	92	0	1076966195	4644	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30174369252	0	0	4644	49152	0	3131	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3240	0	0	1	56	0	1077005516	4645	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30174765254	0	12937	4645	49152	0	3240	-360	14562	21460	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3349	0	0	1	1	0	1077044838	4646	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30175150696	0	0	4646	49152	0	3349	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3458	0	0	1	1	0	1077084160	4647	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30175540092	0	0	4647	49152	0	3458	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3568	0	0	1	92	0	1077123481	4648	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30175932558	0	12737	4648	49152	0	3568	-360	14562	21534	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3677	0	0	1	92	0	1077162803	4649	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	3786	0	0	1	92	0	1077202124	4650	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30176329190	0	0	4649	49152	0	3677	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+ACM::STROBE_DATA(0x8801)	              30176709224	0	0	4650	49152	0	3786	-360	14562	0	0	11	0	1024	8	80	48	0	1	
+SNC::STROBE(0x9200)	                        0	0	3895	0	0	1	56	0	1077241446	4651	1	1024	48	80	
+Unknown pFileDataHdr->dwType = 0x9003
+SNC::STROBE(0x9200)	                        0	0	4004	0	0	1	1	0	1077280768	4652	1	1024	48	80	
+ACM::STROBE_DATA(0x8801)	              30177194818	0	12780	4651	49152	0	3895	-360	14562	21289	0	11	0	1024	8	80	48	0	1	
+ACM::STROBE_DATA(0x8801)	              30177488856	0	13071	4652	49152	0	4004	-360	14562	21588	0	11	0	1024	8	80	48	0	1	
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+Unknown pFileDataHdr->dwType = 0x9003
+parsed: 2019-12-25T15-37-36
+Press any key

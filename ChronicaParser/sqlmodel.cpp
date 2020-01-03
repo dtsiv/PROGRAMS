@@ -86,6 +86,7 @@ int readSettings() {
     else if (qsOperation==OPERATION_POI) omSelectedMode=mPrimaryProc;
     else if (qsOperation==OPERATION_POI20190409) omSelectedMode=mPOI20190409;
     else if (qsOperation==OPERATION_POI20191016) omSelectedMode=mPOI20191016;
+    else if (qsOperation==OPERATION_POI20191231) omSelectedMode=mPOI20191231;
     else if (qsOperation==OPERATION_JUST_DOPPLER) omSelectedMode=mJustDoppler;
     else if (qsOperation==OPERATION_POI_RAW) omSelectedMode=mPrimaryProcRaw;
     else if (qsOperation==OPERATION_POI_NONCOHER) omSelectedMode=mPrimaryProcNoncoher;
@@ -150,7 +151,7 @@ int openDataFile() {
         // map & parse contents
 
         iRetval=parseDataFile(dtTimeStamp.toMSecsSinceEpoch(),qsCurFile, &qfCurFile, qfCurFile.size());
-        if (iRetval == true) {
+        if (iRetval) {
             tsStdOut << "\nparseDataFile() returned: " << iRetval << endl;
             return 100+iRetval;
         }

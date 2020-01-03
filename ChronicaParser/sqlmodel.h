@@ -40,6 +40,7 @@
 #define OPERATION_POI               "poi"
 #define OPERATION_POI20190409       "poi20190409"
 #define OPERATION_POI20191016       "poi20191016"
+#define OPERATION_POI20191231       "poi20191231"
 #define OPERATION_JUST_DOPPLER      "justDoppler"
 #define OPERATION_POI_RAW           "poiRaw"
 #define OPERATION_POI_NONCOHER      "poiNoncoher"
@@ -68,6 +69,7 @@ extern enum OperationModes {
     mPrimaryProc,
     mPOI20190409,
     mPOI20191016,
+    mPOI20191231,
     mJustDoppler,
     mPrimaryProcRaw,
     mPrimaryProcNoncoher,

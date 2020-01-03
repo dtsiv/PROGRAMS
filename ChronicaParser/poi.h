@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include "nr.h"
 
-int poi20191016();
+int poi20191231();
 int interferenceSpectrum();
 int interferenceMap();
 int readInterferenceMap(

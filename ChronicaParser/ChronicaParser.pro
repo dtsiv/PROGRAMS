@@ -24,6 +24,11 @@ CONFIG += c++11
                       -Wno-sign-compare
 }
 
+win32 {
+    QMAKE_CXXFLAGS += /wd4244 /wd4018 /wd4200 /wd4189
+    !system(del /F ChronicaParser.exe)
+}
+
 TEMPLATE = app
 
 INCLUDEPATH += ../include/nr2
@@ -42,8 +47,8 @@ SOURCES += \
     ran1.cpp \
     sort.cpp \
     sqlmodel.cpp \
-    poi20191016.cpp \
-    intfspec.cpp
+    intfspec.cpp \
+    poi20191231.cpp
 
 HEADERS += \
     parser.h \

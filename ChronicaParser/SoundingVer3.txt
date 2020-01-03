@@ -1,8 +1,8 @@
 Sampling time 120ns
-Period 200 samples
+Period 80 samples
 Pulse duration 8 samples
-Distance 80 samples
+Distance 48 samples
 Total periods 1024
-Carrier 9500MHz
-beamCountsNum 81920 (total samples per strobe = 1024*80)
+Carrier 9400MHz
+beamCountsNum 49152 (total samples per strobe = 1024*48)
 

@@ -30,9 +30,9 @@ int main(int argc, char *argv[]) {
             closeDatabase();
             break;
 
-        case mPOI20191016:
-            if ((iErr=poi20191016())) {
-                tsStdOut << "poi20191016() returned: " << iErr << endl;
+        case mPOI20191231:
+            if ((iErr=poi20191231())) {
+                tsStdOut << "poi20191231() returned: " << iErr << endl;
                 return 1;
             }
             closeDatabase();
@@ -57,11 +57,11 @@ int main(int argc, char *argv[]) {
             tsStdOut << "unknown operation" << endl;
     }
 
-    tsStdOut << "Press any key" << endl;
+    // tsStdOut << "Press any key" << endl;
 
-    QTextStream tsStdIn(stdin);
-    int aDum;
-    tsStdIn >> aDum;
+    //QTextStream tsStdIn(stdin);
+    //int aDum;
+    //tsStdIn >> aDum;
     QTimer::singleShot(0,&a,SLOT(quit()));
     return a.exec();
 }

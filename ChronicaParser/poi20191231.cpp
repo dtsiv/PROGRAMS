@@ -16,6 +16,13 @@ using namespace std;
 #include "sqlmodel.h"
 #include "poi.h"
 
+#include "qchrprotoacm.h"
+
+#include "qavtctrl.h"
+#include "codograms.h"
+
+#include "winbase.h"
+
 int idum=-13;
 
 #define SKIP_ZERO_DOPPLER          5
@@ -28,7 +35,7 @@ int idum=-13;
 //======================================================================================================
 //
 //======================================================================================================
-int poi20191016() {
+int poi20191231() {
     int iRet=0;
     QTextStream tsStdOut(stdout);
 
@@ -37,12 +44,19 @@ int poi20191016() {
     // double dGlobalMax2=0.0e0;
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
+    QSqlRecord rec;
+    if (!query.exec("SELECT filever FROM files LIMIT 1")) return 1;
+    rec = query.record();
+    if (!query.next()) return 1;
+    quint32 uFileVersion = query.value(rec.indexOf("filever")).toUInt(&bOk);
+    if (!bOk) return 1;
+
 //    bOk=query.prepare("SELECT complexdata,seqnum,beam,ncnt,timestamp FROM"
 //                   " files f LEFT JOIN strobs s ON f.id=s.fileid"
 //                   " LEFT JOIN samples sa ON s.id=sa.strobid"
 //                   " WHERE beam=:beam AND f.filepath LIKE :filepath"
 //                   );
-    bOk=query.prepare("SELECT complexdata,seqnum,beam,ncnt,timestamp FROM"
+    bOk=query.prepare("SELECT complexdata,seqnum,beam,ncnt,structStrobData FROM"
                     " strobs s LEFT JOIN files f ON f.id=s.fileid"
                     " LEFT JOIN samples sa ON s.id=sa.strobid"
                     " ORDER BY s.seqnum ASC"
@@ -50,12 +64,19 @@ int poi20191016() {
 //    query.bindValue(":beam",iPlotSliceBeam);
 //    query.bindValue(":filepath",qsGetFileName());
     if (!query.exec()) return 1;
-    QSqlRecord rec;
     rec = query.record();
-    QFile qfDetectionResults("detection.txt");
+    QFile qfDetectionResults("detection.dat");
     qfDetectionResults.resize(0);
     if (!qfDetectionResults.open(QIODevice::ReadWrite)) tsStdOut << "open failed" << endl;
     QTextStream tsDetectionResults(&qfDetectionResults);
+
+    // Latex table
+    QFile qfTbl("latextbl.txt");
+    qfTbl.resize(0);
+    if (!qfTbl.open(QIODevice::ReadWrite)) tsStdOut << "open failed" << endl;
+    QTextStream tsTbl(&qfTbl);
+
+    QByteArray baStructStrobData;
 
     int iStrobsDetect=0;
     while (query.next()) {
@@ -63,9 +84,39 @@ int poi20191016() {
         int beamCountsNum=query.value(rec.indexOf("ncnt")).toInt(&bOk);
         int iBeam=query.value(rec.indexOf("beam")).toInt(&bOk);
         // if (iBeam != iPlotSliceBeam) return 2;
-        qint64 iTimestamp=query.value(rec.indexOf("timestamp")).toLongLong(&bOk);
+        baStructStrobData=query.value(rec.indexOf("structStrobData")).toByteArray();
         QByteArray baSamples=query.value(rec.indexOf("complexdata")).toByteArray();
         qint16 *pData = (qint16*) baSamples.data();
+        char* pStructStrobData = (char*)baStructStrobData.data();
+        QString qsExecTime("n/a");
+        QString qsBeta("n/a");
+        QString qsEpsilon("n/a");
+        if (uFileVersion==REG::FORMAT_VERSION) {
+            static qulonglong uStartTime=(qulonglong)(-1);
+            ACM::STROBE_DATA *pStrobeData=(ACM::STROBE_DATA *)pStructStrobData;
+            //FILETIME ftExecTime=pStrobeData->header.execTime;
+            //SYSTEMTIME st;
+            //FileTimeToSystemTime(&ftTlock,&st);
+            //qsExecTime = QString("%1-%2-%3T%4:%5:%6.%7")
+            //              .arg(st.wYear)
+            //              .arg(st.wMonth,2,10,QLatin1Char('0'))
+            //              .arg(st.wDay,2,10,QLatin1Char('0'))
+            //              .arg(st.wHour,2,10,QLatin1Char('0'))
+            //              .arg(st.wMinute,2,10,QLatin1Char('0'))
+            //              .arg(st.wSecond,2,10,QLatin1Char('0'))
+            //              .arg(st.wMilliseconds,3,10,QLatin1Char('0'));
+            if (uStartTime==(qulonglong)(-1)) uStartTime = pStrobeData->header.execTime;
+            qsExecTime = QString::number((pStrobeData->header.execTime-uStartTime)*1.0e-7);
+            qsBeta = QString::number(pStrobeData->beamPos.beamBeta);
+            qsEpsilon = QString::number(pStrobeData->beamPos.beamEpsilon);
+            if (iBeam == 0) {
+                tsStdOut << QString::number((pStrobeData->header.execTime-uStartTime)*1.0e-7)
+                         << "\t" << QString::number(iBeam)
+                         << "\t" << QString::number(pStrobeData->beamPos.beamEpsilon)
+                         << "\t" << QString::number(iStrob)
+                         << endl;
+            }
+        }
         int iDataSize = baSamples.size();
 
         int iArrElemCount = 2*Np*NT_;
@@ -167,9 +218,13 @@ int poi20191016() {
                 int kDoppler = NFFT/2+kDoppler1;
                 if (kDoppler >= NFFT-SKIP_ZERO_DOPPLER) kDoppler=kDoppler-NFFT+2*SKIP_ZERO_DOPPLER;
                 int idx=2*(kDoppler*iFilteredN+iDelay);
+                double dAvrRe=pAvrRe[kDoppler*iFilteredN+iDelay];
+                double dAvrIm=pAvrIm[kDoppler*iFilteredN+iDelay];
+                double dAvrM2=pAvrM2[kDoppler*iFilteredN+iDelay];
+                double dSqrtM2=sqrt(dAvrM2);
                 Vec_DP dSignal(2);
-                dSignal[0]=pDopplerData[idx];
-                dSignal[1]=pDopplerData[idx+1];
+                dSignal[0]=(pDopplerData[idx]-dAvrRe)/dSqrtM2;
+                dSignal[1]=(pDopplerData[idx+1]-dAvrIm)/dSqrtM2;
                 // if (pY2M[idx]>dAvrM2global*dThreshold) continue;
                 Vec_DP dNoise((2*NOISE_AVERAGING_N-2)*2);
                 int idxNoise=0;
@@ -180,8 +235,12 @@ int poi20191016() {
                     if (k1>=NFFT) k1-=NFFT;
                     int idx=2*(k1*iFilteredN+iDelay);
                     if (idxNoise>dNoise.size()-2) qFatal("Array size error");
-                    dNoise[idxNoise++]=pDopplerData[idx];
-                    dNoise[idxNoise++]=pDopplerData[idx+1];
+                    double dAvrRe=pAvrRe[kDoppler*iFilteredN+iDelay];
+                    double dAvrIm=pAvrIm[kDoppler*iFilteredN+iDelay];
+                    double dAvrM2=pAvrM2[kDoppler*iFilteredN+iDelay];
+                    double dSqrtM2=sqrt(dAvrM2);
+                    dNoise[idxNoise++]=(pDopplerData[idx]-dAvrRe)/dSqrtM2;
+                    dNoise[idxNoise++]=(pDopplerData[idx+1]-dAvrRe)/dSqrtM2;
                 }
                 DP dFrac,dProb;
                 ftest_poi(dNoise,dSignal,dFrac,dProb);
@@ -278,6 +337,26 @@ int poi20191016() {
             }
             if (tgs.at(itg)>5) {
                 bTargetsListed=true;
+                // output to file of detections
+                if (dVel>0) {
+                    tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5\t%6")
+                                          .arg(qsExecTime)
+                                          .arg(iDelay*dDistCoef,15)
+                                          .arg(dVel,15)
+                                          .arg(iBeam,15)
+                                          .arg(qsEpsilon)
+                                          .arg(iStrob,15)
+                                      << endl;
+
+                    ACM::STROBE_DATA *pStrobeData=(ACM::STROBE_DATA *)baStructStrobData.data();
+                    tsTbl << pStrobeData->header.execTime
+                          << " & " << iStrob
+                          << " & " << iBeam
+                          << " & " << pStrobeData->beamPos.beamEpsilon
+                          << " & " << QString("%1").arg(iDelay*dDistCoef,0,'f',1)
+                          << " & " << QString("%1").arg(dVel,0,'f',1)
+                          << " \\\\ " << endl;
+                }
                 #ifdef USE_GNUPLOT
                 // text-file output of detected target
                 tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5")
@@ -289,15 +368,6 @@ int poi20191016() {
                                << endl;
 
                 #endif
-                if (USE_TEXT_DEBUG) {
-                    tsStdOut << QString("%1\t%2\t%3\t%4\t%5")
-                                       .arg(iDelay*dDistCoef,15)
-                                       .arg(dVel,15)
-                                       .arg(dY2M/dAvrM2global,15)
-                                       .arg(iStrob,15)
-                                       .arg(QDateTime::fromMSecsSinceEpoch(iTimestamp).toString("yyMMdd-hh:mm"))
-                                   << endl;
-                }
             }
         }
 
@@ -327,9 +397,9 @@ int poi20191016() {
             iStrobsDetect++;
 
         }
-        qfDetectionResults.resize(0);
+        baStructStrobData.clear();
     }
-    tsStdOut << "Number of strobs with candidates:\t" << iStrobsDetect << endl;
+    // tsStdOut << "Number of strobs with candidates:\t" << iStrobsDetect << endl;
     return 0;
 }
 

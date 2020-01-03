@@ -1,4 +1,3 @@
 ChronicaParser.exe
-Makefile.Debug
-Makefile.Release
+Makefile*
 detection.txt

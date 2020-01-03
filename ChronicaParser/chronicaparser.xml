@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
-    <carrierF>1.0e4</carrierF>
-    <dataFile>../DATA/RegFixed/2019-09-27T13-10-21/00000007</dataFile>
+    <carrierF>9400</carrierF>
+    <dataFile>../DATA/RegFixed/2019-12-25T15-37-36/00000000</dataFile>
+    <dataFile0>../DATA/RegFixed/2019-09-27T13-10-21/00000007</dataFile0>
     <dataFile1>../DATA/RegFixed/2019-09-27T13-27-32/00000000</dataFile1>
     <dataFile2>../DATA/RegFixed/2019-03-04T12-16-58/00000000</dataFile2>
     <delayFrom>1</delayFrom>
     <delayTo>10</delayTo>
     <dopplerFrom>100</dopplerFrom>
     <dopplerTo>1948</dopplerTo>
-    <falseAlarmProb>1.0e-8</falseAlarmProb>
+    <falseAlarmProb>1.0e-7</falseAlarmProb>
     <falseAlarms>1</falseAlarms>
     <maxVelocity>10000.0</maxVelocity>
-    <operation>poi20191016</operation>
+    <operation>poi20191231</operation>
     <operation0>dataImport</operation0>
     <operation1>poi</operation1>
-    <operation2>poi20191016</operation2>
+    <operation2>poi20191231</operation2>
     <operation3>justDoppler</operation3>
     <operation4>poiRaw</operation4>
     <operation5>poiNoncoher</operation5>
@@ -22,17 +23,17 @@
     <operation7>plotSignal3D</operation7>
     <operation8>interferenceSpectrum</operation8>
     <operation9>interferenceMap</operation9>
-    <pathIntfMap>../DATA/20191020/intfmap_20191020.dat</pathIntfMap>
+    <pathIntfMap>../DATA/20191230/intfmap_20191230.dat</pathIntfMap>
     <periodsPerBatch>1024</periodsPerBatch>
     <plotSliceBeam>0</plotSliceBeam>
     <plotSlicePeriod>500</plotSlicePeriod>
     <rawStrobFrom>0</rawStrobFrom>
     <rawStrobTo>10000</rawStrobTo>
-    <recordedSamplesPerPeriod>80</recordedSamplesPerPeriod>
-    <samplesPerPeriod>200</samplesPerPeriod>
+    <recordedSamplesPerPeriod>48</recordedSamplesPerPeriod>
+    <samplesPerPeriod>80</samplesPerPeriod>
     <samplesPerPulse>8</samplesPerPulse>
     <samplingTime>0.120e0</samplingTime>
-    <sqliteDbName>../DATA/20191020/chronicaparser_00000007.sqlite3</sqliteDbName>
-    <threshold>30.0e0</threshold>
+    <sqliteDbName>../DATA/20191230/chronicaparser_20191230.sqlite3</sqliteDbName>
+    <threshold>10.0e0</threshold>
     <thresholdRelative>10</thresholdRelative>
 </PARAMETERS>

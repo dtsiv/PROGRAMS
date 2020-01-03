@@ -18,13 +18,14 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
     // check magic string "REGI"
     if (qfCurFile->read((char*)&fileHdr,sizeof(struct sFileHdr)) != sizeof(struct sFileHdr)) return 1;
     if (QString(QByteArray(fileHdr.sMagic,sizeof(fileHdr.sMagic)))!=REG::FILE_MAGIC) return 1;
+    tsStdOut << "REGI checked" << endl;
 
     // version of the registration file
     uFileVersion = fileHdr.uVer;
     qint64 iFileId=addFileRec(uTimeStamp,qsFilePath,fileHdr.nRec,QString::number(uFileVersion,16));
     if (iFileId==-1) return 21;
 
-    // tsStdOut << "uFileVersion = " << uFileVersion << endl;
+    tsStdOut << "uFileVersion = " << uFileVersion << endl;
     if (  fileHdr.uVer != REG_OLD_VER1::FORMAT_VERSION
        && fileHdr.uVer != REG::FORMAT_VERSION) return 2;
 
@@ -37,7 +38,7 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
          || sizeof(struct sFileHdr)+sizeof(quint32)+fileHdr.nRecMax*sizeof(quint32)+fileHdr.nRec*sizeof(struct ACM::STROBE_DATA) > uSize) return 3;
     }
 
-    // DTSIV: наверное, uProtoVersion не используется и может привести к ошибке потом
+    // DTSIV: РЅР°РІРµСЂРЅРѕРµ, uProtoVersion РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Рё РјРѕР¶РµС‚ РїСЂРёРІРµСЃС‚Рё Рє РѕС€РёР±РєРµ РїРѕС‚РѕРј
     if (uFileVersion==REG::FORMAT_VERSION) {
         if (qfCurFile->read((char*)&uProtoVersion,sizeof(quint32)) != sizeof(quint32)) return 1;
         // tsStdOut << "uProtoVersion = " << uProtoVersion << endl;
@@ -57,8 +58,8 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
         return 2;
     }
 
-    // tsStdOut << "nRec = " << fileHdr.nRec << endl;
-    // tsStdOut << "nRecMax = " << fileHdr.nRecMax << endl;
+    tsStdOut << "nRec = " << fileHdr.nRec << endl;
+    tsStdOut << "nRecMax = " << fileHdr.nRecMax << endl;
 
     QSqlDatabase db=QSqlDatabase::database();
     if (!db.isOpen()) return 22;
@@ -87,6 +88,7 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
             SNC::STROBE* pStrobe=0;
             CHR::STROBE_HEADER strobeHeader;
 
+            //  tsStdOut << "pFileDataHdr->dwType == SNC_TYPE::STROBE" << endl;
             // old format version
             if (uFileVersion==REG_OLD_VER1::FORMAT_VERSION) {
                 pOldVer1Strobe = (SNC_OLD_VER1::SNC_STROBE*)pData;
@@ -106,9 +108,15 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
                 // tsStdOut << "found new SNC::STROBE" << endl;
                 strobeHeader=pStrobe->header;
                 tsStdOut << "SNC::STROBE(0x" << QString::number(pFileDataHdr->dwType,16) << ")" << "\t"
-                         << QString::number(strobeHeader.execTime*1.0e0,'g',8).rightJustified(10) << "\t"
+                         << QString::number(strobeHeader.execTime).rightJustified(25) << "\t"
                          << pStrobe->azimuth << "\t"
                          << pStrobe->elevation << "\t"
+                         << pStrobe->ctrlChIndex << "\t"
+                         << pStrobe->panelSelect << "\t"
+                         << pStrobe->pilotBlank << "\t"
+                         << pStrobe->pulseTimingNo << "\t"
+                         << pStrobe->rtxSelect << "\t"
+                         << pStrobe->velocity << "\t"
                          << strobeHeader.strobeNo << "\t"
                          << strobeHeader.flags << "\t"
                          << strobeHeader.pCount << "\t"
@@ -118,9 +126,9 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
             }
             // unknown format version
             else {
-                tsStdOut << "pFileDataHdr->dwType = 0x" << QString::number(pFileDataHdr->dwType,16)
+                tsStdOut << "Unknown pFileDataHdr->dwType = 0x" << QString::number(pFileDataHdr->dwType,16)
                          << " uFileVersion=" << uFileVersion << endl;
-                return 11;
+                // return 11;
             }
 
         }
@@ -133,6 +141,7 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
             int iSizeOfComplex=2*sizeof(qint16);
             CHR::STROBE_HEADER strobeHeader;
 
+            // tsStdOut << "pFileDataHdr->dwType == ACM_TYPE::STROBE_DATA" << endl;
             // old format version
             if (uFileVersion==REG_OLD_VER1::FORMAT_VERSION) {
                 // dwType == ACM_TYPE::STROBE_DATA
@@ -161,39 +170,44 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
             else if (uFileVersion==REG::FORMAT_VERSION) {
                 ACM::STROBE_DATA *pStrobeData=(ACM::STROBE_DATA *)pData;
                 if (pStrobeData->beamCountsNum == 0) return 6;
-                // tsStdOut << pStrobeData->strobeNo << "\t" << pStrobeData->beamCountsNum << endl;
+                // tsStdOut << "uFileVersion==REG::FORMAT_VERSION" << endl;
+                // tsStdOut << "pStrobeData->beamCountsNum: " << pStrobeData->beamCountsNum << endl;
                 // ok, we have a valid strobe
                 CHR::STROBE_HEADER *pStrobeHeader = &pStrobeData->header;
-                tsStdOut << "\t" << " ACM::STROBE_DATA(0x" << QString::number(pFileDataHdr->dwType,16) << ")" << "\t"
-                         << QString::number(pStrobeHeader->execTime).rightJustified(10) << "\t"
+                tsStdOut << "ACM::STROBE_DATA(0x" << QString::number(pFileDataHdr->dwType,16) << ")" << "\t"
+                         << QString::number(pStrobeHeader->execTime).rightJustified(25) << "\t"
                          << pStrobeData->inclEpsilon << "\t"
                          << pStrobeData->inclBeta << "\t"
                          << pStrobeHeader->strobeNo << "\t"
-                         << pStrobeHeader->flags << "\t"
                          << pStrobeData->beamCountsNum << "\t"
-                         << pStrobeHeader->distance << "\t"
+                         << pStrobeData->beamPos.beamBeta << "\t"
+                         << pStrobeData->beamPos.beamEpsilon << "\t"
+                         << pStrobeData->beamPos.sensorBeta << "\t"
+                         << pStrobeData->beamPos.sensorEpsilon << "\t"
+                         << pStrobeData->timeParams << "\t"
+                         << pStrobeData->velocity << "\t"
                          << pStrobeHeader->blank << "\t"
                          << pStrobeHeader->signalID << "\t"
-                         << pStrobeHeader->pPeriod << "\t"
                          << pStrobeHeader->pCount << "\t"
                          << pStrobeHeader->pDuration << "\t"
+                         << pStrobeHeader->pPeriod << "\t"
+                         << pStrobeHeader->distance << "\t"
                          << pStrobeHeader->padding << "\t"
-                         << pStrobeData->velocity << "\t"
-                         << pStrobeData->timeParams << "\t"
+                         << pStrobeHeader->flags << "\t"
                          << endl;
                 strobeHeader=*pStrobeHeader;
                 uStrobeNo=pStrobeHeader->strobeNo;
                 uBeamCountsNum=pStrobeData->beamCountsNum;
                 pSamples=(qint16*)(pStrobeData+1);
 
-                if (uStrobeNo >21643) {
-                    if (pStrobeHeader->distance == 0 || pStrobeHeader->pPeriod!=200) {
-                        // uOffset=*pOffsets++;
-                        if (pFileDataHdr) delete pFileDataHdr; pFileDataHdr=0;
-                        if (pData) delete []pData; pData=0;
-                        break;
-                    }
-                }
+                //if (uStrobeNo >21643) {
+                //    if (pStrobeHeader->distance == 0 || pStrobeHeader->pPeriod!=200) {
+                //        // uOffset=*pOffsets++;
+                //        if (pFileDataHdr) delete pFileDataHdr; pFileDataHdr=0;
+                //        if (pData) delete []pData; pData=0;
+                //        break;
+                //    }
+                //}
                 //else {
                 //    tsStdOut << "nRec = " << fileHdr.nRec << endl;
                 //    tsStdOut << "i=" << i << endl;
@@ -202,6 +216,12 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
                 //    tsStdOut << "file size=" << qfCurFile->size() << endl;
                 //    qFatal("Problem record");
                 //}
+                //tsStdOut << "nRec = " << fileHdr.nRec << endl;
+                //tsStdOut << "i=" << i << endl;
+                //tsStdOut << "uOffset=" << uOffset << endl;
+                //tsStdOut << "pOffsets-base=" << (char *)pOffsets-(char *)pOffsetsArray << endl;
+                //tsStdOut << "file size=" << qfCurFile->size() << endl;
+                // qFatal("Problem record");
 
                 // add strobe to database
                 db.transaction();
@@ -226,15 +246,15 @@ int parseDataFile(quint64 uTimeStamp, QString qsFilePath, QFile *qfCurFile, quin
             }
             // unknown format version
             else {
-                tsStdOut << "pFileDataHdr->dwType = 0x" << QString::number(pFileDataHdr->dwType,16)
+                tsStdOut << "Unknown pFileDataHdr->dwType = 0x" << QString::number(pFileDataHdr->dwType,16)
                          << " uFileVersion=" << uFileVersion << endl;
-                return 11;
+                // return 11;
             }
         }
         //############# UNKNOWN record header type ######################
         else {
-            tsStdOut << "pFileDataHdr->dwType = 0x" << QString::number(pFileDataHdr->dwType,16) << endl;
-            return 12;
+            tsStdOut << "Unknown pFileDataHdr->dwType = 0x" << QString::number(pFileDataHdr->dwType,16) << endl;
+            // return 12;
         }
 
         uOffset=*pOffsets++;

@@ -163,7 +163,6 @@ int interferenceSpectrum() {
         return 10+iRet;
     }
 
-#if 0
     //==================== plotting
     for (int kDoppler=NFFT/2; kDoppler<NFFT; kDoppler++) {
         tsSpectrumResults << kDoppler-NFFT;
@@ -187,8 +186,8 @@ int interferenceSpectrum() {
         }
         tsSpectrumResults << endl;
     }
-#endif
 
+#if 0
     for (int kDoppler=0; kDoppler<NFFT; kDoppler++) {
         tsSpectrumResults << kDoppler;
         for (int iDelay=0; iDelay<iFilteredN; iDelay++) {
@@ -207,6 +206,7 @@ int interferenceSpectrum() {
         }
         tsSpectrumResults << endl;
     }
+#endif
 
     return iRet;
 }
