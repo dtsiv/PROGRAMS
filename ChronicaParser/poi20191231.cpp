@@ -32,6 +32,141 @@ int idum=-13;
 // #define USE_GNUPLOT
 #define USE_TEXT_DEBUG             1
 
+int iFilteredN;
+int iNumberOfBeams=4;
+QByteArray baYM2forBeams;
+QByteArray baDetectionForBeams;
+QByteArray baDopplerForBeams;
+QByteArray baDelayForBeams;
+QFile qfTbl("latextbl.txt");
+QTextStream tsTbl(&qfTbl);
+QFile qfPowTbl("pawertbl.txt");
+QTextStream tsPowTbl(&qfPowTbl);
+
+//============================================================================================
+//
+//============================================================================================
+void outputLatexPowerLine(int iStrob) {
+    // phy scales
+    double dVLight=300.0; // m/usec
+    int NFFT=1024;
+    double dDoppFmin=1.0e0/(NT*dTs)/NFFT; // This is smallest Doppler frequency (MHz) possible for this sampling interval dTs
+    double dVelCoef = 1.0e6*dVLight/2/dCarrierF; // Increment of target velocity (m/s) per 1 MHz of Doppler shift
+    dVelCoef = dVelCoef*dDoppFmin; // m/s per frequency count (the "smallest" Doppler frequency possible)
+    double dDistCoef = dTs*dVLight/2; // m per sample (target distance increment per sampling interval dTs)
+
+    //===
+    int baYM2forBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+    if (baYM2forBeams.size()!=baYM2forBeamsSize) {
+        qDebug() << "clearPowerList(): baYM2forBeams.size()!=baYM2forBeamsSize";
+        return;
+    }
+    double *pYM2forBeams = (double *)baYM2forBeams.data();
+    //===
+    int baDetectionForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(bool);
+    if (baDetectionForBeams.size()!=baDetectionForBeamsSize) {
+        qDebug() << "clearPowerList(): baDetectionForBeams.size()!=baDetectionForBeamsSize";
+        return;
+    }
+    bool *pDetectionForBeams = (bool *)baDetectionForBeams.data();
+    //===
+    int baDelayForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+    if (baDelayForBeams.size()!=baDelayForBeamsSize) {
+        qDebug() << "clearPowerList(): baDelayForBeams.size()!=baDelayForBeamsSize";
+        return;
+    }
+    double *pDelayforBeams = (double *)baDelayForBeams.data();
+    //===
+    int baDopplerForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+    if (baDopplerForBeams.size()!=baDopplerForBeamsSize) {
+        qDebug() << "clearPowerList(): baDopplerForBeams.size()!=baDopplerForBeamsSize";
+    }
+    double *pDopplerforBeams = (double *)baDopplerForBeams.data();
+
+    double dDopplerMain=0;
+    double dDelayMain=0;
+    int kDopplerMain=0;
+    int iDelayMain=0;
+    bool bDetection=false;
+    double dY2max=0;
+    for (int kDoppler=0; kDoppler<NFFT; kDoppler++) {
+        for (int iDelay=0; iDelay<iFilteredN; iDelay++) {
+            for (int iBeam=0; iBeam<iNumberOfBeams; iBeam++) {
+                if (!pDetectionForBeams[iBeam*NFFT*iFilteredN+kDoppler*iFilteredN+iDelay]) continue;
+                bDetection=true;
+                double dY2 = pYM2forBeams[iBeam*NFFT*iFilteredN+kDoppler*iFilteredN+iDelay];
+                if (dY2max < dY2) {
+                    dY2max = dY2;
+                    dDopplerMain=pDopplerforBeams[iBeam*NFFT*iFilteredN+kDoppler*iFilteredN+iDelay];
+                    dDelayMain=pDelayforBeams[iBeam*NFFT*iFilteredN+kDoppler*iFilteredN+iDelay];
+                    kDopplerMain=kDoppler;
+                    iDelayMain=iDelay;
+                }
+            }
+        }
+    }
+    if (!bDetection) return;
+    double dVel;
+    if (dDopplerMain >= NFFT/2) {
+        dVel=dVelCoef*(dDopplerMain-NFFT);
+    }
+    else {
+        dVel=dVelCoef*dDopplerMain;
+    }
+    tsPowTbl << iStrob
+             << " & " << QString("%1").arg(dDelayMain*dDistCoef,0,'f',1)
+             << " & " << QString("%1").arg(dVel,0,'f',1);
+    for (int iBeam=0; iBeam<iNumberOfBeams; iBeam++) {
+        double dY2 = pYM2forBeams[iBeam*NFFT*iFilteredN+kDopplerMain*iFilteredN+iDelayMain];
+        tsPowTbl << " & " << QString("%1").arg(dY2,0,'f',1);
+    }
+    tsPowTbl << " \\\\ " << endl;
+}
+//============================================================================================
+//
+//============================================================================================
+void clearPowerList() {
+    int NFFT=1024;
+    //===
+    int baYM2forBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+    if (baYM2forBeams.size()!=baYM2forBeamsSize) {
+        qDebug() << "clearPowerList(): baYM2forBeams.size()!=baYM2forBeamsSize";
+        return;
+    }
+    double *pYM2forBeams = (double *)baYM2forBeams.data();
+    //===
+    int baDetectionForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(bool);
+    if (baDetectionForBeams.size()!=baDetectionForBeamsSize) {
+        qDebug() << "clearPowerList(): baDetectionForBeams.size()!=baDetectionForBeamsSize";
+        return;
+    }
+    bool *pDetectionForBeams = (bool *)baDetectionForBeams.data();
+    //===
+    int baDelayForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+    if (baDelayForBeams.size()!=baDelayForBeamsSize) {
+        qDebug() << "clearPowerList(): baDelayForBeams.size()!=baDelayForBeamsSize";
+        return;
+    }
+    double *pDelayforBeams = (double *)baDelayForBeams.data();
+    //===
+    int baDopplerForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+    if (baDopplerForBeams.size()!=baDopplerForBeamsSize) {
+        qDebug() << "clearPowerList(): baDopplerForBeams.size()!=baDopplerForBeamsSize";
+    }
+    double *pDopplerforBeams = (double *)baDopplerForBeams.data();
+
+    for (int iBeam=0; iBeam<iNumberOfBeams; iBeam++) {
+        for (int kDoppler=0; kDoppler<NFFT; kDoppler++) {
+            for (int iDelay=0; iDelay<iFilteredN; iDelay++) {
+                pDetectionForBeams[iBeam*NFFT*iFilteredN + kDoppler*iFilteredN+iDelay] = false;
+                pYM2forBeams[iBeam*NFFT*iFilteredN + kDoppler*iFilteredN+iDelay] = 0;
+                pDelayforBeams[iBeam*NFFT*iFilteredN + kDoppler*iFilteredN+iDelay]=0;
+                pDopplerforBeams[iBeam*NFFT*iFilteredN + kDoppler*iFilteredN+iDelay]=0;
+            }
+        }
+    }
+}
+
 //======================================================================================================
 //
 //======================================================================================================
@@ -71,10 +206,10 @@ int poi20191231() {
     QTextStream tsDetectionResults(&qfDetectionResults);
 
     // Latex table
-    QFile qfTbl("latextbl.txt");
     qfTbl.resize(0);
     if (!qfTbl.open(QIODevice::ReadWrite)) tsStdOut << "open failed" << endl;
-    QTextStream tsTbl(&qfTbl);
+    qfPowTbl.resize(0);
+    if (!qfPowTbl.open(QIODevice::ReadWrite)) tsStdOut << "open failed" << endl;
 
     QByteArray baStructStrobData;
 
@@ -105,7 +240,16 @@ int poi20191231() {
             //              .arg(st.wMinute,2,10,QLatin1Char('0'))
             //              .arg(st.wSecond,2,10,QLatin1Char('0'))
             //              .arg(st.wMilliseconds,3,10,QLatin1Char('0'));
-            if (uStartTime==(qulonglong)(-1)) uStartTime = pStrobeData->header.execTime;
+            if (uStartTime==(qulonglong)(-1)) {
+                QFile qfTime("timeunits.txt");
+                qfTime.resize(0);
+                qfTime.open(QIODevice::ReadWrite);
+                QTextStream tsTime(&qfTime);
+                uStartTime = pStrobeData->header.execTime;
+                tsTime << "uStartTime = " << uStartTime << endl;
+                tsTime << "StartStrobe = " << iStrob << endl;
+                qfTime.close();
+            }
             qsExecTime = QString::number((pStrobeData->header.execTime-uStartTime)*1.0e-7);
             qsBeta = QString::number(pStrobeData->beamPos.beamBeta);
             qsEpsilon = QString::number(pStrobeData->beamPos.beamEpsilon);
@@ -123,7 +267,7 @@ int poi20191231() {
         int iSizeOfComplex = 2*sizeof(qint16);
         if (beamCountsNum != Np*NT_ || iDataSize!=Np*NT_*iSizeOfComplex) return 2;
 
-        int iFilteredN=NT_-Ntau+1; // in-place array size
+        iFilteredN=NT_-Ntau+1; // in-place array size
         int NFFT=0;
 
         // Doppler representation
@@ -135,6 +279,26 @@ int poi20191231() {
         if (baDopplerRepresentation.isEmpty()) return 3;
         if (baDopplerRepresentation.size()<2*iFilteredN*NFFT*sizeof(double)) return 4;
         double *pDopplerData=(double*)baDopplerRepresentation.data();
+
+        // power table output
+        static bool bInit=false;
+        int baYM2forBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+        if (baYM2forBeams.size()<baYM2forBeamsSize) {baYM2forBeams.resize(baYM2forBeamsSize); }
+        double *pYM2forBeams = (double *)baYM2forBeams.data();
+        int baDetectionForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(bool);
+        if (baDetectionForBeams.size()<baDetectionForBeamsSize) {baDetectionForBeams.resize(baDetectionForBeamsSize);}
+        bool *pDetectionForBeams = (bool *)baDetectionForBeams.data();
+        int baDopplerForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+        if (baDopplerForBeams.size()<baDopplerForBeamsSize) {baDopplerForBeams.resize(baDopplerForBeamsSize); }
+        double *pDopplerforBeams = (double *)baDopplerForBeams.data();
+        int baDelayForBeamsSize = iFilteredN*NFFT*iNumberOfBeams*sizeof(double);
+        if (baDelayForBeams.size()<baDelayForBeamsSize) {baDelayForBeams.resize(baDelayForBeamsSize); }
+        double *pDelayforBeams = (double *)baDelayForBeams.data();
+        if (!bInit) {
+            bInit=true;
+            clearPowerList();
+        }
+
         // phy scales
         double dVLight=300.0; // m/usec
         double dDoppFmin=1.0e0/(NT*dTs)/NFFT; // This is smallest Doppler frequency (MHz) possible for this sampling interval dTs
@@ -202,6 +366,8 @@ int poi20191231() {
                 pY2M[idx]=dRe*dRe+dIm*dIm;
                 // rescale with respect to interference
                 pY2M[idx]/=dAvrM2;
+                // record power for all beams
+                pYM2forBeams[iBeam*NFFT*iFilteredN+(kDoppler*iFilteredN+iDelay)]=pY2M[idx];
                 // Auxiliary global average
                 dAvrM2global+=pY2M[idx];
                 iAvrM2global++;
@@ -240,7 +406,7 @@ int poi20191231() {
                     double dAvrM2=pAvrM2[kDoppler*iFilteredN+iDelay];
                     double dSqrtM2=sqrt(dAvrM2);
                     dNoise[idxNoise++]=(pDopplerData[idx]-dAvrRe)/dSqrtM2;
-                    dNoise[idxNoise++]=(pDopplerData[idx+1]-dAvrRe)/dSqrtM2;
+                    dNoise[idxNoise++]=(pDopplerData[idx+1]-dAvrIm)/dSqrtM2;
                 }
                 DP dFrac,dProb;
                 ftest_poi(dNoise,dSignal,dFrac,dProb);
@@ -267,6 +433,10 @@ int poi20191231() {
             }
         }
         if (!nc) {
+            if (iBeam==3) {
+                outputLatexPowerLine(iStrob);
+                clearPowerList();
+            }
             if(USE_TEXT_DEBUG > 1) {
                 tsStdOut << iStrob << "\t" << dFracMax << "\t" << dProbMin << endl;
             }
@@ -339,13 +509,20 @@ int poi20191231() {
                 bTargetsListed=true;
                 // output to file of detections
                 if (dVel>0) {
-                    tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5\t%6")
+                    int iDelayInt    =lmtg.at(itg);
+                    int kDopplerInt  =kmtg.at(itg);
+                    pDetectionForBeams[iBeam*NFFT*iFilteredN + kDopplerInt*iFilteredN+iDelayInt]=true;
+                    // center of mass for signal
+                    pDelayforBeams[iBeam*NFFT*iFilteredN + kDopplerInt*iFilteredN+iDelayInt]=iDelay;
+                    pDopplerforBeams[iBeam*NFFT*iFilteredN + kDopplerInt*iFilteredN+iDelayInt]=kDoppler;
+                    tsDetectionResults << QString("%1\t%2\t%3\t%4\t%5\t%6\t%7")
                                           .arg(qsExecTime)
-                                          .arg(iDelay*dDistCoef,15)
-                                          .arg(dVel,15)
-                                          .arg(iBeam,15)
+                                          .arg(iDelay*dDistCoef)
+                                          .arg(dVel)
+                                          .arg(iBeam)
                                           .arg(qsEpsilon)
-                                          .arg(iStrob,15)
+                                          .arg(iStrob)
+                                          .arg(dY2M)
                                       << endl;
 
                     ACM::STROBE_DATA *pStrobeData=(ACM::STROBE_DATA *)baStructStrobData.data();
@@ -368,6 +545,8 @@ int poi20191231() {
                                << endl;
 
                 #endif
+
+
             }
         }
 
@@ -398,8 +577,16 @@ int poi20191231() {
 
         }
         baStructStrobData.clear();
+
+        if (iBeam==3) {
+            outputLatexPowerLine(iStrob);
+            clearPowerList();
+        }
     }
     // tsStdOut << "Number of strobs with candidates:\t" << iStrobsDetect << endl;
     return 0;
 }
 
+void clearPowerLine() {
+
+}

@@ -1,0 +1,2 @@
+uStartTime = 30126401058
+StartStrobe = 4521
