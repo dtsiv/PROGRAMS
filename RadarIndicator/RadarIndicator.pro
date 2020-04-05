@@ -9,6 +9,7 @@ CONFIG += ordered
 SUBDIRS = QExceptionDialog \
           QPoi \
           QSqlModel \
+          QRegFileParser \
           QPropPages \
           QIniSettings \
           QTargetsMap \

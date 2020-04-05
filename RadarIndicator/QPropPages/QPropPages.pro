@@ -16,6 +16,7 @@ TEMPLATE = lib
 QMAKE_CXXFLAGS += /std:c++17
 
 INCLUDEPATH +=  \
+    ../include \
     ../QIniSettings \
     ../QIndicatorWindow
 

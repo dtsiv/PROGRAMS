@@ -4,5 +4,6 @@
       <file>Resources/stopper_screen.png</file>
       <file>Resources/plane_small.png</file>
 	  <file>Resources/settings.ico</file>
+      <file>Resources/open.ico</file>
     </qresource>
 </RCC>

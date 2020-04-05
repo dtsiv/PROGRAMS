@@ -52,6 +52,7 @@ public:
     MapWidget *getMapInstance();
     void addTargetMarker(QTargetMarker* pTargetMarker);
     bool bBeamsUsedForPeleng(int iBeam1, int iBeam2);
+    void clearMarkers();
 
 signals:
     void doUpdate();

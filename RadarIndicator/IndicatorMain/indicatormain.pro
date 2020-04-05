@@ -22,10 +22,12 @@ CONFIG += static
 INCLUDEPATH +=  $PWD/include
 
 INCLUDEPATH += \
+    ../include \
     ../QIndicatorWindow \
     ../QIniSettings \
     ../QPropPages \
     ../QSqlModel \
+    ../QRegFileParser \
     ../QTargetsMap \
     ../QPoi \
     ../include/nr2 \
@@ -41,6 +43,7 @@ LIBS += -L..\lib \
     -lqinisettings \
     -lqproppages \
     -lqsqlmodel \
+    -lqregfileparser \
     -lqtargetsmap \
     -lqexceptiondialog \
     -lqpoi

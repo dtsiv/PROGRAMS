@@ -285,7 +285,7 @@ void QTargetsMap::mapPaintEvent(MapWidget *pMapWidget, [[maybe_unused]]QPaintEve
     if (m_qsLastError.isEmpty()) {
         if (!drawGrid(pMapWidget, painter)) {
             if (!m_pSafeParams) {
-                m_qsLastError = "Grid safe parameters missing";
+                m_qsLastError=QString("Grid safe parameters missing");
             }
             QExceptionDialog *pDlg = new QExceptionDialog(m_qsLastError, pMapWidget);
             QObject::connect(pDlg,SIGNAL(accepted()),SLOT(onExceptionDialogClosed()));
@@ -649,5 +649,13 @@ void QTargetsMap::zoomMap(MapWidget *pMapWidget, int iX, int iY, bool bZoomIn /*
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::addTargetMarker(QTargetMarker* pTargetMarker) {
     if (pTargetMarker) m_qlTargets.append(pTargetMarker);
+    emit doUpdate();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::clearMarkers() {
+    qDebug() << "clearMarkers() called";
+    while (m_qlTargets.count()) delete m_qlTargets.takeLast();
     emit doUpdate();
 }

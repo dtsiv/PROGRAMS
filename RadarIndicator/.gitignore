@@ -2,6 +2,9 @@ Makefile
 Makefile.Debug
 Makefile.Release
 RadarIndicator.exe
+!include/
+include/nr2
 debug/
 release/
 build/
+peleng.dat

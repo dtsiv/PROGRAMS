@@ -15,25 +15,13 @@ TEMPLATE = lib
 
 QMAKE_CXXFLAGS += /std:c++17
 
-QMAKE_CXXFLAGS += /wd4018 /wd4244
-
 INCLUDEPATH += \
-    ../QPropPages \
+    ../include \
     ../QIniSettings \
-    ../QExceptionDialog \
-    ../include/nr2
+    ../QPropPages
 
 HEADERS += \
-    qpoi.h
-	
+    qregfileparser.h
+
 SOURCES += \
-    qpoi.cpp \
-    avevar.cpp \
-    betacf.cpp \
-    betai.cpp \
-    four1.cpp \
-    ftest.cpp \
-    gammln.cpp \
-    gasdev.cpp \
-    ran1.cpp \
-    sort.cpp
+    qregfileparser.cpp

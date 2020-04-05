@@ -2,7 +2,6 @@
 #define QINDICATORWINDOW_H
 
 #include <QMainWindow>
-#include <QSplashScreen> 
 #include <QtGui>
 #include <QtWidgets>
 #include <QGLWidget>
@@ -12,15 +11,18 @@
 #include "qinisettings.h"
 #include "qproppages.h"
 #include "qsqlmodel.h"
+#include "qregfileparser.h"
 #include "qtargetsmap.h"
 #include "qpoi.h"
+#include "qstopper.h"
+#include "usercontrolinputfilter.h"
+#include "qparsemgr.h"
+#include "qsimumgr.h"
 
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
 #define SETTINGS_KEY_SHUFFLE                    "useShuffle"
 
-#define STOPPER_MIN_DELAY_MSECS                 1000
-
-class QStopper;
+#define SIMULATION_TIMER_INTERVAL               100
 
 class QIndicatorWindow : public QMainWindow
 {
@@ -37,6 +39,11 @@ public slots:
     void hideStopper();
     void onSetup();
     void onSimulationTimeout();
+    void onParseDataFile();
+    void onUpdateProgressBar(double dCurr);
+
+signals:
+    void updateProgressBar(double dCurr);
 
 public:
     void showStopper();
@@ -45,48 +52,27 @@ public:
 private:
     QList<QObject*> m_qlObjects;
     QSqlModel *m_pSqlModel;
+    QRegFileParser *m_pRegFileParser;
     QTargetsMap *m_pTargetsMap;
     QPoi *m_pPoi;
+
 private:
     QStopper *m_pStopper;
 
     QAction *settingsAct;
-
-    QRect qrPropDlgGeo;
+private:
+    QRect m_qrPropDlgGeo;
     QLabel *lbStatusArea;
     QLabel *lbStatusMsg;
     QTimer m_simulationTimer;
-    QFile m_qfPeleng;
     bool m_bUseShuffle;
-};
-
-//*****************************************************************************
-//
-//*****************************************************************************
-class UserControlInputFilter : public QObject {
-protected:
-    virtual bool eventFilter(QObject*, QEvent*);
-
+    QParseMgr *m_pParseMgr;
+    QSimuMgr *m_pSimuMgr;
 public:
-    UserControlInputFilter(QIndicatorWindow* pOwner, QObject *pobj=0);
+    bool m_bParsingInProgress;
 
-private:
-    QIndicatorWindow *m_pOwner;
-};
-
-//*****************************************************************************
-//
-//*****************************************************************************
-class QStopper : public QSplashScreen {
-public:
-	QStopper();
-	~QStopper();
-
-protected:
-	virtual void drawContents (QPainter *painter);
-
-private:
-    QPixmap m_pmStopper;
+friend class QParseMgr;
+friend class QSimuMgr;
 };
 
 #endif // QINDICATORWINDOW_H

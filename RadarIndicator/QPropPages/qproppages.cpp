@@ -56,11 +56,17 @@ void QColorSelectionButton::onColorSelected(const QColor &color) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QPropPages::QPropPages(QObject *pOwner, QWidget *parent /* =0 */)
- : QDialog(parent,Qt::Dialog),
-         m_pleDBFileName(NULL),
-         m_pbAccept(NULL),
-         m_pOwner (pOwner),
-         m_pTabWidget(NULL) {
+ : QDialog(parent,Qt::Dialog)
+         , m_pOwner(pOwner)
+         , m_pleDBFileName(NULL)
+         , m_pleRegFileName(NULL)
+         , m_ppbAccept(NULL)
+         , m_ppbParse(NULL)
+         , m_pleFCarrier(NULL)
+         , m_pleTSampl(NULL)
+         , m_pcbParseWholeDir(NULL)
+         , m_pcbAdaptiveGrid(NULL)
+         , m_ppbarParseProgress(NULL) {
 	 resize(591,326);
      setWindowTitle("Properties");
      setWindowIcon(QIcon(QPixmap(":/Resources/settings.ico")));
@@ -72,17 +78,18 @@ QPropPages::QPropPages(QObject *pOwner, QWidget *parent /* =0 */)
      pVLayout->addWidget(m_pTabWidget);
      QMetaObject::invokeMethod(m_pOwner,"fillTabs",Q_ARG(QObject *,this),Q_ARG(QObject *,m_pTabWidget));
      QPushButton *pbCancel = new QPushButton("Cancel");
-     m_pbAccept = new QPushButton("Accept");
-     m_pbAccept->setDefault(true);
+     m_ppbAccept = new QPushButton("Accept");
+     m_ppbAccept->setDefault(true);
      QHBoxLayout *pHLayout = new QHBoxLayout;
      pHLayout->addStretch();
      pHLayout->addWidget(pbCancel);
      pHLayout->addSpacing(20);
-     pHLayout->addWidget(m_pbAccept);
+     pHLayout->addWidget(m_ppbAccept);
      pVLayout->addLayout(pHLayout);
      setLayout(pVLayout);
-     QObject::connect(m_pbAccept,SIGNAL(clicked()),SLOT(onAccepted()));
-     QObject::connect(pbCancel,SIGNAL(clicked()),SLOT(close()));
+     QObject::connect(m_ppbAccept,SIGNAL(clicked(bool)),SLOT(onAccepted()));
+     QObject::connect(pbCancel,SIGNAL(clicked(bool)),SLOT(close()));
+     QObject::connect(this,SIGNAL(doParse()),m_pOwner,SLOT(onParseDataFile()));
      QIniSettings &iniSettings = QIniSettings::getInstance();
      QIniSettings::STATUS_CODES scStat;
      bool bOk=false;

@@ -6,6 +6,7 @@
 #include <QtSql>
 #include <QMetaObject>
 
+#include "qinisettings.h"
 #include "qproppages.h"
 
 #define QSQLMODEL_SQLITE_FILE                    "SQLiteFile"
@@ -27,13 +28,28 @@ public:
     bool execQuery();
     bool getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum, qint64 &iTimestamp);
     bool getBeamData(quint64 &iRecId, int &iBeam, QByteArray &baSamples);
+    bool changeDatabaseName(QString qsDbFileName);
+    void startTransaction();
+    void commitTransaction();
 
     Q_INVOKABLE void addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx);
     Q_INVOKABLE void propChanged(QObject *pPropDlg);
+    qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString qsFileVer);
+    qint64 addStrobe(int strobeNo, int beamCountsNum, QByteArray baStructStrobeData, qint64 iFileId);
+    int addSamples(qint64 iStrobId, int iBeam, char *pSamples, int iSize);
+
+    int dropTables();
+    int createTables();
+    bool isDBOpen();
+    QString getDBFileName() { return m_qsDBFile; }
+
+public slots:
+    void onSQLiteFileChoose();
 
 private:
 	QString m_qsDBFile;
     void closeDatabase();
+
     QSqlQuery m_query;
     QSqlRecord m_record;
 };

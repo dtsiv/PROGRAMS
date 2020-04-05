@@ -16,21 +16,31 @@ TEMPLATE = lib
 QMAKE_CXXFLAGS += /std:c++17
 
 INCLUDEPATH +=  \
+    ../include \
     ../QIniSettings \
     ../QPropPages \
     ../QExceptionDialog \
     ../QTargetsMap \
     ../QSqlModel \
+    ../QRegFileParser \
     ../QPoi \
     ../include/nr2
 
 FORMS +=
 
 HEADERS += \
-    qindicatorwindow.h	
+    qindicatorwindow.h \
+    qparsemgr.h \
+    usercontrolinputfilter.h \
+    qsimumgr.h \
+    qstopper.h
 	
 SOURCES += \
-    qindicatorwindow.cpp
+    qindicatorwindow.cpp \
+    qparsemgr.cpp \
+    usercontrolinputfilter.cpp \
+    qsimumgr.cpp \
+    qstopper.cpp
 
 INCLUDEPATH +=  \
     ../include/nr2

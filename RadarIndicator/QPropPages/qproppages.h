@@ -40,14 +40,24 @@ public:
 public slots:
     void onAccepted();
 
+signals:
+    void doParse();
+    void chooseRegFile();
+    void updateProgressBar(double dCurr);
+    void chooseSqliteFile();
+
 	// public-visible interface controls
 public:
     QLineEdit *m_pleDBFileName;
-    QPushButton *m_pbAccept;
+    QLineEdit *m_pleRegFileName;
+    QPushButton *m_ppbAccept;
+    QPushButton *m_ppbParse;
     QLineEdit *m_pleFCarrier;
     QLineEdit *m_pleTSampl;
+    QCheckBox *m_pcbParseWholeDir;
     QCheckBox *m_pcbAdaptiveGrid;
     QCheckBox *m_pcbBeamsUsedForPeleng[QPROPPAGES_NBEAMS*(QPROPPAGES_NBEAMS-1)/2];
+    QProgressBar *m_ppbarParseProgress;
 
 private:
     QObject *m_pOwner;
