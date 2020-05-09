@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QtWidgets>
-#include <QGLWidget>
 #include <QMetaObject>
 #include <QtGlobal>
 #include <QObject>

@@ -13,7 +13,7 @@ UserControlInputFilter::UserControlInputFilter(QIndicatorWindow *pOwner, QObject
 /*virtual*/ bool UserControlInputFilter::eventFilter([[maybe_unused]]QObject *pobj, QEvent *pe) {
     QEvent::Type eventType = pe->type();
     // block all user input events during parsing
-    if (m_pOwner->m_bParsingInProgress==true) {
+    if (m_pOwner->m_bParsingInProgress==true || m_pOwner->m_bGenerateNoiseMapInProgress) {
         if (    eventType == QEvent::KeyPress
              || eventType == QEvent::KeyRelease
              || eventType == QEvent::MouseButtonPress
@@ -44,6 +44,10 @@ UserControlInputFilter::UserControlInputFilter(QIndicatorWindow *pOwner, QObject
         else if ((pKeyEvent->key()==Qt::Key_Q || pKeyEvent->key()==Qt::Key_X)
                && (pKeyEvent->modifiers() & Qt::ControlModifier || pKeyEvent->modifiers() & Qt::AltModifier)) {
             qApp->quit();
+            return true;
+        }
+        else if (pKeyEvent->key()==Qt::Key_Space) {
+            m_pOwner->toggleTimer();
             return true;
         }
     }

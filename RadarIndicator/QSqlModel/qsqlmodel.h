@@ -26,7 +26,8 @@ public:
 
     bool openDatabase();
     bool execQuery();
-    bool getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum, qint64 &iTimestamp);
+    bool getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum, qint64 &iTimestamp,
+                        QByteArray &baStructStrobeData, quint32 &uFileVer);
     bool getBeamData(quint64 &iRecId, int &iBeam, QByteArray &baSamples);
     bool changeDatabaseName(QString qsDbFileName);
     void startTransaction();
@@ -42,13 +43,14 @@ public:
     int createTables();
     bool isDBOpen();
     QString getDBFileName() { return m_qsDBFile; }
+    void closeDatabase();
+    bool getTotStrobes(quint32 &iTotStrobes);
 
 public slots:
     void onSQLiteFileChoose();
 
 private:
 	QString m_qsDBFile;
-    void closeDatabase();
 
     QSqlQuery m_query;
     QSqlRecord m_record;

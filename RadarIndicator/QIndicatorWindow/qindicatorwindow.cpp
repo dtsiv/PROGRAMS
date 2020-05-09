@@ -12,10 +12,11 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
           , m_pPoi(NULL)
           , m_pStopper(NULL)
           , settingsAct(NULL)
-          , m_bUseShuffle(false)
           , m_pParseMgr(NULL)
           , m_pSimuMgr(NULL)
-          , m_bParsingInProgress(false) {
+          , m_pNoiseMapMgr(NULL)
+          , m_bParsingInProgress(false)
+          , m_bGenerateNoiseMapInProgress(false) {
     setWindowIcon(QIcon(QPixmap(":/Resources/spear.ico")));
     lbStatusArea=new QLabel(QString::fromLocal8Bit(CONN_STATUS_DISCONN));
     statusBar()->addPermanentWidget(lbStatusArea,1);
@@ -27,8 +28,6 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     QIniSettings::STATUS_CODES scRes;
     iniSettings.setDefault(SETTINGS_KEY_GEOMETRY,QSerial(QRect(200, 200, 200, 200)).toBase64());
     QString qsEncodedGeometry = iniSettings.value(SETTINGS_KEY_GEOMETRY,scRes).toString();
-    iniSettings.setDefault(SETTINGS_KEY_SHUFFLE,false);
-    m_bUseShuffle = iniSettings.value(SETTINGS_KEY_SHUFFLE,scRes).toBool();
     // qDebug() << scRes << " err=" << QIniSettings::INIT_ERROR << " notf=" << QIniSettings::KEY_NOT_FOUND << " def=" << QIniSettings::READ_DEFAULT << " valid=" << QIniSettings::READ_VALID;
     bool bOk;
     QRect qrGeometry = QSerial(qsEncodedGeometry).toRect(&bOk);
@@ -61,11 +60,12 @@ QIndicatorWindow::QIndicatorWindow(QWidget *parent, Qt::WindowFlags flags)
     if (m_pPoi) m_qlObjects << qobject_cast<QObject *> (m_pPoi);
 
     // connect simulation timer
-    m_simulationTimer.setInterval(SIMULATION_TIMER_INTERVAL);
+    m_simulationTimer.setInterval(m_pTargetsMap->m_uTimerMSecs);
     QObject::connect(&m_simulationTimer,SIGNAL(timeout()),SLOT(onSimulationTimeout()));
 
     m_pParseMgr = new QParseMgr(this);
     m_pSimuMgr = new QSimuMgr(this);
+    m_pNoiseMapMgr = new QNoiseMapMgr(this);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -77,7 +77,6 @@ QIndicatorWindow::~QIndicatorWindow() {
     QString qsEncodedGeometry = QSerial(qrCurGeometry).toBase64();
     // qDebug() << geometry() << " " << qsEncodedGeometry;
     iniSettings.setValue(SETTINGS_KEY_GEOMETRY, qsEncodedGeometry);
-    iniSettings.setValue(SETTINGS_KEY_SHUFFLE, m_bUseShuffle);
 
     for (int i=0; i<m_qlObjects.size(); i++) {
         QObject *pObj=m_qlObjects.at(i);
@@ -86,13 +85,6 @@ QIndicatorWindow::~QIndicatorWindow() {
     if (m_pStopper)   { delete m_pStopper; m_pStopper=NULL; }
     if (m_pParseMgr)  { delete m_pParseMgr; m_pParseMgr=NULL; }
     if (m_pSimuMgr)   { delete m_pSimuMgr; m_pSimuMgr=NULL; }
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QIndicatorWindow::showStopper() {
-    this->setVisible(false);
-    m_pStopper = new QStopper;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -133,12 +125,6 @@ void QIndicatorWindow::hideStopper() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QIndicatorWindow::onSimulationTimeout() {
-    if (m_pSimuMgr) m_pSimuMgr->processStrob();
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QIndicatorWindow::onSetup() {
     static bool bInSetup=false;
     if (!bInSetup) {
@@ -174,26 +160,15 @@ void QIndicatorWindow::onSetup() {
                 qDebug() << "Failed to open DB " << m_pSqlModel->getDBFileName();
             }
         }
+        // adapt new settings if dialog was accepted
+        if (dlgPropPages.result() == QDialog::Accepted) {
+            // restart timer with new interval (msec)
+            m_simulationTimer.start(m_pTargetsMap->m_uTimerMSecs);
+        }
         // setup was finished and results applied
         settingsAct->setEnabled(true);
         bInSetup=false;
     }
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QIndicatorWindow::onParseDataFile() {
-    if (m_pParseMgr) m_pParseMgr->startParsing(QObject::sender());
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QIndicatorWindow::onUpdateProgressBar(double dCurr) {
-    QPropPages *pPropPages = qobject_cast<QPropPages *> (QObject::sender());
-    int iMax=pPropPages->m_ppbarParseProgress->maximum();
-    int iVal = qRound(iMax*dCurr/PROGRESS_BAR_STEP)*PROGRESS_BAR_STEP;
-    // qDebug() << "onUpdateProgressBar: dCurr=" << dCurr << " iVal=" << iVal ;
-    pPropPages->m_ppbarParseProgress->setValue(iVal);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

@@ -4,8 +4,8 @@
 #include <QtGlobal>
 #include <QObject>
 
-#define     PROGRESS_BAR_STEP         10
-#define     PROGRESS_BAR_MAX          100
+#define     PARSE_PROGRESS_BAR_STEP         10
+#define     PARSE_PROGRESS_BAR_MAX          100
 
 class QIndicatorWindow;
 class QRegFileParser;
@@ -18,13 +18,14 @@ public:
     ~QParseMgr();
     void startParsing(QObject *pSender);
     void parseDataFile();
-    void updateProgressBar(bool bReset=false);
+    void updateParseProgressBar(bool bReset=false);
 
 private:
     QIndicatorWindow *m_pOwner;
     QRegFileParser *m_pRegFileParser;
     QSqlModel *m_pSqlModel;
-
+    int iNumberOfBeams;
+    int iSizeOfComplex;
 };
 
 #endif // QPARSEMGR_H

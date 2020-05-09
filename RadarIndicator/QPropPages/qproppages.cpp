@@ -66,7 +66,13 @@ QPropPages::QPropPages(QObject *pOwner, QWidget *parent /* =0 */)
          , m_pleTSampl(NULL)
          , m_pcbParseWholeDir(NULL)
          , m_pcbAdaptiveGrid(NULL)
-         , m_ppbarParseProgress(NULL) {
+         , m_ppbarParseProgress(NULL)
+         , m_pleTimerMSecs(NULL)
+         , m_pleNoiseMapFName(NULL)
+         , m_pcbUseNoiseMap(NULL)
+         , m_ppbarGenerateNoiseMap(NULL)
+         , m_ppbGenerateNoiseMap(NULL) {
+
 	 resize(591,326);
      setWindowTitle("Properties");
      setWindowIcon(QIcon(QPixmap(":/Resources/settings.ico")));
@@ -96,6 +102,11 @@ QPropPages::QPropPages(QObject *pOwner, QWidget *parent /* =0 */)
      iniSettings.setDefault(QPROPPAGES_ACTIVE_TAB,-1);
      int iActiveTab = iniSettings.value(QPROPPAGES_ACTIVE_TAB,scStat).toInt(&bOk);
      if (bOk && iActiveTab >= 0 && iActiveTab < m_pTabWidget->count()) m_pTabWidget->setCurrentIndex(iActiveTab);
+
+     // connect QPropPages::signals and QIndicatorWindow::slots
+     QObject::connect(this,SIGNAL(updateParseProgressBar(double)),m_pOwner,SLOT(onUpdateParseProgressBar(double)));
+     QObject::connect(this,SIGNAL(updateGenerateNoiseMapProgressBar(double)),m_pOwner,SLOT(onUpdateGenerateNoiseMapProgressBar(double)));
+     QObject::connect(this,SIGNAL(generateNoiseMapFile()),m_pOwner,SLOT(onNoiseMapFileGenerate()));
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //

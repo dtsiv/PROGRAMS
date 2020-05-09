@@ -1,6 +1,16 @@
 #include <QtCore>
 #include <QApplication>
 
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+Q_IMPORT_PLUGIN(QICNSPlugin)
+Q_IMPORT_PLUGIN(QICOPlugin)
+Q_IMPORT_PLUGIN(QTgaPlugin)
+Q_IMPORT_PLUGIN(QTiffPlugin)
+Q_IMPORT_PLUGIN(QWbmpPlugin)
+Q_IMPORT_PLUGIN(QWebpPlugin)
+// Q_IMPORT_PLUGIN(QPSQLDriverPlugin)
+
 #include "qindicatorwindow.h"
 #include "qexceptiondialog.h"
 

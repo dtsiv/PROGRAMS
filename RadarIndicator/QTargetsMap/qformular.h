@@ -30,7 +30,8 @@ public:
     bool isStale();
     static const quint64 m_uFormularLifetime;
     static const quint64 m_uFormularCutoffPix;
-
+    bool contains(QPoint qp);
+    QPoint m_qpOffset;
 
 signals:
 
@@ -41,6 +42,7 @@ private:
     QTargetMarker *m_pTargetMarker;
     bool m_bStale;
     struct sMouseStillPos m_mouseStill;
+    QRect m_qrFormularRect;
 };
 
 #endif // QFORMULAR_H

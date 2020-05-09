@@ -11,7 +11,8 @@ QFormular::QFormular(struct sMouseStillPos *pMouseStill,
                      QObject *parent /* = 0 */ )
                : QObject(parent)
                , m_pTargetMarker(NULL)
-               , m_bStale(false) {
+               , m_bStale(false)
+               , m_qpOffset(QPoint(30,30)) {
     Q_ASSERT(pMouseStill != 0);
     m_mouseStill = *pMouseStill;
 }
@@ -71,6 +72,12 @@ bool QFormular::selectTarg(QList<QTargetMarker*> qlTargets, QTransform &t) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool QFormular::contains(QPoint qp) {
+    return m_qrFormularRect.contains(qp);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QFormular::drawFormular(QPainter &painter, QTransform &t) {
     // if formular is stale then m_pTargetMarker no longer exists
     if (m_bStale) return;
@@ -105,11 +112,12 @@ void QFormular::drawFormular(QPainter &painter, QTransform &t) {
     painter.setFont(font);
     QFontMetrics fmTickLabel(font,painter.device());
     // formular rectangle
-    QPoint qpFormularOffset = QPoint(30.,30.);
     QString qsMesg = m_pTargetMarker->mesgString();
-    QRect qrTxt = fmTickLabel.boundingRect(qsMesg);
+    QRect qrOuter(0,0,100,100);
+    int iFlags=0;
+    QRect qrTxt = fmTickLabel.boundingRect(qrOuter,iFlags,qsMesg);
     QRectF qrFormuRect = QRectF(0.0, 0.0, qrTxt.width()+6, qrTxt.height());
-    qrFormuRect.moveTo(qpFormularOffset + qpTarPix);
+    qrFormuRect.moveTo(m_qpOffset + qpTarPix);
     if (qrFormuRect.top() < 0.) qrFormuRect.translate(0.,-qrFormuRect.top());
     if (qrFormuRect.left() < 0.) qrFormuRect.translate(-qrFormuRect.left(),0.);
     if (qrFormuRect.bottom() > qrBounding.height()) qrFormuRect.translate(QPointF(0.,qrBounding.height()-qrFormuRect.bottom()));
@@ -132,13 +140,18 @@ void QFormular::drawFormular(QPainter &painter, QTransform &t) {
         d0 = d3; pt0 = pt3;
     }
     painter.drawLine(qpTarPix,pt0);
-    QPointF qpTxt(qrFormuRect.left(),qrFormuRect.top());
-    qpTxt += QPointF(3.0,qrTxt.height()-3.0);
+    // QPointF qpTxt(qrFormuRect.left(),qrFormuRect.top());
+    // qpTxt += QPointF(3.0,qrTxt.height()-3.0);
     // start actual grawing
     painter.setPen(qpFormularPen);
     painter.setBrush(qbFormularBrush);
     painter.drawRect(qrFormuRect);
-    painter.drawText(qpTxt,qsMesg);
+    m_qrFormularRect.setRect(qrFormuRect.x(),qrFormuRect.y(),qrFormuRect.width(),qrFormuRect.height());
+    QPointF qpTopLeft = qrFormuRect.topLeft();
+    qpTopLeft.rx()+=3.0e0;
+    qpTopLeft.ry()-=3.0e0;
+    qrFormuRect.moveTopLeft(qpTopLeft);
+    painter.drawText(qrFormuRect,Qt::AlignLeft,qsMesg);
     // restore painter state
     painter.restore();
 }

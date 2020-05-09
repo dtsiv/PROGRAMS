@@ -22,7 +22,7 @@
 #define QTARGETSMAP_ADAPT_GRD_STEP      "GridStepAdapt"
 #define QTARGETSMAP_GRD_STEP_D          "GridStepDistanceM"
 #define QTARGETSMAP_GRD_STEP_V          "GridStepVelMpS"
-#define QTARGETSMAP_PELENG_MASK         "BeamsUsesForPeleng"
+#define QTARGETSMAP_TIMER_MSEC          "timerMsecs"
 
 #define QTARGETSMAP_MINTICKS            5     // minimum number of major ticks along one axis
 #define QTARGETSMAP_MAXTICKS            40     // maximum number of major ticks along one axis
@@ -31,6 +31,7 @@
 #define QTARGETSMAP_MAXSCALEV           200     // pixels per m/s
 #define QTARGETSMAP_MINSCALED           0.1    // pixels per m
 #define QTARGETSMAP_MINSCALEV           0.25   // pixels per m/s
+#define QTARGETSMAP_MAXTIMERMSEC        1000   // maximum timer interval
 
 class QTargetsMap : public QObject {
 	Q_OBJECT
@@ -51,8 +52,8 @@ private slots:
 public:
     MapWidget *getMapInstance();
     void addTargetMarker(QTargetMarker* pTargetMarker);
-    bool bBeamsUsedForPeleng(int iBeam1, int iBeam2);
     void clearMarkers();
+    bool getFirstFormular(QPoint &qpPos);
 
 signals:
     void doUpdate();
@@ -62,6 +63,8 @@ private:
     bool drawGrid(MapWidget *pMapWidget, QPainter &painter);
     void shiftView(bool bVertical, bool bPositive);
     void shiftView(QPoint qpShift);
+    void shiftFormular(QPoint qpShift);
+
     void resetScale();
 
     struct GridSafeParams {
@@ -90,19 +93,19 @@ private:
     QString m_qsLastError;
     QWidget *m_pOwner;
     bool m_bAdaptiveGridStep;
-    bool m_bBeamsUsedForPeleng[QPROPPAGES_NBEAMS*(QPROPPAGES_NBEAMS-1)/2];
 
 public:
     // last position & time
     QFormular::sMouseStillPos *m_pMouseStill;
     // time delay to show formular
     static const quint64 m_iFormularDelay;
+    quint32 m_uTimerMSecs;
+    QFormular* m_pMovingFormular;
 
 private:
     QTimer m_qtFormular;
     QList<QFormular*> m_qlFormulars;
     QList<QTargetMarker*> m_qlTargets;
-
     friend class MapWidget;
 };
 

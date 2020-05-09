@@ -36,6 +36,7 @@ private:
     // used to translate coordinate grid with mouse drag
     QPoint m_qpLastPoint;
     bool m_bMapDragging;
+    bool m_bFormularMoving;
 };
 
 #endif // MAPWIDGET_H

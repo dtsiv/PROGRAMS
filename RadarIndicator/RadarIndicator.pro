@@ -6,6 +6,8 @@ TEMPLATE = subdirs
 
 CONFIG += ordered
 
+CONFIG -= import_plugins
+
 SUBDIRS = QExceptionDialog \
           QPoi \
           QSqlModel \
@@ -15,6 +17,8 @@ SUBDIRS = QExceptionDialog \
           QTargetsMap \
           QIndicatorWindow \
           IndicatorMain
+
+QMAKE_RC = rcc
 
 win32 {
     !system(del /F RadarIndicator.exe)

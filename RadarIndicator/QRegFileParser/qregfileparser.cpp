@@ -216,17 +216,7 @@ double QRegFileParser::getProgress() {
 QByteArray * QRegFileParser::getStrobe() {
     // qDebug() << "iRec=" << iRec << " m_sFileHdr.nRec=" << m_sFileHdr.nRec;
     if (m_iRec>m_sFileHdr.nRec) return NULL;
-    if (m_uFileVersion==REG_OLD_VER1::FORMAT_VERSION) {
-        m_uOffset = *m_pOffsets++;
-    }
-    else if (m_uFileVersion==REG::FORMAT_VERSION) {
-        m_uOffset=m_qfRegFile.pos();
-        m_pOffsets++;
-    }
-    else {
-        return NULL;
-    }
-
+    m_uOffset = *m_pOffsets++;
     // qDebug() << "m_uOffset+sizeof(struct s_dataHeader)=" << m_uOffset+sizeof(struct s_dataHeader) << " m_uSize=" << m_uSize;
     if (m_uOffset+sizeof(struct s_dataHeader) > m_uSize) return NULL;
     // qDebug() << "m_uOffset=" << m_uOffset;

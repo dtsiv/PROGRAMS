@@ -9,7 +9,7 @@ MOC_DIR = $$PWD/../build/.moc
 RCC_DIR = $$PWD/../build/.rcc
 UI_DIR = $$PWD/../build/.ui
 
-QT += core gui sql opengl widgets
+QT += core gui sql widgets
 
 TEMPLATE = lib
 
@@ -24,16 +24,16 @@ INCLUDEPATH += \
     ../include/nr2
 
 HEADERS += \
-    qpoi.h
+    qpoi.h \
+    qnoisemap.h
 	
 SOURCES += \
     qpoi.cpp \
-    avevar.cpp \
-    betacf.cpp \
-    betai.cpp \
     four1.cpp \
-    ftest.cpp \
-    gammln.cpp \
     gasdev.cpp \
     ran1.cpp \
-    sort.cpp
+    sort.cpp \
+    qnoisemap.cpp \
+    dopplerrep.cpp \
+    detecttargets.cpp \
+    peleng.cpp

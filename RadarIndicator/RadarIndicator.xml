@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PARAMETERS>
-    <ActivePropertyPage>0</ActivePropertyPage>
-    <BeamsUsesForPeleng>33</BeamsUsesForPeleng>
-    <CarrierFreqMHz>9500</CarrierFreqMHz>
-    <DistanceOriginM>802.3135280851792</DistanceOriginM>
+    <ActivePropertyPage>3</ActivePropertyPage>
+    <CarrierFreqMHz>9400</CarrierFreqMHz>
+    <DistanceOriginM>154.94848410525719</DistanceOriginM>
     <GridStepAdapt>true</GridStepAdapt>
     <GridStepDistanceM>40</GridStepDistanceM>
-    <GridStepVelMpS>10</GridStepVelMpS>
-    <PixelsPerDistanceM>4.7158953820000642</PixelsPerDistanceM>
-    <PixelsPerVelMpS>12.231818089683086</PixelsPerVelMpS>
+    <GridStepVelMpS>1.25</GridStepVelMpS>
+    <PixelsPerDistanceM>1.0263162364614327</PixelsPerDistanceM>
+    <PixelsPerVelMpS>19.699465351615597</PixelsPerVelMpS>
     <SQLiteFile>../DATA/chronicaparser_20200404.sqlite3</SQLiteFile>
     <TSamplingMicroSec>0.12</TSamplingMicroSec>
-    <VelOriginMpS>26.25966967218492</VelOriginMpS>
+    <VelOriginMpS>15.034279801128418</VelOriginMpS>
+    <antennaSizeAz>0.6</antennaSizeAz>
+    <antennaSizeEl>0.9</antennaSizeEl>
+    <antennaWeight>0</antennaWeight>
+    <beamOffsetD0>0.487</beamOffsetD0>
     <dataFile>../DATA/RegFixed/AngleMeas/2019-11-14T16-43-00/00000000</dataFile>
-    <falseAlarmProb>1e-08</falseAlarmProb>
-    <geometry>AAAAwwAAAH0AAAYIAAADJA==</geometry>
+    <falseAlarmProb>1e-06</falseAlarmProb>
+    <geometry>AAAAtgAAAIMAAAUmAAADGQ==</geometry>
     <parseWholeDir>true</parseWholeDir>
-    <pathIntfMap>../DATA/20191020/intfmap_20191020.dat</pathIntfMap>
-    <periodsPerBatch>1024</periodsPerBatch>
-    <recordedSamplesPerPeriod>80</recordedSamplesPerPeriod>
-    <samplesPerPeriod>200</samplesPerPeriod>
-    <samplesPerPulse>8</samplesPerPulse>
-    <threshold>30</threshold>
-    <useShuffle>true</useShuffle>
+    <pathNoiseMap>../DATA/20200507_noisemap.dat</pathNoiseMap>
+    <plotNoiseSpec>true</plotNoiseSpec>
+    <simulationLog>true</simulationLog>
+    <tarSizeThresh>5</tarSizeThresh>
+    <timerMsecs>0</timerMsecs>
+    <useNoiseMap>true</useNoiseMap>
 </PARAMETERS>

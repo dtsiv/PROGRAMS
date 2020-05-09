@@ -149,3 +149,67 @@ void QIniSettings::setValue(const QString &key, const QVariant &value) {
     m_pSettings->setValue(key,value);
     m_pSettings->endGroup();
 }
+//========================================================================
+//   different setters for numbers with rounding
+//========================================================================
+void QIniSettings::setNum(const QString &key, int n, int base /*= 10*/){
+    QByteArray ba;
+    ba.setNum(n,base);
+    this->setValue(key,ba);
+}
+//========================================================================
+//
+//========================================================================
+void QIniSettings::setNum(const QString &key, ushort n, int base /*= 10*/){
+    QByteArray ba;
+    ba.setNum(n,base);
+    this->setValue(key,ba);
+}
+//========================================================================
+//
+//========================================================================
+void QIniSettings::setNum(const QString &key, short n, int base /*= 10*/){
+    QByteArray ba;
+    ba.setNum(n,base);
+    this->setValue(key,ba);
+}
+//========================================================================
+//
+//========================================================================
+void QIniSettings::setNum(const QString &key, uint n, int base /*= 10*/){
+    QByteArray ba;
+    ba.setNum(n,base);
+    this->setValue(key,ba);
+}
+//========================================================================
+//
+//========================================================================
+void QIniSettings::setNum(const QString &key, qlonglong n, int base /*= 10*/){
+    QByteArray ba;
+    ba.setNum(n,base);
+    this->setValue(key,ba);
+}
+//========================================================================
+//
+//========================================================================
+void QIniSettings::setNum(const QString &key, qulonglong n, int base /*= 10*/){
+    QByteArray ba;
+    ba.setNum(n,base);
+    this->setValue(key,ba);
+}
+//========================================================================
+//
+//========================================================================
+void QIniSettings::setNum(const QString &key, float n, char f /*= 'g'*/, int prec /*= 6*/){
+    QByteArray ba;
+    ba.setNum(n,f,prec);
+    this->setValue(key,ba);
+}
+//========================================================================
+//
+//========================================================================
+void QIniSettings::setNum(const QString &key, double n, char f /*= 'g'*/, int prec /*= 6*/){
+    QByteArray ba;
+    ba.setNum(n,f,prec);
+    this->setValue(key,ba);
+}

@@ -13,11 +13,13 @@ MOC_DIR = $$PWD/../build/.moc
 RCC_DIR = $$PWD/../build/.rcc
 UI_DIR = $$PWD/../build/.ui
 
-QT += core gui widgets opengl sql
+QT += core gui widgets sql
 
 CONFIG -= debug
 CONFIG += release
 CONFIG += static
+
+CONFIG -= import_plugins
 
 INCLUDEPATH +=  $PWD/include
 
@@ -48,11 +50,9 @@ LIBS += -L..\lib \
     -lqexceptiondialog \
     -lqpoi
 
-LIBS += \
-    -lopengl32 \
-    -lglu32
 
 win32 {
    RC_FILE = indicatormain.rc
+#   QMAKE_LFLAGS_WINDOWS += /VERBOSE
 }
 

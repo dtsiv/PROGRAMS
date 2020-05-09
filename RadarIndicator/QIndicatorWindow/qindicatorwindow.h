@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QtWidgets>
-#include <QGLWidget>
 #include <QMetaObject>
 #include <QtGlobal>
 
@@ -18,11 +17,9 @@
 #include "usercontrolinputfilter.h"
 #include "qparsemgr.h"
 #include "qsimumgr.h"
+#include "qnoisemapmgr.h"
 
 #define SETTINGS_KEY_GEOMETRY                   "geometry"
-#define SETTINGS_KEY_SHUFFLE                    "useShuffle"
-
-#define SIMULATION_TIMER_INTERVAL               100
 
 class QIndicatorWindow : public QMainWindow
 {
@@ -40,14 +37,18 @@ public slots:
     void onSetup();
     void onSimulationTimeout();
     void onParseDataFile();
-    void onUpdateProgressBar(double dCurr);
+    void onUpdateParseProgressBar(double dCurr);
+    void onUpdateGenerateNoiseMapProgressBar(double dCurr);
+    void onNoiseMapFileGenerate();
 
 signals:
-    void updateProgressBar(double dCurr);
+    void updateParseProgressBar(double dCurr);
+    void updateGenerateNoiseMapProgressBar(double dCurr);
 
 public:
     void showStopper();
     void initComponents();
+    void toggleTimer();
 
 private:
     QList<QObject*> m_qlObjects;
@@ -58,21 +59,24 @@ private:
 
 private:
     QStopper *m_pStopper;
-
     QAction *settingsAct;
+
 private:
     QRect m_qrPropDlgGeo;
     QLabel *lbStatusArea;
     QLabel *lbStatusMsg;
     QTimer m_simulationTimer;
-    bool m_bUseShuffle;
     QParseMgr *m_pParseMgr;
     QSimuMgr *m_pSimuMgr;
+    QNoiseMapMgr *m_pNoiseMapMgr;
+
 public:
     bool m_bParsingInProgress;
+    bool m_bGenerateNoiseMapInProgress;
 
 friend class QParseMgr;
 friend class QSimuMgr;
+friend class QNoiseMapMgr;
 };
 
 #endif // QINDICATORWINDOW_H

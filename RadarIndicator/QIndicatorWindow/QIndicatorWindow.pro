@@ -9,7 +9,7 @@ MOC_DIR = $$PWD/../build/.moc
 RCC_DIR = $$PWD/../build/.rcc
 UI_DIR = $$PWD/../build/.ui
 
-QT += core gui sql opengl widgets
+QT += core gui sql widgets
 
 TEMPLATE = lib
 
@@ -33,18 +33,17 @@ HEADERS += \
     qparsemgr.h \
     usercontrolinputfilter.h \
     qsimumgr.h \
-    qstopper.h
+    qstopper.h \
+    qnoisemapmgr.h
 	
 SOURCES += \
     qindicatorwindow.cpp \
     qparsemgr.cpp \
     usercontrolinputfilter.cpp \
     qsimumgr.cpp \
-    qstopper.cpp
+    qstopper.cpp \
+    qnoisemapmgr.cpp
 
 INCLUDEPATH +=  \
     ../include/nr2
 
-LIBS += \
-     -lopengl32 \
-     -lglu32

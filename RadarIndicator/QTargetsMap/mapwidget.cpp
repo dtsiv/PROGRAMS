@@ -1,13 +1,16 @@
 #include "mapwidget.h"
 #include "qtargetsmap.h"
 
+#include <QOpenGLFunctions>
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 MapWidget::MapWidget(QTargetsMap *owner, QWidget *parent /* =0 */)
       : QOpenGLWidget(parent)
       , m_bMapDragging(false)
-      , m_pOwner(owner) {
+      , m_pOwner(owner)
+      , m_bFormularMoving(false) {
     setAutoFillBackground(false);
     setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
     setMinimumWidth(MAP_WINDOW_MINIMUM_WIDTH);
@@ -62,18 +65,32 @@ void MapWidget::resizeGL([[maybe_unused]]int w, [[maybe_unused]]int h) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /* virtual */ void MapWidget::mousePressEvent(QMouseEvent *pe) {
     if (pe->button() == Qt::LeftButton) {
-        m_qpLastPoint = pe->pos();
-        m_bMapDragging = true;
+        QPoint qpPos = pe->pos();
+        m_bFormularMoving = m_pOwner->getFirstFormular(qpPos);
+        if (m_bFormularMoving) {
+            m_bMapDragging = false;
+            // qDebug() << "m_bFormularMoving = true";
+        }
+        else {
+            m_bMapDragging = true;
+        }
+        m_qpLastPoint = qpPos;
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /* virtual */ void MapWidget::mouseMoveEvent(QMouseEvent *pe) {
-    if ((pe->buttons() & Qt::LeftButton) && m_bMapDragging) {
+    if ((pe->buttons() & Qt::LeftButton) && (m_bMapDragging || m_bFormularMoving)) {
         QPoint qpDelta = pe->pos() - m_qpLastPoint;
         m_qpLastPoint = pe->pos();
-        m_pOwner->shiftView(qpDelta);
+        if (m_bFormularMoving) {
+            // qDebug() << "call to shiftFormular(qpDelta)";
+            m_pOwner->shiftFormular(qpDelta);
+        }
+        else {
+            m_pOwner->shiftView(qpDelta);
+        }
         repaint();
         return;
     }
@@ -87,9 +104,15 @@ void MapWidget::resizeGL([[maybe_unused]]int w, [[maybe_unused]]int h) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /* virtual */ void MapWidget::mouseReleaseEvent(QMouseEvent *pe) {
     if (pe->button() == Qt::LeftButton && m_bMapDragging) {
-        m_bMapDragging = false;
         QPoint qpDelta = pe->pos() - m_qpLastPoint;
-        m_pOwner->shiftView(qpDelta);
+        if (m_bFormularMoving) {
+            m_pOwner->shiftFormular(qpDelta);
+        }
+        else {
+            m_pOwner->shiftView(qpDelta);
+        }
+        m_bMapDragging = false;
+        m_bFormularMoving = false;
         repaint();
     }
 }

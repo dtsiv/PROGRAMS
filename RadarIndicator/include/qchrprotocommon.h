@@ -54,24 +54,24 @@ namespace CHR
 
     struct STROBE_HEADER
     {
-        uint64_t execTime;   ///< Время выполнения (0 - сразу, если указано - время от первой вспышки)
-        uint32_t strobeNo;   ///< Номер строба
-        uint32_t flags;      ///< Флаги
+        uint64_t execTime;   // Время выполнения (0 - сразу, если указано - время от первой вспышки)
+        uint32_t strobeNo;   // Номер строба
+        uint32_t flags;      // Флаги
 
-        uint16_t pCount;      ///< количество импульсов в стробе
-        uint16_t pDuration;   ///< Длительность импульса
-        uint16_t pPeriod;     ///< Период повторения импульсов
-        uint16_t distance;    ///< Дистанция приема
-        uint16_t blank;       ///< Бланк
-        uint8_t  signalID;    ///< Номер модуляции сигнала
+        uint16_t pCount;      // количество импульсов в стробе
+        uint16_t pDuration;   // Длительность импульса
+        uint16_t pPeriod;     // Период повторения импульсов
+        uint16_t distance;    // Дистанция приема
+        uint16_t blank;       // Бланк
+        uint8_t  signalID;    // Номер модуляции сигнала
         uint8_t  padding;
     };
     struct BEAM_POS
     {
-        int16_t sensorBeta;
-        int16_t sensorEpsilon;
-        int16_t beamBeta;
-        int16_t beamEpsilon;
+        int16_t sensorBeta;     // азимут
+        int16_t sensorEpsilon;  // угол места
+        int16_t beamBeta;       // азимут луча относительно нормали антенны
+        int16_t beamEpsilon;    // угол места луча относительно нормали антенны
     };
 } // namespace CHR
 

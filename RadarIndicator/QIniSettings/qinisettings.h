@@ -40,8 +40,18 @@ public:
     QVariant value(const QString &key, STATUS_CODES &iStatus);
     void setDefault(const QString &key, const QVariant &value);
     void setDefault(const QMap<QString,QVariant> &qmNewDefaults);
-    void setValue(const QString &key, const QVariant &value);
     QVariant getDefault(const QString &key);
+    void setValue(const QString &key, const QVariant &value);
+
+    // difference setters for numbers with rounding
+    void setNum(const QString &key, int n, int base = 10);
+    void setNum(const QString &key, ushort n, int base = 10);
+    void setNum(const QString &key, short n, int base = 10);
+    void setNum(const QString &key, uint n, int base = 10);
+    void setNum(const QString &key, qlonglong n, int base = 10);
+    void setNum(const QString &key, qulonglong n, int base = 10);
+    void setNum(const QString &key, float n, char f = 'g', int prec = 6);
+    void setNum(const QString &key, double n, char f = 'g', int prec = 6);
 };
 
 #endif // QINISETTINGS_H

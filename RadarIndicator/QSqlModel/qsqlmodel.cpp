@@ -201,7 +201,8 @@ bool QSqlModel::execQuery() {
     QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection,false);
     if (!db.isOpen()) return false;
     m_query = QSqlQuery(db);
-    bOk=m_query.prepare("SELECT s.id AS guid, s.seqnum, s.ncnt, f.timestamp FROM"
+    bOk=m_query.prepare("SELECT f.filever,s.id AS guid, s.seqnum,"
+                    " s.ncnt, f.timestamp, s.structStrobData FROM"
                     " strobs s LEFT JOIN files f ON f.id=s.fileid"
                     " ORDER BY s.seqnum ASC"
                     );
@@ -213,12 +214,13 @@ bool QSqlModel::execQuery() {
 //======================================================================================================
 //
 //======================================================================================================
-bool QSqlModel::getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum, qint64 &iTimestamp) {
+bool QSqlModel::getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum, qint64 &iTimestamp,
+                               QByteArray &baStructStrobeData, quint32 &uFileVer) {
     bool bOk;
-    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection,false);
-    //if (!db.isOpen()) {
-    //    qDebug() << "getStrobRecord(): DB is not open";
-    //}
+    // QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection,false);
+    // if (!db.isOpen()) {
+    //     qDebug() << "getStrobRecord(): DB is not open";
+    // }
     if (!m_query.isActive()) {
     //    qDebug() << "getStrobRecord(): m_query is not active";
         return false;
@@ -234,6 +236,11 @@ bool QSqlModel::getStrobRecord(quint64 &iRecId, int &iStrob, int &iBeamCountsNum
     iBeamCountsNum=m_query.value(m_record.indexOf("ncnt")).toInt(&bOk);
     if (!bOk) return false;
     iTimestamp=m_query.value(m_record.indexOf("timestamp")).toLongLong(&bOk);
+    if (!bOk) return false;
+    baStructStrobeData=m_query.value(m_record.indexOf("structStrobData")).toByteArray();
+    if (baStructStrobeData.isEmpty()) return false;
+    QString qsFileVer=m_query.value(m_record.indexOf("filever")).toString();
+    uFileVer=qsFileVer.toUInt(&bOk);
     if (!bOk) return false;
     return true;
 }
@@ -255,6 +262,25 @@ bool QSqlModel::getBeamData(quint64 &iRecId, int &iBeam, QByteArray &baSamples) 
     QSqlRecord recData = queryData.record();
     baSamples = queryData.value(recData.indexOf("complexdata")).toByteArray();
     if (queryData.next()) return false;
+    return true;
+}
+//======================================================================================================
+//
+//======================================================================================================
+bool QSqlModel::getTotStrobes(quint32 &iTotStrobes) {
+    bool bOk;
+    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection,false);
+    if (!db.isOpen()) return false;
+    QSqlQuery queryData = QSqlQuery(db);
+    bOk=queryData.prepare("SELECT SUM(nstrobs) AS totStrobes FROM files");
+    if (!bOk) return false;
+    if (!queryData.exec()) return false;
+    if (!queryData.next()) return false;
+    QSqlRecord recData = queryData.record();
+    int iRetVal = queryData.value(recData.indexOf("totStrobes")).toInt(&bOk);
+    if (!bOk) return false;
+    if (queryData.next()) return false;
+    iTotStrobes=iRetVal;
     return true;
 }
 //======================================================================================================

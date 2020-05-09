@@ -2,16 +2,16 @@
 #include "qindicatorwindow.h"
 #include "qexceptiondialog.h"
 
-double dProgressBarStep=(double)PROGRESS_BAR_STEP/PROGRESS_BAR_MAX;
-int iNumberOfBeams = 4;
-int iSizeOfComplex=2*sizeof(qint16);
+double dParseProgressBarStep=(double)PARSE_PROGRESS_BAR_STEP/PARSE_PROGRESS_BAR_MAX;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QParseMgr::QParseMgr(QIndicatorWindow *pOwner) :
          m_pOwner(pOwner)
-       , m_pRegFileParser(NULL) {
+       , m_pRegFileParser(NULL)
+       , iNumberOfBeams(4)
+       , iSizeOfComplex(2*sizeof(qint16)) {
     // map members for convenience
     m_pRegFileParser           = m_pOwner->m_pRegFileParser;
     m_pSqlModel                = m_pOwner->m_pSqlModel;
@@ -33,11 +33,10 @@ void QParseMgr::startParsing(QObject *pSender) {
     m_pOwner->m_bParsingInProgress=true;
     pPropPages->m_ppbAccept->setEnabled(false);
     pPropPages->m_ppbParse->setEnabled(false);
-    pPropPages->m_ppbarParseProgress->setMaximum(PROGRESS_BAR_MAX);
+    pPropPages->m_ppbarParseProgress->setMaximum(PARSE_PROGRESS_BAR_MAX);
 
     // ensure progress bar updates
-    QObject::connect(m_pOwner,SIGNAL(updateProgressBar(double)),pPropPages,SIGNAL(updateProgressBar(double)));
-    QObject::connect(pPropPages,SIGNAL(updateProgressBar(double)),m_pOwner,SLOT(onUpdateProgressBar(double)));
+    QObject::connect(m_pOwner,SIGNAL(updateParseProgressBar(double)),pPropPages,SIGNAL(updateParseProgressBar(double)));
 
     QString qsDbFileName = pPropPages->m_pleDBFileName->text();
     if (!m_pSqlModel->changeDatabaseName(qsDbFileName)) {
@@ -131,7 +130,7 @@ void QParseMgr::parseDataFile() {
         return;
     }
     bool bReset=true;
-    updateProgressBar(bReset);
+    updateParseProgressBar(bReset);
     while(!m_pRegFileParser->isAtEnd()) {
         QByteArray *pbaStrobe = m_pRegFileParser->getStrobe();
         if (pbaStrobe==NULL || m_pRegFileParser->m_pDataHeader==NULL) {
@@ -163,23 +162,39 @@ void QParseMgr::parseDataFile() {
             m_pSqlModel->commitTransaction();
             delete pbaStrobe;
         }
-        updateProgressBar();
+        updateParseProgressBar();
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void QParseMgr::updateProgressBar(bool bReset /* =false */) {
+void QParseMgr::updateParseProgressBar(bool bReset /* =false */) {
     static int iCurr=0,iPrev=0;
     if (bReset) {
         iCurr=iPrev=0;
-        emit m_pOwner->updateProgressBar(iCurr);
+        emit m_pOwner->updateParseProgressBar(iCurr);
         return;
     }
-    iCurr = qRound(m_pRegFileParser->getProgress()/dProgressBarStep);
+    iCurr = qRound(m_pRegFileParser->getProgress()/dParseProgressBarStep);
     if (iCurr==iPrev) return;
     iPrev=iCurr;
-    emit m_pOwner->updateProgressBar(iCurr*dProgressBarStep);
+    emit m_pOwner->updateParseProgressBar(iCurr*dParseProgressBarStep);
     int iMaxMSecs=500;
     QCoreApplication::processEvents(QEventLoop::AllEvents,iMaxMSecs);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QIndicatorWindow::onParseDataFile() {
+    if (m_pParseMgr) m_pParseMgr->startParsing(QObject::sender());
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QIndicatorWindow::onUpdateParseProgressBar(double dCurr) {
+    QPropPages *pPropPages = qobject_cast<QPropPages *> (QObject::sender());
+    int iMax=pPropPages->m_ppbarParseProgress->maximum();
+    int iVal = qRound(iMax*dCurr/PARSE_PROGRESS_BAR_STEP)*PARSE_PROGRESS_BAR_STEP;
+    // qDebug() << "onUpdateParseProgressBar: dCurr=" << dCurr << " iVal=" << iVal ;
+    pPropPages->m_ppbarParseProgress->setValue(iVal);
 }

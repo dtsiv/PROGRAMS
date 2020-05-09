@@ -4,9 +4,11 @@
 #include <QtGui>
 #include <QtWidgets>
 #include <QTabWidget>
+#include <QComboBox>
 
 #define QPROPPAGES_ACTIVE_TAB                        "ActivePropertyPage"
 #define QPROPPAGES_NBEAMS                            4
+#define PROP_LINE_WIDTH                              60
 
 // color selection button
 class QColorSelectionButton : public QPushButton {
@@ -43,8 +45,11 @@ public slots:
 signals:
     void doParse();
     void chooseRegFile();
-    void updateProgressBar(double dCurr);
+    void updateParseProgressBar(double dCurr);
+    void updateGenerateNoiseMapProgressBar(double dCurr);
     void chooseSqliteFile();
+    void chooseNoiseMapFile();
+    void generateNoiseMapFile();
 
 	// public-visible interface controls
 public:
@@ -58,6 +63,16 @@ public:
     QCheckBox *m_pcbAdaptiveGrid;
     QCheckBox *m_pcbBeamsUsedForPeleng[QPROPPAGES_NBEAMS*(QPROPPAGES_NBEAMS-1)/2];
     QProgressBar *m_ppbarParseProgress;
+    QLineEdit *m_pleTimerMSecs;
+    QLineEdit *m_pleNoiseMapFName;
+    QCheckBox *m_pcbUseNoiseMap;
+    QProgressBar *m_ppbarGenerateNoiseMap;
+    QPushButton *m_ppbGenerateNoiseMap;
+    QLineEdit *m_pleTargSzThresh;
+    QLineEdit *m_pleAntennaSzAz;
+    QLineEdit *m_pleAntennaSzEl;
+    QLineEdit *m_pleBeamOffsetD0;
+    QComboBox *m_pcbbWeighting;
 
 private:
     QObject *m_pOwner;

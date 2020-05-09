@@ -13,28 +13,43 @@
 #include "nr.h"
 using namespace std;
 
+#include "qnoisemap.h"
+
 #define QPOI_PROP_TAB_CAPTION    "POI"
 
 #define QPOI_SAMPLING_TIME_USEC             "TSamplingMicroSec"
 #define QPOI_CARRIER_FREQUENCY              "CarrierFreqMHz"
-#define QPOI_INTFMAP                        "pathIntfMap"
-// samples per puls
-#define QPOI_NTAU                           "samplesPerPulse"
-// samples per period
-#define QPOI_NT                             "samplesPerPeriod"
-// samples per period recorded
-#define QPOI_NT_                            "recordedSamplesPerPeriod"
-// periods per batch
-#define QPOI_NP                             "periodsPerBatch"
+#define QPOI_NOISEMAP                       "pathNoiseMap"
 // signal detection threshold
 #define QPOI_THRESHOLD                      "threshold"
 // false alarm probability
 #define QPOI_PFALARM                        "falseAlarmProb"
+// use noise scaling in doppler domain
+#define QPOI_USE_NOISEMAP                   "useNoiseMap"
+// output noise spectrum for plotting
+#define QPOI_PLOT_NOISESPEC                 "plotNoiseSpec"
+// output simulation log
+#define QPOI_USE_LOG                        "simulationLog"
+// detection threshold on target size
+#define QPOI_TARGET_SZTHRESH                "tarSizeThresh"
+// beam relative offset Delta_0 from scan line in each direction (see manuscript for details)
+#define QPOI_BEAM_OFFSET_D0                 "beamOffsetD0"
+// antenna size along Az dir in meters
+#define QPOI_ANTENNA_SIZE_AZ                "antennaSizeAz"
+// antenna size along El dir in meters
+#define QPOI_ANTENNA_SIZE_EL                "antennaSizeEl"
+// antenna weighting type
+#define QPOI_ANTENNA_WEIGHTING              "antennaWeight"
+
+#define QPOI_WEIGHTING_RCOSINE_P065         0
 
 #define QPOI_NUMBER_OF_BEAMS                4
 #define QPOI_MAXIMUM_TG_MISMATCH            10
 
-class QIntfMap;
+#define GENERATE_PROGRESS_BAR_STEP          1
+#define GENERATE_PROGRESS_BAR_MAX           100
+
+class QNoiseMap;
 
 class QPoi : public QObject {
     Q_OBJECT
@@ -45,7 +60,7 @@ public:
     Q_INVOKABLE void addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx);
     Q_INVOKABLE void propChanged(QObject *pPropDlg);
 
-    bool detectTargets(QByteArray &baSamples, QByteArray &baStrTargets, int &nTargets);
+    bool detectTargets(QByteArray &baSamplesDP, QByteArray &baStrTargets, int &nTargets);
 
     struct sTarget {
         unsigned int uCandNum;   // number of candidates attributed to this target
@@ -62,13 +77,43 @@ public:
 signals:
 
 public slots:
+    void onNoiseMapFileChoose();
 
-private:
+public:
     void avevar_poi(Vec_I_DP &data, DP &ave, DP &var);
-    void ftest_poi(Vec_I_DP &data_noise, Vec_I_DP &data_signal, DP &f, DP &prob);
-    QByteArray dopplerRepresentation(qint16 *pData, unsigned int iArrElemCount);
+    // void ftest_poi(Vec_I_DP &data_noise, Vec_I_DP &data_signal, DP &f, DP &prob);
+    QByteArray dopplerRepresentation(QByteArray &baSamplesDP);
+    bool getPointDopplerRep(int iDelay, int kDoppler,
+        QByteArray pbaBeamDataDP[QPOI_NUMBER_OF_BEAMS],
+        double dBeamAmplRe[QPOI_NUMBER_OF_BEAMS],
+        double dBeamAmplIm[QPOI_NUMBER_OF_BEAMS]);
     void resetRandomNumberGenerators();
+    bool checkStrobeParams(int iNp,              /* pStructStrobeHeader->pCount */
+                           int iNtau,            /* pStructStrobeHeader->pDuration */
+                           int iNT,              /* pStructStrobeHeader->pPeriod */
+                           int iNT_,             /* pStructStrobeHeader->distance */
+                           int iBeamCountsNum    /* beamCountsNum = NT_ * Np */
+                           );
+    bool appendStrobToNoiseMap(QByteArray baSamples[QPOI_NUMBER_OF_BEAMS]);
+    bool calcAverages();
+    bool updateNFFT();
+    bool updateStrobeParams(int iNp,              /* pStructStrobeHeader->pCount */
+                            int iNtau,            /* pStructStrobeHeader->pDuration */
+                            int iNT,              /* pStructStrobeHeader->pPeriod */
+                            int iNT_,             /* pStructStrobeHeader->distance */
+                            int iBeamCountsNum    /* beamCountsNum = NT_ * Np */
+                            );
+    void writeNoiseMapFile(QString qsFileName);
+    bool getAngles(double dBeamAmplRe[4], double dBeamAmplIm[4], double &dAzimuth, double &dElevation);
+    double dsinc(double x);
+    double raised_cos_spec(double Delta, double p=0.65);
+    double raised_cos_charact(double Delta);
+    double dichotomy(double dFuncValue, double dLeft, double dRight, double (QPoi::*pFunc)(double), bool *pbOk = NULL);
+    void initPelengInv(double (QPoi::*pFunc)(double));
+    void initPeleng();
+    double getRelAngOffset(double dPelengRatio, bool *pbOk = NULL);
 
+public:
     double m_dCarrierF;  // Irradiation carrier frequency (MHz)
     double m_dTs;        // sampling time interval (microsecs)
     int NT_;    // NT_ - recorded data samples per period, typically at 20191016 this is 80 samples
@@ -76,52 +121,36 @@ private:
     int Np;     // Np - number of periods, typically at 20191016 this is 1024 periods
     int Ntau;   // Ntau - pulse duration (samples), typically at 20191016 this is 8 samples
     int iFilteredN; // in-place array size at filter output: iFilteredN=NT_-Ntau+1; Ntau -pulse duration (samples)
+                    // 20200502: changed to iFilteredN=NT_
     int NFFT;   // the least power of 2 to cover Np, typically at 20191016 this is 1024 periods
-    double m_dThreshold; // signal detection threshold
+    int iBeamCountsNum; // number of complex samples per beam = NT_*Np
     double m_dFalseAlarmProb; // probability of false alarm
+    bool m_bUseNoiseMap;
+    bool m_bPlotNoiseSpec;
+    bool m_bUseLog;
+    QByteArray m_baStructFileHdr;
+    QByteArray m_baStructStobeData;
+    quint32 m_uFileVer;
 
-    QIntfMap *m_pIntfMap;
+    QNoiseMap *m_pNoiseMap;
+    int iSizeOfComplex;
 
-    friend class QIntfMap;
+    quint32 m_uTargSzThresh;
+
+    // Peleng-related
+    double m_dBeamDelta0;
+    double m_dAntennaSzAz;
+    double m_dAntennaSzEl;
+    int m_iWeighting;
+    static const char *m_pWeightingType[];
+    double m_dAzLOverD;
+    double m_dElLOverD;
+    double *m_pPelengInv;
+    double m_dDeltaBound;
+    double m_dPelengBound;
+    double m_dPelengIncr;
+
+    friend class QNoiseMap;
 };
-
-class QIntfMap : public QObject {
-    Q_OBJECT
-    struct intfMapHeader {
-        quint32 vMaj;
-        quint32 vMin;
-        quint32 Np;
-        quint32 NT_;
-        quint32 iFilteredN;
-        quint32 NFFT;
-        quint32 uStrobsCount;
-    };
-
-    struct intfMapRecord {
-        double iRe;   // average real component of signal in Doppler rep.
-        double iIm;   // average imag component
-        double uM1;  // average signal modulus
-        double uM2;  // average signal modulus2
-        double uM3;  // average signal modulus3
-        double uM4;  // average signal modulus4
-    };
-
-public:
-    explicit QIntfMap(QString qsIntfMapFName = "intfmap.dat");
-    int readInterferenceMap(unsigned int iFilteredN,unsigned int NT_,unsigned int Np,int NFFT);
-
-    QByteArray m_baAvrRe;
-    QByteArray m_baAvrIm;
-    QByteArray m_baAvrM1;
-    QByteArray m_baAvrM2;
-    QByteArray m_baAvrM3;
-    QByteArray m_baAvrM4;
-
-    QString m_qsIntfMapFName;
-
-private:
-    QFile m_qfIntfMap;
-};
-
 
 #endif // QPOI_H

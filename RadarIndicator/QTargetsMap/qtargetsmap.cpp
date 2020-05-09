@@ -8,6 +8,7 @@
 #include <QPaintEvent>
 #include <QtMath>
 #include <QRegExp>
+#include <QOpenGLFunctions>
 
 // time delay to show formular
 const quint64 QTargetsMap::m_iFormularDelay = 1000;
@@ -27,7 +28,9 @@ QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
          , m_pSafeParams(NULL)
          , m_pOwner(pOwner)
          , m_pMouseStill(NULL)
-         , m_bAdaptiveGridStep(false) {
+         , m_uTimerMSecs(0)
+         , m_bAdaptiveGridStep(false)
+         , m_pMovingFormular(NULL) {
     QIniSettings &iniSettings = QIniSettings::getInstance();
     QIniSettings::STATUS_CODES scRes;
     iniSettings.setDefault(QTARGETSMAP_SCALE_D,2.0e0);
@@ -44,15 +47,8 @@ QTargetsMap::QTargetsMap(QWidget * pOwner /* = 0 */)
     m_dDGridStep = iniSettings.value(QTARGETSMAP_GRD_STEP_D,scRes).toDouble();
     iniSettings.setDefault(QTARGETSMAP_GRD_STEP_V,20.0e0);
     m_dVGridStep = iniSettings.value(QTARGETSMAP_GRD_STEP_V,scRes).toDouble();
-    iniSettings.setDefault(QTARGETSMAP_PELENG_MASK,0x3F);
-    unsigned int uBeamsMask = iniSettings.value(QTARGETSMAP_PELENG_MASK,scRes).toUInt();
-    int iBeamsPair=0;
-    for (int iBeam1=0; iBeam1<QPROPPAGES_NBEAMS-1; iBeam1++) {
-        for (int iBeam2=iBeam1+1; iBeam2<QPROPPAGES_NBEAMS; iBeam2++) {
-            m_bBeamsUsedForPeleng[iBeamsPair] = (bool)(uBeamsMask & (1 << iBeamsPair));
-            iBeamsPair++;
-        }
-    }
+    iniSettings.setDefault(QTARGETSMAP_TIMER_MSEC,100);
+    m_uTimerMSecs = iniSettings.value(QTARGETSMAP_TIMER_MSEC,scRes).toUInt();
 
     // periodic formulars update
     QObject::connect(&m_qtFormular,SIGNAL(timeout()),SLOT(onFormularTimeout()));
@@ -77,16 +73,7 @@ QTargetsMap::~QTargetsMap() {
     iniSettings.setValue(QTARGETSMAP_ADAPT_GRD_STEP, m_bAdaptiveGridStep);
     iniSettings.setValue(QTARGETSMAP_GRD_STEP_D, m_dDGridStep);
     iniSettings.setValue(QTARGETSMAP_GRD_STEP_V, m_dVGridStep);
-    unsigned int uBeamsMask = 0;
-    int iBeamsPair = 0;
-    for (int iBeam1=0; iBeam1<QPROPPAGES_NBEAMS-1; iBeam1++) {
-        for (int iBeam2=iBeam1+1; iBeam2<QPROPPAGES_NBEAMS; iBeam2++) {
-            int iBeamsUsed = (m_bBeamsUsedForPeleng[iBeamsPair] ? 1 : 0);
-            uBeamsMask =  uBeamsMask | (iBeamsUsed << iBeamsPair);
-            iBeamsPair++;
-        }
-    }
-    iniSettings.setValue(QTARGETSMAP_PELENG_MASK,uBeamsMask);
+    iniSettings.setValue(QTARGETSMAP_TIMER_MSEC,m_uTimerMSecs);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -123,25 +110,16 @@ void QTargetsMap::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
 
     QWidget *pWidget=new QWidget;
     QGridLayout *pGridLayout=new QGridLayout;
+    // grid step
     pGridLayout->addWidget(new QLabel("Grid step"),0,0);
     pPropPages->m_pcbAdaptiveGrid = new QCheckBox("adaptive");
     pPropPages->m_pcbAdaptiveGrid->setChecked(m_bAdaptiveGridStep);
     pGridLayout->addWidget(pPropPages->m_pcbAdaptiveGrid,0,1);
-
-    QHBoxLayout *pHLayout = new QHBoxLayout;
-    pHLayout->addWidget(new QLabel("Beams used for peleng:"));
-    pHLayout->setSpacing(20);
-    int iCheckBox=0;
-    for (int iBeam1=0; iBeam1<QPROPPAGES_NBEAMS-1; iBeam1++) {
-        for (int iBeam2=iBeam1+1; iBeam2<QPROPPAGES_NBEAMS; iBeam2++) {
-            QCheckBox *pcb = pPropPages->m_pcbBeamsUsedForPeleng[iCheckBox]
-                           = new QCheckBox(QString("%1-%2").arg(iBeam1).arg(iBeam2));
-            pcb->setChecked(m_bBeamsUsedForPeleng[iCheckBox]);
-            pHLayout->addWidget(pcb);
-            iCheckBox++;
-        }
-    }
-    pGridLayout->addLayout(pHLayout,1,0,1,6,Qt::AlignLeft);
+    // strob delay
+    pGridLayout->addWidget(new QLabel("Strob delay (ms)"),0,3);
+    pPropPages->m_pleTimerMSecs = new QLineEdit(QString::number(m_uTimerMSecs));
+    pPropPages->m_pleTimerMSecs->setValidator(new QIntValidator(0,QTARGETSMAP_MAXTIMERMSEC,pPropPages->m_pleTimerMSecs));
+    pGridLayout->addWidget(pPropPages->m_pleTimerMSecs,0,4);
 
     pGridLayout->setColumnStretch(2,100);
     pGridLayout->setColumnStretch(5,100);
@@ -155,15 +133,13 @@ void QTargetsMap::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::propChanged(QObject *pPropDlg) {
+    bool bOk=false;
     QPropPages *pPropPages = qobject_cast<QPropPages *> (pPropDlg);
     // assign new prop values
     m_bAdaptiveGridStep = pPropPages->m_pcbAdaptiveGrid->isChecked();
-    int iCheckBox=0;
-    for (int iBeam1=0; iBeam1<QPROPPAGES_NBEAMS-1; iBeam1++) {
-        for (int iBeam2=iBeam1+1; iBeam2<QPROPPAGES_NBEAMS; iBeam2++) {
-            QCheckBox *pcb = pPropPages->m_pcbBeamsUsedForPeleng[iCheckBox];
-            m_bBeamsUsedForPeleng[iCheckBox++] = pcb->isChecked();
-        }
+    quint32 uTimerMSecs = pPropPages->m_pleTimerMSecs->text().toUInt(&bOk);
+    if (bOk) {
+        m_uTimerMSecs = qBound((quint32)0,uTimerMSecs,(quint32)QTARGETSMAP_MAXTIMERMSEC);
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -247,6 +223,16 @@ void QTargetsMap::shiftView(QPoint qpShift) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void QTargetsMap::shiftFormular(QPoint qpShift) {
+    qDebug() << "shiftFormular";
+    if (m_pMovingFormular) {
+        m_pMovingFormular->m_qpOffset+=qpShift;
+        qDebug() << "adding shift";
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::resetScale() {
     if (m_pSafeParams) {
         m_dScaleD    = m_pSafeParams->dScaleD;
@@ -302,28 +288,6 @@ void QTargetsMap::mapPaintEvent(MapWidget *pMapWidget, [[maybe_unused]]QPaintEve
         m_qlTargets.at(i)->drawMarker(painter,m_transform);
     }
     painter.end();
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bool QTargetsMap::bBeamsUsedForPeleng(int iBeam1, int iBeam2) {
-    // beams cannot be the same
-    if (iBeam1 == iBeam2) return false;
-    // iBeam1, iBeam2 must be int the range [0..QPROPPAGES_NBEAMS-1]
-    if (iBeam1 < 0 || iBeam2 < 0 || iBeam1 >= QPROPPAGES_NBEAMS || iBeam2 >= QPROPPAGES_NBEAMS) return false;
-    // for convenience, iBeam1 < iBeam2, otherwise swap them
-    if (iBeam1 > iBeam2) {
-        int iDummy = iBeam1; iBeam1 = iBeam2; iBeam2 = iDummy;
-    }
-    int iBeamsPair = 0;
-    for (int iBeam1_ = 0; iBeam1_ < QPROPPAGES_NBEAMS-1; iBeam1_++) {
-        for (int iBeam2_ = iBeam1_+1; iBeam2_ < QPROPPAGES_NBEAMS; iBeam2_++) {
-            if (iBeam1 == iBeam1_ && iBeam2 == iBeam2_) return m_bBeamsUsedForPeleng[iBeamsPair];
-            iBeamsPair++;
-        }
-    }
-    qDebug() << "QTargetsMap::bBeamsUsedForPeleng - unexpected state";
-    return false;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -658,4 +622,15 @@ void QTargetsMap::clearMarkers() {
     qDebug() << "clearMarkers() called";
     while (m_qlTargets.count()) delete m_qlTargets.takeLast();
     emit doUpdate();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool QTargetsMap::getFirstFormular(QPoint &qpPos) {
+    m_pMovingFormular = NULL;
+    for (int i=0; i < m_qlFormulars.size(); i++) {
+        QFormular *pFormular = m_qlFormulars.at(i);
+        if (pFormular->contains(qpPos)) m_pMovingFormular = pFormular;
+    }
+    return (m_pMovingFormular != NULL);
 }
