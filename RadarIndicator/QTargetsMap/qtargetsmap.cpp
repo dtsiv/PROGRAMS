@@ -224,10 +224,10 @@ void QTargetsMap::shiftView(QPoint qpShift) {
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void QTargetsMap::shiftFormular(QPoint qpShift) {
-    qDebug() << "shiftFormular";
+    // qDebug() << "shiftFormular";
     if (m_pMovingFormular) {
         m_pMovingFormular->m_qpOffset+=qpShift;
-        qDebug() << "adding shift";
+        // qDebug() << "adding shift";
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

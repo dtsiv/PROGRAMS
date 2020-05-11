@@ -34,6 +34,7 @@ void QSimuMgr::processStrob() {
     int iStrob;
     qint64 iTimeStamp;
     static bool bStarted=false;
+    static double dStartTime=0;
 
     // map members for convenience
     QByteArray &baStructStobeData  = m_pPoi->m_baStructStobeData;
@@ -227,8 +228,6 @@ void QSimuMgr::processStrob() {
 
         // debug printout
         {
-            static double dStartTime=0;
-
             double dSumRe = dBeamAmplRe[0] + dBeamAmplRe[1] + dBeamAmplRe[2] + dBeamAmplRe[3];
             double dSumIm = dBeamAmplIm[0] + dBeamAmplIm[1] + dBeamAmplIm[2] + dBeamAmplIm[3];
             double dSum2 = dSumRe*dSumRe + dSumIm*dSumIm;
@@ -264,10 +263,11 @@ void QSimuMgr::processStrob() {
         }
 
         // prepare target marker
-        QString qsTempl("S: %1\ndB:%2\nAz:%3\nEl:%4");
+        QString qsTempl("S:%1\ndB:%2\nT:%3\nAz:%4\nEl:%5");
         QPointF qpfTar = pTarData->qpf_wei;
         double dGlobal_dB = m_pPoi->m_pNoiseMap->m_dGlobal_dB;
         double dM2Tar=10.0*log(pTarData->y2mc_rep)/log(10.0e0) - dGlobal_dB;
+        double dTime = ((pStructStrobeHeader->execTime) * (m_pPoi->m_dTs) - dStartTime) * 1.0e-6;
         QString qsLegend;
         if (bAnglesOk) {
             CHR::BEAM_POS *pBeamPos = &pStructStrobeData->beamPos;
@@ -276,12 +276,18 @@ void QSimuMgr::processStrob() {
             double dElevationScan = pBeamPos->beamEpsilon*180.0e0/32768;
             dAzimuth = dAzimuthScan + dAzimuth*180.0e0/dPI;
             dElevation = dElevationScan + dElevation*180.0e0/dPI;
-            qsLegend = qsTempl.arg(iStrob).arg(dM2Tar,0,'f',0)
-                .arg(dAzimuth,0,'f',2)
-                .arg(dElevation,0,'f',2);
+            qsLegend = qsTempl.arg(iStrob)
+                              .arg(dM2Tar,0,'f',0)
+                              .arg(dTime,0,'f',1)
+                              .arg(dAzimuth,0,'f',2)
+                              .arg(dElevation,0,'f',2);
         }
         else {
-            qsLegend = qsTempl.arg(iStrob).arg(dM2Tar,0,'f',0).arg("N/A").arg("N/A");
+            qsLegend = qsTempl.arg(iStrob)
+                              .arg(dM2Tar,0,'f',0)
+                              .arg(dTime,0,'f',1)
+                              .arg("N/A")
+                              .arg("N/A");
         }
         QTargetMarker *pTarMark = new QTargetMarker(qpfTar,qsLegend);
         m_pTargetsMap->addTargetMarker(pTarMark);
