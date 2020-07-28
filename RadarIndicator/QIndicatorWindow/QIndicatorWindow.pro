@@ -16,15 +16,14 @@ TEMPLATE = lib
 QMAKE_CXXFLAGS += /std:c++17
 
 INCLUDEPATH +=  \
-    ../include \
+    $$PWD/../include \
     ../QIniSettings \
     ../QPropPages \
     ../QExceptionDialog \
     ../QTargetsMap \
     ../QSqlModel \
     ../QRegFileParser \
-    ../QPoi \
-    ../include/nr2
+    ../QPoi
 
 FORMS +=
 
@@ -45,5 +44,7 @@ SOURCES += \
     qnoisemapmgr.cpp
 
 INCLUDEPATH +=  \
-    ../include/nr2
+    $$PWD/../../include/nr2
 
+INCLUDEPATH += \
+    "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/include"

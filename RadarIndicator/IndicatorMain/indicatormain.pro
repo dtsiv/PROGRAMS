@@ -32,7 +32,7 @@ INCLUDEPATH += \
     ../QRegFileParser \
     ../QTargetsMap \
     ../QPoi \
-    ../include/nr2 \
+    $$PWD/../../include/nr2 \
     ../QExceptionDialog
 
 SOURCES += main.cpp

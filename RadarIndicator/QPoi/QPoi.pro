@@ -21,7 +21,7 @@ INCLUDEPATH += \
     ../QPropPages \
     ../QIniSettings \
     ../QExceptionDialog \
-    ../include/nr2
+    $$PWD/../../include/nr2
 
 HEADERS += \
     qpoi.h \

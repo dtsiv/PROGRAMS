@@ -71,7 +71,10 @@ QPropPages::QPropPages(QObject *pOwner, QWidget *parent /* =0 */)
          , m_pleNoiseMapFName(NULL)
          , m_pcbUseNoiseMap(NULL)
          , m_ppbarGenerateNoiseMap(NULL)
-         , m_ppbGenerateNoiseMap(NULL) {
+         , m_ppbGenerateNoiseMap(NULL)
+         , m_pcbbRejector(NULL)
+         , m_pleFalseAlarmP(NULL)
+         , m_pleMaxTgSize(NULL) {
 
 	 resize(591,326);
      setWindowTitle("Properties");
