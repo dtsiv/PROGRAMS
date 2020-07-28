@@ -3,6 +3,9 @@
 // Created: 2020.05.03
 // Used for SNC-related constants and data structures
 
+// Changed: 2020.07.22
+// Introduced changed for file version 4
+
 #include "qchrprotocommon.h"
 #include <complex>
 
@@ -24,6 +27,14 @@ namespace SNC_TYPE {
 
     // Включить режим постоянного излучения
     SET_CONT_EMI = 0x9006,
+
+    // Синхронизация времени
+    // Запрос
+    GET_TIME_REQ = 0x9007,
+    // Ответ
+    GET_TIME_RESP = 0x9008,
+    // Результат синхронизации
+    TIME_SYNC_INFO = 0x9009,
 
     // Время прихода вспышки
     FLASH_TIME = 0x9205,
@@ -62,7 +73,17 @@ namespace SNC_TYPE {
     SET_RX_AMP = 0x9297,
 
     // Образ сигнала
-    SIGNAL_IMAGE = 0x9220;
+    SIGNAL_IMAGE = 0x9220,
+
+    // Информация о ячейке: слот, роль и др.
+    DEVICE_INFO = 0xF0000,
+
+    // Управление загрузкой: начальные установки
+    BOOT_START   = 0xF1000,
+    // Управление загрузкой: запуск ядра
+    BOOT_END     = 0xF100F,
+    // Управление загрузкой: сегмент данных
+    BOOT_SEGMENT = 0xF1001;
 
 } // namespace SNC_TYPE
 
@@ -234,6 +255,36 @@ namespace SNC {
         float    p;
         float    i;
         float    d;
+    };
+    struct TIME_SYNC_INFO
+    {
+        uint64_t utcTime;
+        uint64_t sncTime;
+    };
+
+    struct DEVICE_INFO
+    {
+        int8_t  slot;
+        int8_t  role;
+    };
+
+
+    struct BOOT_START
+    {
+        uint32_t coreID;
+        uint32_t sectionsCount;
+    };
+
+    struct BOOT_END
+    {
+        uint32_t bootAddr;
+    };
+
+    struct BOOT_SEGMENT
+    {
+        uint32_t address;
+        uint32_t size;
+        //uint8_t data[size];
     };
 
 }   // namespace SNC

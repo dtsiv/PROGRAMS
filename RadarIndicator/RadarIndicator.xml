@@ -2,24 +2,26 @@
 <PARAMETERS>
     <ActivePropertyPage>3</ActivePropertyPage>
     <CarrierFreqMHz>9400</CarrierFreqMHz>
-    <DistanceOriginM>154.94848410525719</DistanceOriginM>
+    <DistanceOriginM>-29.897965115099904</DistanceOriginM>
     <GridStepAdapt>true</GridStepAdapt>
-    <GridStepDistanceM>40</GridStepDistanceM>
-    <GridStepVelMpS>1.25</GridStepVelMpS>
-    <PixelsPerDistanceM>1.0263162364614327</PixelsPerDistanceM>
-    <PixelsPerVelMpS>19.699465351615597</PixelsPerVelMpS>
-    <SQLiteFile>../DATA/chronicaparser_20200404.sqlite3</SQLiteFile>
+    <GridStepDistanceM>20</GridStepDistanceM>
+    <GridStepVelMpS>20</GridStepVelMpS>
+    <PixelsPerDistanceM>1.2418426461183405</PixelsPerDistanceM>
+    <PixelsPerVelMpS>1.2418426461183385</PixelsPerVelMpS>
+    <SQLiteFile>../DATA/chronicaparser_20200720.sqlite3</SQLiteFile>
     <TSamplingMicroSec>0.12</TSamplingMicroSec>
-    <VelOriginMpS>15.034279801128418</VelOriginMpS>
+    <VelOriginMpS>830.44796446189901</VelOriginMpS>
     <antennaSizeAz>0.6</antennaSizeAz>
     <antennaSizeEl>0.9</antennaSizeEl>
     <antennaWeight>0</antennaWeight>
     <beamOffsetD0>0.487</beamOffsetD0>
-    <dataFile>../DATA/RegFixed/AngleMeas/2019-11-14T16-43-00/00000000</dataFile>
+    <dataFile>../DATA/20200720/00000000</dataFile>
     <falseAlarmProb>1e-06</falseAlarmProb>
-    <geometry>AAAAtgAAAIMAAAUmAAADGQ==</geometry>
+    <geometry>///7Bf///6X////7AAADVg==</geometry>
+    <interferenceRejectorType>0</interferenceRejectorType>
+    <maxTargetSize>20</maxTargetSize>
     <parseWholeDir>true</parseWholeDir>
-    <pathNoiseMap>../DATA/20200507_noisemap.dat</pathNoiseMap>
+    <pathNoiseMap>../DATA/20200720_noisemap.dat</pathNoiseMap>
     <plotNoiseSpec>true</plotNoiseSpec>
     <simulationLog>true</simulationLog>
     <tarSizeThresh>5</tarSizeThresh>

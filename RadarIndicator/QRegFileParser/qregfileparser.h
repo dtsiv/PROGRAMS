@@ -1,6 +1,9 @@
 #ifndef QREGFILEPARSER_H
 #define QREGFILEPARSER_H
 
+// Changed 2020.07.22
+// Introduced changed for format version 4
+
 #include <QtCore>
 #include <QMetaObject>
 
@@ -26,9 +29,12 @@ class QRegFileParser : public QObject {
 
     struct sFileHdr {
         char sMagic[4];
-        quint32 uVer;
-        quint32 nRecMax;
-        quint32 nRec;
+        quint32 uVer;              // format version = 0x00000004
+        quint32 uCodogramsVer;     // version of codograms.h
+        quint32 uPtrTblOffset;     // offset for table of pointers (offset=40=0x28)
+        quint32 nRecMax;           // maximum number of records (=1000)
+        quint32 nRec;              // de facto number of records
+        char pVoid[16];            // empty space before table of ponters (offset 40=0x28)
     };
 
     struct s_dataHeader{

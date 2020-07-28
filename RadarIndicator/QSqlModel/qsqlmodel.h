@@ -38,6 +38,7 @@ public:
     qint64 addFileRec(quint64 uTimeStamp, QString qsFilePath, int nStrobs, QString qsFileVer);
     qint64 addStrobe(int strobeNo, int beamCountsNum, QByteArray baStructStrobeData, qint64 iFileId);
     int addSamples(qint64 iStrobId, int iBeam, char *pSamples, int iSize);
+    bool setNumberOfRecords(int nRec, qint64 iFileId);
 
     int dropTables();
     int createTables();

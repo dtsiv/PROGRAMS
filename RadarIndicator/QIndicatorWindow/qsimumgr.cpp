@@ -2,7 +2,22 @@
 #include "qindicatorwindow.h"
 #include "qexceptiondialog.h"
 
+#include <cmath>
+
+// #define PHASE_COHERENCE
+
 QFile qfStrobeParams;
+
+#ifdef PHASE_COHERENCE
+double getArg(double dRe, double dIm, bool &bOk) {
+    bOk = false;
+    double dEPS=1.0e-40;
+    double dR2=dRe*dRe+dIm*dIm;
+    if (dR2 < dEPS) return 0.0e0;
+    bOk=true;
+    return atan2(dIm,dRe);
+}
+#endif
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -202,6 +217,7 @@ void QSimuMgr::processStrob() {
     // detect targets
     QByteArray baStrTargets;
     int nTargets;
+    // int iStrobNo = pStructStrobeHeader->strobeNo;
     if (!m_pPoi->detectTargets(baBeamsSumDP, baStrTargets, nTargets)) {
         // qDebug() << "detectTargets failed: " << iStrob << " " << iBeam;
         bStarted = true;
@@ -248,6 +264,47 @@ void QSimuMgr::processStrob() {
 
             if (!bStarted) dStartTime = (pStructStrobeHeader->execTime) * (m_pPoi->m_dTs);
 
+#ifdef PHASE_COHERENCE
+            // phase coherence ==================================================================
+            bool bOk0,bOk1,bOk2,bOk3,bOkAvr;
+            double dPhi0=getArg(dBeamAmplRe[0],dBeamAmplIm[0],bOk0);
+            double dPhi1=getArg(dBeamAmplRe[1],dBeamAmplIm[1],bOk1);
+            double dPhi2=getArg(dBeamAmplRe[2],dBeamAmplIm[2],bOk2);
+            double dPhi3=getArg(dBeamAmplRe[3],dBeamAmplIm[3],bOk3);
+            double xC=cos(dPhi0)+cos(dPhi1)+cos(dPhi2)+cos(dPhi3);
+            double yC=sin(dPhi0)+sin(dPhi1)+sin(dPhi2)+sin(dPhi3);
+            double dPhiAvr=getArg(xC,yC,bOk0);
+            if (!bOk0 || !bOk1 || !bOk2 || !bOk3 || !bOkAvr) qDebug() << "getArg() failed for strob: " << pStructStrobeHeader->strobeNo;
+            dPhi0=180.0e0/dPI*(dPhi0-dPhiAvr);
+            dPhi1=180.0e0/dPI*(dPhi1-dPhiAvr);
+            dPhi2=180.0e0/dPI*(dPhi2-dPhiAvr);
+            dPhi3=180.0e0/dPI*(dPhi3-dPhiAvr);
+            dPhi0=dPhi0-360.0e0*qRound(dPhi0/360.0e0);
+            dPhi1=dPhi1-360.0e0*qRound(dPhi1/360.0e0);
+            dPhi2=dPhi2-360.0e0*qRound(dPhi2/360.0e0);
+            dPhi3=dPhi3-360.0e0*qRound(dPhi3/360.0e0);
+            // amplitude method
+            double dAmplRatioAz,dAmplRatioEl;
+            {
+                double dA0,dA1,dA2,dA3;
+                dA0=dBeamAmplRe[0]*dBeamAmplRe[0]+dBeamAmplIm[0]*dBeamAmplIm[0];
+                dA0=sqrt(dA0);
+                dA1=dBeamAmplRe[1]*dBeamAmplRe[1]+dBeamAmplIm[1]*dBeamAmplIm[1];
+                dA1=sqrt(dA1);
+                dA2=dBeamAmplRe[2]*dBeamAmplRe[2]+dBeamAmplIm[2]*dBeamAmplIm[2];
+                dA2=sqrt(dA2);
+                dA3=dBeamAmplRe[3]*dBeamAmplRe[3]+dBeamAmplIm[3]*dBeamAmplIm[3];
+                dA3=sqrt(dA3);
+                double dAsum = dA0 + dA1 + dA2 + dA3;
+                // Azimuth
+                dAmplRatioAz = (dA0 + dA2 - dA1 - dA3)/dAsum;
+                // Elevation
+                dAmplRatioEl = (dA2 + dA3 - dA0 - dA1)/dAsum;
+            }
+            if (qRound(dElevationScan) == 2)
+            // end of phase coherence ==================================================================
+#endif
+
             m_tsPeleng << ((pStructStrobeHeader->execTime) * (m_pPoi->m_dTs) - dStartTime) * 1.0e-6
                 << "\t" << dAzimuthScan
                 << "\t" << dElevationScan
@@ -259,6 +316,17 @@ void QSimuMgr::processStrob() {
                 << "\t" << pTarData->qpf_wei.x()
                 << "\t" << pTarData->qpf_wei.y()
                 << "\t" << (int)bAnglesOk
+#ifdef PHASE_COHERENCE
+                // phase coherence ==================================================================
+                << "\t" << (int)dPhi0
+                << "\t" << (int)dPhi1
+                << "\t" << (int)dPhi2
+                << "\t" << (int)dPhi3
+                // amplitude method
+                // << "\t" <<  dAmplRatioAz
+                // << "\t" <<  dAmplRatioEl
+                // end of phase coherence ==================================================================
+#endif
                 << endl;
         }
 
