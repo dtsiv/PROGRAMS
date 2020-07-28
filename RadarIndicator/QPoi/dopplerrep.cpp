@@ -27,7 +27,7 @@ QByteArray QPoi::dopplerRepresentation(QByteArray &baSamplesDP) {
     for (k=0; k<Np; k++) {
         // loop over one period (recorded fragment) 0...NT_-1
         for (i=0; i<iFilteredN; i++) { // index within one period
-            double dRe=0,dIm=0; // running cumulants
+            qint32 iRe=0,iIm=0; // running cumulants
             int itau_min = qMax(0,Ntau-i-1);
             int itau_max = Ntau-1;
             for (int itau=itau_min; itau<Ntau; itau++) { // summation over pulse duration:
@@ -36,59 +36,17 @@ QByteArray QPoi::dopplerRepresentation(QByteArray &baSamplesDP) {
                 idx_in=2*(k*NT_ + (i-itau_max+itau) ); // k*NT_ - offset of period beginning;
                                                        // i - offset of filter output: i=0,1,...,(iFilteredN-1)
                                                        // (i-itau_max+itau) = max(0,i-Ntau+1), ... , i
-                dRe+=pData[idx_in    ]; // the first array index is 2*(k*NT_)
-                dIm+=pData[idx_in + 1]; // the last array index is 2*(k*NT_+NT_-1)+1 = 2*(k*NT_+NT_)-1
+                iRe+=pData[idx_in    ]; // the first array index is 2*(k*NT_)
+                iIm+=pData[idx_in + 1]; // the last array index is 2*(k*NT_+NT_-1)+1 = 2*(k*NT_+NT_)-1
                 // Thus within one period we span (2*NT_) pData array elements: 2*(k*NT_)+0, ..., 2*(k*NT_+NT_)-1
             }
             int idx; // index of output array pDataFiltered: idx=2*(k*NT_),...,2*(k*NT_+iFilteredN-1)
             idx=2*(k*iFilteredN+ i); // k*iFilteredN - offset of period beginning; i - offset of filter output: i=0,1,...,(iFilteredN-1)
             // Thus within one period we produce 2*(iFilteredN) pDataFiltered array elements of type double
-            pDataFiltered[idx]=dRe; pDataFiltered[idx+1]=dIm;
+            pDataFiltered[idx]=iRe; pDataFiltered[idx+1]=iIm;
         }
     }
 
-    if (m_iRejectorType == QPOI_REJECTOR_NARROW_BAND) {
-        // interference rejector: cancellation of zero-frequency interference
-        for (i=0; i<iFilteredN; i++) { // index within one period
-            double dSumRe=0.0e0, dSumIm=0.0e0;
-            int idx; // index of output array pDataFiltered: idx=2*(k*NT_),...,2*(k*NT_+iFilteredN-1)
-            for (k=0; k<Np; k++) {
-                idx=2*(k*iFilteredN+ i); // k*iFilteredN - offset of period beginning; i - offset of filter output: i=0,1,...,(iFilteredN-1)
-                dSumRe+=pDataFiltered[idx];
-                dSumIm+=pDataFiltered[idx+1];
-            }
-            dSumRe/=Np;
-            dSumIm/=Np;
-            for (k=0; k<Np; k++) {
-                idx=2*(k*iFilteredN+ i); // k*iFilteredN - offset of period beginning; i - offset of filter output: i=0,1,...,(iFilteredN-1)
-                pDataFiltered[idx]  -=dSumRe;
-                pDataFiltered[idx+1]-=dSumIm;
-            }
-        }
-    }
-
-    if (m_iRejectorType == QPOI_REJECTOR_CHE_PE_KA) {
-        // interference rejector: inter-period cancellation (+-)
-        for (i=0; i<iFilteredN; i++) { // index within one period
-            int idx; // index of output array pDataFiltered: idx=2*(k*NT_),...,2*(k*NT_+iFilteredN-1)
-            for (k=0; k<Np-1; k++) {
-                double dSumRe=0.0e0, dSumIm=0.0e0;
-                idx=2*((k+1)*iFilteredN+ i); // k*iFilteredN - offset of period beginning; i - offset of filter output: i=0,1,...,(iFilteredN-1)
-                dSumRe-=pDataFiltered[idx];
-                dSumIm-=pDataFiltered[idx+1];
-                idx=2*(k*iFilteredN+ i); // k*iFilteredN - offset of period beginning; i - offset of filter output: i=0,1,...,(iFilteredN-1)
-                dSumRe+=pDataFiltered[idx];
-                dSumIm+=pDataFiltered[idx+1];
-                pDataFiltered[idx]=dSumRe;
-                pDataFiltered[idx+1]=dSumIm;
-            }
-            idx=2*((Np-1)*iFilteredN+ i); // k*iFilteredN - offset of period beginning; i - offset of filter output: i=0,1,...,(iFilteredN-1)
-            pDataFiltered[idx]=0.0e0;
-            pDataFiltered[idx+1]=0.0e0;
-        }
-    }
-
-    // Fourier transform
     QByteArray retVal(2*NFFT*iFilteredN*sizeof(double),0);
     double *pRetData=(double *)retVal.data();
     Vec_DP inData(NFFT*2),vecZeroes(NFFT*2);

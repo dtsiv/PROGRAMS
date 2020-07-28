@@ -8,12 +8,6 @@ using namespace std;
 
 int QPoi::m_idum = -13;
 
-const char *QPoi::m_pRejectorType[] = {
-    "Нет",
-    "Узкополосный",
-    "ЧПК"
-};
-
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
@@ -30,7 +24,6 @@ QPoi::QPoi(QObject *parent)
           , iBeamCountsNum (0)
           , iSizeOfComplex(2*sizeof(qint16))
           , m_uTargSzThresh(0)
-          , m_uMaxTgSize(0)
           , m_dBeamDelta0(0)
           , m_dAntennaSzAz(0)
           , m_dAntennaSzEl(0)
@@ -60,8 +53,6 @@ QPoi::QPoi(QObject *parent)
     m_bUseLog = iniSettings.value(QPOI_USE_LOG,scRes).toBool();
     iniSettings.setDefault(QPOI_TARGET_SZTHRESH,5);
     m_uTargSzThresh = iniSettings.value(QPOI_TARGET_SZTHRESH,scRes).toInt();
-    iniSettings.setDefault(QPOI_TARGET_MAXTGSIZE,20);
-    m_uMaxTgSize = iniSettings.value(QPOI_TARGET_MAXTGSIZE,scRes).toInt();
     iniSettings.setDefault(QPOI_BEAM_OFFSET_D0,0.487e0);
     m_dBeamDelta0 = iniSettings.value(QPOI_BEAM_OFFSET_D0,scRes).toDouble();
     iniSettings.setDefault(QPOI_ANTENNA_SIZE_AZ,0.6e0);
@@ -70,8 +61,6 @@ QPoi::QPoi(QObject *parent)
     m_dAntennaSzEl = iniSettings.value(QPOI_ANTENNA_SIZE_EL,scRes).toDouble();
     iniSettings.setDefault(QPOI_ANTENNA_WEIGHTING,QPOI_WEIGHTING_RCOSINE_P065);
     m_iWeighting = iniSettings.value(QPOI_ANTENNA_WEIGHTING,scRes).toUInt();
-    iniSettings.setDefault(QPOI_REJECTOR_TYPE,QPOI_REJECTOR_NONE);
-    m_iRejectorType = iniSettings.value(QPOI_REJECTOR_TYPE,scRes).toUInt();
 
     initPeleng();
 
@@ -90,12 +79,10 @@ QPoi::~QPoi() {
     iniSettings.setValue(QPOI_PLOT_NOISESPEC, m_bPlotNoiseSpec);
     iniSettings.setValue(QPOI_USE_LOG, m_bUseLog);
     iniSettings.setNum(QPOI_TARGET_SZTHRESH, m_uTargSzThresh);
-    iniSettings.setNum(QPOI_TARGET_MAXTGSIZE, m_uMaxTgSize);
     iniSettings.setNum(QPOI_BEAM_OFFSET_D0, m_dBeamDelta0);
     iniSettings.setNum(QPOI_ANTENNA_SIZE_AZ, m_dAntennaSzAz);
     iniSettings.setNum(QPOI_ANTENNA_SIZE_EL, m_dAntennaSzEl);
     iniSettings.setNum(QPOI_ANTENNA_WEIGHTING, m_iWeighting);
-    iniSettings.setNum(QPOI_REJECTOR_TYPE, m_iRejectorType);
 
     if (m_pNoiseMap) delete m_pNoiseMap;
     if (m_pPelengInv) delete m_pPelengInv;
@@ -115,18 +102,15 @@ void QPoi::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     pPropPages->m_pleFCarrier = new QLineEdit(QString::number(m_dCarrierF,'f',0));
     pPropPages->m_pleFCarrier->setMaximumWidth(PROP_LINE_WIDTH);
     pGLayout->addWidget(pPropPages->m_pleFCarrier,0,1);
-
     pGLayout->addWidget(new QLabel("Sampling time (microsec)"),0,3);
     pPropPages->m_pleTSampl = new QLineEdit(QString::number(m_dTs,'f',3));
     pPropPages->m_pleTSampl->setMaximumWidth(PROP_LINE_WIDTH);
     pGLayout->addWidget(pPropPages->m_pleTSampl,0,4);
-
     pGLayout->addWidget(new QLabel("Target size threshold"),1,0);
     pPropPages->m_pleTargSzThresh = new QLineEdit(QString::number(m_uTargSzThresh));
     pPropPages->m_pleTargSzThresh->setMaximumWidth(PROP_LINE_WIDTH);
     pPropPages->m_pleTargSzThresh->setValidator(new QIntValidator(0,100));
     pGLayout->addWidget(pPropPages->m_pleTargSzThresh,1,1);
-
     pGLayout->addWidget(new QLabel("Beam relative offset"),1,3);
     pPropPages->m_pleBeamOffsetD0 = new QLineEdit(QString::number(m_dBeamDelta0));
     pPropPages->m_pleBeamOffsetD0->setMaximumWidth(PROP_LINE_WIDTH);
@@ -135,47 +119,23 @@ void QPoi::addTab(QObject *pPropDlg, QObject *pPropTabs, int iIdx) {
     pdv = new QDoubleValidator(0,1,3); pdv->setLocale(locale);
     pPropPages->m_pleBeamOffsetD0->setValidator(pdv);
     pGLayout->addWidget(pPropPages->m_pleBeamOffsetD0,1,4);
-
     pGLayout->addWidget(new QLabel("Antenna size Az (m)"),2,0);
     pPropPages->m_pleAntennaSzAz = new QLineEdit(QString::number(m_dAntennaSzAz));
     pdv = new QDoubleValidator(0,10,2); pdv->setLocale(locale);
     pPropPages->m_pleAntennaSzAz->setValidator(pdv);
     pPropPages->m_pleAntennaSzAz->setMaximumWidth(PROP_LINE_WIDTH);
     pGLayout->addWidget(pPropPages->m_pleAntennaSzAz,2,1);
-
     pGLayout->addWidget(new QLabel("Antenna size El (m)"),2,3);
     pPropPages->m_pleAntennaSzEl = new QLineEdit(QString::number(m_dAntennaSzEl));
     pPropPages->m_pleAntennaSzEl->setMaximumWidth(PROP_LINE_WIDTH);
     pdv = new QDoubleValidator(0,10,2); pdv->setLocale(locale);
     pPropPages->m_pleAntennaSzEl->setValidator(pdv);
     pGLayout->addWidget(pPropPages->m_pleAntennaSzEl,2,4);
-
     pGLayout->addWidget(new QLabel("Antenna weighting"),3,0);
     pPropPages->m_pcbbWeighting=new QComboBox;
     pPropPages->m_pcbbWeighting->addItem(m_pWeightingType[QPOI_WEIGHTING_RCOSINE_P065]);
     pPropPages->m_pcbbWeighting->setCurrentIndex(m_iWeighting);
     pGLayout->addWidget(pPropPages->m_pcbbWeighting,3,1);
-
-    pGLayout->addWidget(new QLabel("Interference rejection"),3,3);
-    pPropPages->m_pcbbRejector=new QComboBox;
-    for (int i=0; i<sizeof(m_pRejectorType)/sizeof(m_pRejectorType[0]); i++) {
-        pPropPages->m_pcbbRejector->addItem(QString::fromUtf8(m_pRejectorType[i]));
-    }
-    pPropPages->m_pcbbRejector->setCurrentIndex(m_iRejectorType);
-    pGLayout->addWidget(pPropPages->m_pcbbRejector,3,4);
-
-    pGLayout->addWidget(new QLabel("False alarm probability"),4,0);
-    pPropPages->m_pleFalseAlarmP = new QLineEdit(QString::number(m_dFalseAlarmProb,'e',1));
-    pdv = new QDoubleValidator(0,1,2); pdv->setLocale(locale);
-    pPropPages->m_pleAntennaSzEl->setValidator(pdv);
-    pPropPages->m_pleFalseAlarmP->setMaximumWidth(PROP_LINE_WIDTH);
-    pGLayout->addWidget(pPropPages->m_pleFalseAlarmP,4,1);
-
-    pGLayout->addWidget(new QLabel("Max target size"),4,3);
-    pPropPages->m_pleMaxTgSize = new QLineEdit(QString::number(m_uMaxTgSize));
-    pPropPages->m_pleMaxTgSize->setMaximumWidth(PROP_LINE_WIDTH);
-    pPropPages->m_pleMaxTgSize->setValidator(new QIntValidator(0,100));
-    pGLayout->addWidget(pPropPages->m_pleMaxTgSize,4,4);
 
     pGLayout->setColumnStretch(2,100);
     pGLayout->setColumnStretch(5,100);
@@ -224,8 +184,8 @@ void QPoi::propChanged(QObject *pPropDlg) {
     if (bOk) m_dTs = qBound(0.01e0,dTs,10.0e0); // microseconds
 
     qs = pPropPages->m_pleTargSzThresh->text();
-    quint32 uTargSzThresh = qs.toUInt(&bOk);
-    if (bOk) m_uTargSzThresh = qMax((quint32)0,uTargSzThresh);
+    quint32 uWidth = qs.toUInt(&bOk);
+    if (bOk) m_uTargSzThresh = qMax((quint32)0,uWidth);
 
     qs = pPropPages->m_pleBeamOffsetD0->text();
     double dBeamDelta0 = qs.toDouble(&bOk);
@@ -240,16 +200,6 @@ void QPoi::propChanged(QObject *pPropDlg) {
     if (bOk) m_dAntennaSzEl = qMax(0.0e0,dAntennaSzEl);
 
     m_iWeighting = pPropPages->m_pcbbWeighting->currentIndex();
-
-    qs = pPropPages->m_pleMaxTgSize->text();
-    quint32 uMaxTgSize = qs.toUInt(&bOk);
-    if (bOk) m_uMaxTgSize = qMax((quint32)0,uMaxTgSize);
-
-    m_iRejectorType = pPropPages->m_pcbbRejector->currentIndex();
-
-    qs = pPropPages->m_pleFalseAlarmP->text();
-    double dFalseAlarmP = qs.toDouble(&bOk);
-    if (bOk) m_dFalseAlarmProb = qMax(0.0e0,dFalseAlarmP);
 
     m_pNoiseMap->m_qsNoisefMapFName = pPropPages->m_pleNoiseMapFName->text();
     m_bUseNoiseMap = pPropPages->m_pcbUseNoiseMap->isChecked();

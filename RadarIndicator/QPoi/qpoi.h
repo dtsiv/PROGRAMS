@@ -32,8 +32,6 @@ using namespace std;
 #define QPOI_USE_LOG                        "simulationLog"
 // detection threshold on target size
 #define QPOI_TARGET_SZTHRESH                "tarSizeThresh"
-// limitation on linear size of target
-#define QPOI_TARGET_MAXTGSIZE               "maxTargetSize"
 // beam relative offset Delta_0 from scan line in each direction (see manuscript for details)
 #define QPOI_BEAM_OFFSET_D0                 "beamOffsetD0"
 // antenna size along Az dir in meters
@@ -42,14 +40,8 @@ using namespace std;
 #define QPOI_ANTENNA_SIZE_EL                "antennaSizeEl"
 // antenna weighting type
 #define QPOI_ANTENNA_WEIGHTING              "antennaWeight"
-// interference rejection algorithm
-#define QPOI_REJECTOR_TYPE                  "interferenceRejectorType"
 
 #define QPOI_WEIGHTING_RCOSINE_P065         0
-
-#define QPOI_REJECTOR_NONE                  0
-#define QPOI_REJECTOR_NARROW_BAND           1
-#define QPOI_REJECTOR_CHE_PE_KA             2
 
 #define QPOI_NUMBER_OF_BEAMS                4
 #define QPOI_MAXIMUM_TG_MISMATCH            10
@@ -144,7 +136,6 @@ public:
     int iSizeOfComplex;
 
     quint32 m_uTargSzThresh;
-    quint32 m_uMaxTgSize;
 
     // Peleng-related
     double m_dBeamDelta0;
@@ -152,14 +143,12 @@ public:
     double m_dAntennaSzEl;
     int m_iWeighting;
     static const char *m_pWeightingType[];
-    static const char *m_pRejectorType[];
     double m_dAzLOverD;
     double m_dElLOverD;
     double *m_pPelengInv;
     double m_dDeltaBound;
     double m_dPelengBound;
     double m_dPelengIncr;
-    int m_iRejectorType;
 
     friend class QNoiseMap;
 };

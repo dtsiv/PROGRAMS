@@ -163,6 +163,7 @@ bool QPoi::detectTargets(QByteArray &baSamplesDP, QByteArray &baStrTargets, int 
     QList<double> y2mtg_sum;
     QList<int> lmtg,kmtg;
     QMultiMap<int,int> qmmTgStruct;
+    int tglmax=8;
 
     for (int ic=0; ic<nc; ic++) {  // loop over all candidates - resolution elements (l,k) with threshold reached
         bool bFlag=false;          // found candidates attributed to running target
@@ -172,7 +173,7 @@ bool QPoi::detectTargets(QByteArray &baSamplesDP, QByteArray &baStrTargets, int 
             int kc_=kc.at(ic);             // resolution element along Doppler dimension for candidate ic
             int lc_=lc.at(ic);             // resolution element along delay for candidate ic
             // test delay difference
-            if (abs(lc_-ltg_)>m_uMaxTgSize) continue;     // if candidate delay is too far from target, then skip
+            if (abs(lc_-ltg_)>tglmax) continue;     // if candidate delay is too far from target, then skip
             // test Doppler channel difference
             double kdiff=kc_-ktg_;
             if (kdiff>NFFT/2) kdiff-=NFFT;
@@ -211,27 +212,25 @@ bool QPoi::detectTargets(QByteArray &baSamplesDP, QByteArray &baStrTargets, int 
     }
 
     bool bTargetsListed=false;
-    baStrTargets.clear();   // return array of struct sTarget
-    nTargets=0;             // return number of valid targets
     for (int itg=0; itg<ntg; itg++) {
+        double kDoppler=ktg.at(itg);
+        double iDelay=ltg.at(itg);
+        double dTgVel;
+        if (kDoppler >= NFFT/2) {
+            dTgVel=dVelCoef*(kDoppler-NFFT);
+        }
+        else {
+            dTgVel=dVelCoef*kDoppler;
+        }
+        double dTgDist = iDelay*dDistCoef;
+        baStrTargets.clear();   // return array of struct sTarget
+        nTargets=0;             // return number of valid targets
         if (tgs.at(itg)>m_uTargSzThresh) {
             bTargetsListed=true;
+            //double dTgPower = dY2M;
             baStrTargets.resize(baStrTargets.size()+sizeof(struct sTarget));
             struct sTarget *pStrTarget = (struct sTarget *)baStrTargets.data()+nTargets;
             nTargets++;
-
-            // assign target structure
-            double kDoppler=ktg.at(itg);
-            double iDelay=ltg.at(itg);
-            double dTgVel;
-            if (kDoppler >= NFFT/2) {
-                dTgVel=dVelCoef*(kDoppler-NFFT);
-            }
-            else {
-                dTgVel=dVelCoef*kDoppler;
-            }
-            double dTgDist = iDelay*dDistCoef;
-            //double dTgPower = dY2M;
             pStrTarget->uCandNum=tgs.at(itg);
             pStrTarget->qpf_wei=QPointF(dTgDist,dTgVel);
             pStrTarget->y2mc_sum=y2mtg_sum[itg];
@@ -241,6 +240,5 @@ bool QPoi::detectTargets(QByteArray &baSamplesDP, QByteArray &baStrTargets, int 
         }
     }
     // qDebug() << "At exit bTargetsListed = " << bTargetsListed;
-    // qDebug() << QString("%1 %2 %3 %4").arg(nStrobNo).arg(nc).arg(ntg).arg(nTargets);
     return bTargetsListed;
 }

@@ -73,9 +73,6 @@ public:
     QLineEdit *m_pleAntennaSzEl;
     QLineEdit *m_pleBeamOffsetD0;
     QComboBox *m_pcbbWeighting;
-    QComboBox *m_pcbbRejector;
-    QLineEdit *m_pleFalseAlarmP;
-    QLineEdit *m_pleMaxTgSize;
 
 private:
     QObject *m_pOwner;

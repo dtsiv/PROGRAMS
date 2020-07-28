@@ -151,24 +151,19 @@ int QRegFileParser::openDataFile(QString qsRegFile) {
         if (m_sFileHdr.nRec > m_sFileHdr.nRecMax
          || sizeof(m_sFileHdr)+m_sFileHdr.nRecMax*sizeof(quint32)+m_sFileHdr.nRec*sizeof(struct ACM_OLD_VER1::ACM_STROBE_DATA) > m_uSize) return 6;
     }
-    // in format version 4: pointers table has (m_sFileHdr.nRec) elements, each element is a 4-Bytes pointer
     if (m_uFileVersion==REG::FORMAT_VERSION) {
         if (m_sFileHdr.nRec > m_sFileHdr.nRecMax
-         || sizeof(struct sFileHdr)                             // file header size
-           +m_sFileHdr.nRec*sizeof(quint32)                     // pointers table size
-           +m_sFileHdr.nRec*sizeof(struct s_dataHeader)         // data headers size
-                > m_uSize) return 7;
+         || sizeof(struct sFileHdr)+sizeof(quint32)+m_sFileHdr.nRecMax*sizeof(quint32)+m_sFileHdr.nRec*sizeof(struct ACM::STROBE_DATA) > m_uSize) return 7;
     }
     // DTSIV: наверное, uProtoVersion не используется и может привести к ошибке потом
-    // 20200722: In format version 4 uProtoVersion was removed, see
-    // if (m_uFileVersion==REG::FORMAT_VERSION) {
-    //    quint32 uProtoVersion=0;
-    //    if (m_qfRegFile.read((char*)&uProtoVersion,sizeof(quint32)) != sizeof(quint32)) return 1;
-    //    // tsStdOut << "uProtoVersion = " << uProtoVersion << endl;
-    //}
-    m_pOffsetsArray=new quint32[m_sFileHdr.nRec];
+    if (m_uFileVersion==REG::FORMAT_VERSION) {
+        quint32 uProtoVersion=0;
+        if (m_qfRegFile.read((char*)&uProtoVersion,sizeof(quint32)) != sizeof(quint32)) return 1;
+        // tsStdOut << "uProtoVersion = " << uProtoVersion << endl;
+    }
+    m_pOffsetsArray=new quint32[m_sFileHdr.nRecMax];
     m_pOffsets=m_pOffsetsArray;
-    if (m_qfRegFile.read((char*)m_pOffsets,m_sFileHdr.nRec*sizeof(quint32)) != m_sFileHdr.nRec*sizeof(quint32)) return 8;
+    if (m_qfRegFile.read((char*)m_pOffsets,m_sFileHdr.nRecMax*sizeof(quint32)) != m_sFileHdr.nRecMax*sizeof(quint32)) return 8;
     m_uOffset=0;
     if (m_uFileVersion==REG_OLD_VER1::FORMAT_VERSION) {
         m_uOffset = *m_pOffsets++;

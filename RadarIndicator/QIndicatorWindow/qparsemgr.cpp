@@ -121,8 +121,7 @@ void QParseMgr::startParsing(QObject *pSender) {
 void QParseMgr::parseDataFile() {
     // qDebug() << "Parsing file " << m_pRegFileParser->m_qfRegFile.fileName();
     QString qsFilePath   = m_pRegFileParser->m_fiRegFile.absoluteFilePath();
-    // quint32 nRec         = m_pRegFileParser->m_sFileHdr.nRec;
-    quint32 nRec         = 0;  // at first, we do not know number of recrds with type ACM_TYPE::STROBE_DATA
+    quint32 nRec         = m_pRegFileParser->m_sFileHdr.nRec;
     qint64 uTimeStamp    = m_pRegFileParser->m_uTimeStamp;
     quint32 uFileVersion = m_pRegFileParser->m_uFileVersion;
     qint64 iFileId=m_pSqlModel->addFileRec(uTimeStamp,qsFilePath,nRec,QString::number(uFileVersion,16));
@@ -162,15 +161,8 @@ void QParseMgr::parseDataFile() {
             }
             m_pSqlModel->commitTransaction();
             delete pbaStrobe;
-            nRec++;
         }
-        // else {
-        //    qDebug() << "Found type: 0x" << QString::number(m_pRegFileParser->m_pDataHeader->dwType,16);
-        // }
         updateParseProgressBar();
-    }
-    if (!m_pSqlModel->setNumberOfRecords(nRec,iFileId)) {
-        qDebug() << "Failed to update number of records for fileId: " << iFileId;
     }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

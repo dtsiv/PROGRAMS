@@ -488,19 +488,6 @@ qint64 QSqlModel::addStrobe(int strobeNo, int beamCountsNum, QByteArray baStruct
 //======================================================================================================
 //
 //======================================================================================================
-bool QSqlModel::setNumberOfRecords(int nRec, qint64 iFileId) {
-    QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection,false);
-
-    QSqlQuery query(db);
-    query.prepare("UPDATE files SET nstrobs=:nstrobs WHERE id=:fileid;");
-    query.bindValue(":nstrobs",nRec);
-    query.bindValue(":fileid",iFileId);
-    if (!query.exec()) return false;
-    return true;
-}
-//======================================================================================================
-//
-//======================================================================================================
 int QSqlModel::addSamples(qint64 iStrobId, int iBeam, char *pSamples, int iSize) {
     QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection,false);
     // QSqlRecord rec;

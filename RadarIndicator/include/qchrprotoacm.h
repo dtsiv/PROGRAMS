@@ -9,9 +9,6 @@
 // Introduced latest changes 2020 from Tristan 
 // (qchroprotoXX...X.h)
 
-// Modified: 2020.07.22
-// File format version 4 introduced
-
 #ifndef QCHRPROTOACM_H
 #define QCHRPROTOACM_H
 
@@ -55,9 +52,9 @@ namespace REG_OLD_VER1 {
 
 namespace REG {
 
-    static const uint32_t HEADER_SIZE           = 10 * sizeof(uint32_t); // currently, header=40 Bytes, QRegFileParser::sFileHdr
+    static const uint32_t HEADER_SIZE           = 5 * sizeof(uint32_t); // DTSIV: правильно 4 * sizeof(uint32_t)?
     static const char*    FILE_MAGIC            = "REGI";
-    static const uint32_t FORMAT_VERSION        = 0x00000004;
+    static const uint32_t FORMAT_VERSION        = 0x00000003;
     static const uint32_t DATA_CHUNKS_MAX_COUNT = 1000;
 
     static const uint32_t DATA_PTRS_MAX_COUNT_OFFSET = 8;
@@ -75,8 +72,6 @@ namespace ACM_TYPE {
                    PROCSETTINGS   = 0x8803,
                    ROUNDCFG       = 0x8804,
                    RESET_CMD_FIFO = 0x8805,
-                   ADD_DIST_REJECTION = 0x8806,
-                   CLEAR_DIST_REJECTION = 0x8807,
                    STATUS         = 0x8850,
                    MCO_STATUS     = 0x8851;
 } // namespace ACM_TYPE
