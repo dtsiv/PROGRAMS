@@ -2,7 +2,7 @@
 <PARAMETERS>
     <ActivePropertyPage>3</ActivePropertyPage>
     <CarrierFreqMHz>9400</CarrierFreqMHz>
-    <DistanceOriginM>-29.897965115099904</DistanceOriginM>
+    <DistanceOriginM>-9.6012051150950732</DistanceOriginM>
     <GridStepAdapt>true</GridStepAdapt>
     <GridStepDistanceM>20</GridStepDistanceM>
     <GridStepVelMpS>20</GridStepVelMpS>
@@ -10,14 +10,14 @@
     <PixelsPerVelMpS>1.2418426461183385</PixelsPerVelMpS>
     <SQLiteFile>../DATA/chronicaparser_20200720.sqlite3</SQLiteFile>
     <TSamplingMicroSec>0.12</TSamplingMicroSec>
-    <VelOriginMpS>830.44796446189901</VelOriginMpS>
+    <VelOriginMpS>808.70607946189932</VelOriginMpS>
     <antennaSizeAz>0.6</antennaSizeAz>
     <antennaSizeEl>0.9</antennaSizeEl>
     <antennaWeight>0</antennaWeight>
     <beamOffsetD0>0.487</beamOffsetD0>
     <dataFile>../DATA/20200720/00000000</dataFile>
     <falseAlarmProb>1e-06</falseAlarmProb>
-    <geometry>///7Bf///6X////7AAADVg==</geometry>
+    <geometry>AAAAMAAAAEgAAATgAAADsg==</geometry>
     <interferenceRejectorType>0</interferenceRejectorType>
     <maxTargetSize>20</maxTargetSize>
     <parseWholeDir>true</parseWholeDir>
